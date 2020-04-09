@@ -1,2 +1,2 @@
 # TestRepo
-To what works, and what not.
+To test what works, and what not.
