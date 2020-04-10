@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleToAttribute("UnitTestProject1")]
 
 namespace ConsoleApp1
 {
-    class Program
+    static class Program
     {
-        static void Main()
+        internal static void Main()
         {
             Console.WriteLine("Hello World!");
         }
