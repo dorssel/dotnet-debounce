@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleToAttribute("UnitTestProject1")]
+[assembly: InternalsVisibleTo("UnitTestProject1")]
 
 namespace ConsoleApp1
 {
