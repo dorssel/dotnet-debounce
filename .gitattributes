@@ -1,0 +1,15 @@
+# default: normalize EOL
+* text=auto
+
+.gitattributes   text
+.gitignore       text
+
+*.md    text
+*.txt   text
+
+*.yml   text
+
+*.sln   text
+
+*.csproj   text
+*.cs       text

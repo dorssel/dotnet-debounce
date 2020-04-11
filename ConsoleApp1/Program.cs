@@ -9,7 +9,7 @@ namespace ConsoleApp1
     {
         internal static void Main()
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hello World! Привет мир! Γειά σου Κόσμε!");
         }
     }
 }
