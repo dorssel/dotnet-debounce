@@ -25,9 +25,9 @@ namespace Dorssel.Utility
 
         void Trigger();
 
-        public TimeSpan MinimumDebounceTime { get; set; }
-        public TimeSpan MaximumDebounceTime { get; set; }
-        public TimeSpan BackoffTime { get; set; }
+        public TimeSpan DebounceInterval { get; set; }
+        public TimeSpan DebounceTimeout { get; set; }
+        public TimeSpan BackoffInterval { get; set; }
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -68,73 +69,117 @@ namespace Dorssel.Utility
                 // nothing to schedule
                 return;
             }
-            Timer.Change(LockedMinimumDebounceTime, Timeout.InfiniteTimeSpan);
+            Timer.Change(_LockedDebounceInterval, Timeout.InfiniteTimeSpan);
         }
 
-        TimeSpan LockedMinimumDebounceTime = TimeSpan.Zero;
-        public TimeSpan MinimumDebounceTime {
-            get
+        T LockedGet<T>(ref T field) where T : struct
+        {
+            lock (LockObject)
             {
-                lock (LockObject)
-                {
-                    return LockedMinimumDebounceTime;
-                }
+                return field;
             }
+        }
+
+        TimeSpan _LockedDebounceInterval = TimeSpan.Zero;
+        public TimeSpan DebounceInterval
+        {
+            get => LockedGet(ref _LockedDebounceInterval);
             set
             {
                 if (value.CompareTo(TimeSpan.Zero) < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(MinimumDebounceTime));
+                    throw new ArgumentOutOfRangeException(nameof(DebounceInterval), $"{nameof(DebounceInterval)} must be non-negative.");
                 }
                 lock (LockObject)
                 {
-                    LockedMinimumDebounceTime = value;
+                    LockedThrowIfDisposed();
+                    if (_LockedDebounceInterval == value)
+                    {
+                        return;
+                    }
+                    if ((_LockedDebounceTimeout != Timeout.InfiniteTimeSpan) && (value.CompareTo(_LockedDebounceTimeout) > 0))
+                    {
+                        throw new ArgumentException($"{nameof(DebounceInterval)} ({value}) must not exceed {nameof(DebounceTimeout)} ({DebounceTimeout}).", nameof(DebounceInterval));
+                    }
+                    _LockedDebounceInterval = value;
                     LockedReschedule();
                 }
             }
         }
 
-        readonly TimeSpan _MaximumDebounceTime = Timeout.InfiniteTimeSpan;
-        public TimeSpan MaximumDebounceTime {
-            get => _MaximumDebounceTime;
-            set => throw new NotImplementedException();
+        TimeSpan _LockedDebounceTimeout = Timeout.InfiniteTimeSpan;
+        public TimeSpan DebounceTimeout
+        {
+            get => LockedGet(ref _LockedDebounceTimeout);
+            set
+            {
+                if ((value != Timeout.InfiniteTimeSpan) && (value.CompareTo(TimeSpan.Zero) < 0))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(DebounceTimeout));
+                }
+                lock (LockObject)
+                {
+                    LockedThrowIfDisposed();
+                    if (_LockedDebounceTimeout == value)
+                    {
+                        return;
+                    }
+                    if ((value != Timeout.InfiniteTimeSpan) && (value.CompareTo(_LockedDebounceInterval) < 0))
+                    {
+                        throw new ArgumentException($"{nameof(DebounceTimeout)} ({value}) must not be less than {nameof(DebounceInterval)} ({DebounceInterval}).", nameof(DebounceTimeout));
+                    }
+                    _LockedDebounceTimeout = value;
+                    LockedReschedule();
+                }
+            }
         }
 
-        readonly TimeSpan _BackoffTime = TimeSpan.Zero;
-        public TimeSpan BackoffTime {
-            get => _BackoffTime;
-            set => throw new NotImplementedException();
+        TimeSpan _LockedBackoffInterval = TimeSpan.Zero;
+        public TimeSpan BackoffInterval
+        {
+            get => LockedGet(ref _LockedBackoffInterval);
+            set
+            {
+                if (value.CompareTo(TimeSpan.Zero) < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(BackoffInterval), $"{nameof(BackoffInterval)} must be non-negative.");
+                }
+                lock (LockObject)
+                {
+                    LockedThrowIfDisposed();
+                    if (_LockedBackoffInterval == value)
+                    {
+                        return;
+                    }
+                    _LockedBackoffInterval = value;
+                    LockedReschedule();
+                }
+            }
         }
         #endregion
 
         #region IDisposable Support
-        bool IsDisposed = false;
+        bool LockedIsDisposed = false;
 
         void LockedThrowIfDisposed()
         {
-            if (IsDisposed)
+            if (LockedIsDisposed)
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
         }
 
-        void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    Timer.Dispose();
-                }
-                IsDisposed = true;
-            }
-        }
-
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
+            lock (LockObject)
+            {
+                if (LockedIsDisposed)
+                {
+                    return;
+                }
+                LockedIsDisposed = true;
+            }
+            Timer.Dispose();
         }
         #endregion
     }
