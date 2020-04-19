@@ -273,7 +273,7 @@ namespace UnitTests
                 using var debouncer = new Debouncer();
                 debouncer.Trigger();
             }
-            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -296,7 +296,7 @@ namespace UnitTests
                 ++callCount;
             };
             debouncer.Trigger();
-            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
             Assert.AreEqual(callCount, 1L);
         }
 
@@ -305,7 +305,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.FromMilliseconds(100)
+                DebounceInterval = TimeSpan.FromMilliseconds(1000)
             };
             long callCount = 0;
             debouncer.Debounced += (s, e) =>
@@ -314,13 +314,13 @@ namespace UnitTests
                 Assert.AreEqual(e.Count, 1L);
                 Assert.AreEqual(e.FirstTrigger, e.LastTrigger);
                 TimeSpan ago = DateTimeOffset.Now.Subtract(e.FirstTrigger);
-                Assert.IsTrue(Math.Abs(ago.Subtract(TimeSpan.FromMilliseconds(100)).TotalMilliseconds) < 25.0);
+                Assert.IsTrue(Math.Abs(ago.Subtract(TimeSpan.FromMilliseconds(1000)).TotalMilliseconds) < 250);
                 ++callCount;
             };
             debouncer.Trigger();
-            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
             Assert.AreEqual(callCount, 0L);
-            await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(1000)).ConfigureAwait(false);
             Assert.AreEqual(callCount, 1L);
         }
         #endregion

@@ -34,7 +34,7 @@ namespace Dorssel.Utility
                 var temp = EventArgs;
                 EventArgs = eventArgs;
                 eventArgs = temp;
-                sendNow = !SendingEvent && (EventArgs.Count > 0);
+                sendNow = !SendingEvent && (eventArgs.Count > 0);
                 SendingEvent = SendingEvent || sendNow;
             }
             if (sendNow)
