@@ -149,7 +149,7 @@ namespace UnitTests
 
         #region DebounceTimeout
         [TestMethod]
-        public void DebounceTimeDefault()
+        public void DebounceTimeoutDefault()
         {
             using var debouncer = new Debouncer();
             Assert.AreEqual(debouncer.DebounceTimeout, Timeout.InfiniteTimeSpan);
