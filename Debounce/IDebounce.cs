@@ -2,26 +2,16 @@
 
 namespace Dorssel.Utility
 {
-    public class DebouncedEventArgs : EventArgs
+    public interface IDebouncedEventArgs
     {
-        internal DebouncedEventArgs()
-        { }
-
-        public DebouncedEventArgs(long count, DateTimeOffset firstTrigger, DateTimeOffset lastTrigger)
-        {
-            Count = count;
-            FirstTrigger = firstTrigger;
-            LastTrigger = lastTrigger;
-        }
-
-        public long Count { get; internal set; }
-        public DateTimeOffset FirstTrigger { get; internal set; }
-        public DateTimeOffset LastTrigger { get; internal set; }
+        public long Count { get; }
+        public DateTimeOffset FirstTrigger { get; }
+        public DateTimeOffset LastTrigger { get; }
     }
 
-    interface IDebounce : IDisposable
+    public interface IDebounce : IDisposable
     {
-        event EventHandler<DebouncedEventArgs>? Debounced;
+        event EventHandler<IDebouncedEventArgs>? Debounced;
 
         void Trigger();
 
@@ -29,5 +19,4 @@ namespace Dorssel.Utility
         public TimeSpan DebounceTimeout { get; set; }
         public TimeSpan BackoffInterval { get; set; }
     }
-
 }

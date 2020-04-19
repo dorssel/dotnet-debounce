@@ -1,10 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
 namespace Dorssel.Utility
 {
+    sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
+    {
+        public long Count { get; set; }
+        public DateTimeOffset FirstTrigger { get; set; }
+        public DateTimeOffset LastTrigger { get; set; }
+    }
+
     public sealed class Debouncer : IDebounce
     {
         public Debouncer()
@@ -43,7 +49,7 @@ namespace Dorssel.Utility
         }
 
         #region IDebounce Support
-        public event EventHandler<DebouncedEventArgs>? Debounced;
+        public event EventHandler<IDebouncedEventArgs>? Debounced;
 
         public void Trigger()
         {
