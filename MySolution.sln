@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Debounce", "Debounce\Deboun
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{14067C09-9CE6-403D-BA36-29E7A57C2C08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "PerformanceTests\PerformanceTests.csproj", "{FD317415-1C84-4196-920D-01E3846A7160}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{14067C09-9CE6-403D-BA36-29E7A57C2C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14067C09-9CE6-403D-BA36-29E7A57C2C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14067C09-9CE6-403D-BA36-29E7A57C2C08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD317415-1C84-4196-920D-01E3846A7160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD317415-1C84-4196-920D-01E3846A7160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD317415-1C84-4196-920D-01E3846A7160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD317415-1C84-4196-920D-01E3846A7160}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

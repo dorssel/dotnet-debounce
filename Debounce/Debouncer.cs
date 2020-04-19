@@ -22,6 +22,7 @@ namespace Dorssel.Utility
         DebouncedEventArgs EventArgs = new DebouncedEventArgs();
         readonly Stopwatch FirstTriggerStopwatch = new Stopwatch();
         readonly Stopwatch LastTriggerStopwatch = new Stopwatch();
+        readonly Stopwatch LastHandlerFinished = new Stopwatch();
         readonly Timer Timer;
         bool SendingEvent = false;
 
@@ -31,17 +32,26 @@ namespace Dorssel.Utility
             bool sendNow = false;
             lock (LockObject)
             {
-                var temp = EventArgs;
-                EventArgs = eventArgs;
-                eventArgs = temp;
-                sendNow = !SendingEvent && (eventArgs.Count > 0);
-                SendingEvent = SendingEvent || sendNow;
+                // We need to invoke any handlers outside the lock. There can be a race between
+                // deciding to send here, and a reconfigure of one of the timings followed by a
+                // trigger. That can lead to setting and tripping the timer again before we finish
+                // sending. Hence, we need to guard against being called concurrently multiple times.
+                sendNow = !SendingEvent && (EventArgs.Count > 0);
+                if (sendNow)
+                {
+                    var temp = EventArgs;
+                    EventArgs = eventArgs;
+                    eventArgs = temp;
+                    SendingEvent = true;
+                }
             }
             if (sendNow)
             {
+                // We won the race.
                 Debounced?.Invoke(this, eventArgs);
                 lock (LockObject)
                 {
+                    LastHandlerFinished.Restart();
                     SendingEvent = false;
                     LockedReschedule();
                 }
@@ -60,7 +70,7 @@ namespace Dorssel.Utility
                 if (EventArgs.Count++ == 0)
                 {
                     EventArgs.FirstTrigger = now;
-                    FirstTriggerStopwatch.Start();
+                    FirstTriggerStopwatch.Restart();
                 }
                 EventArgs.LastTrigger = now;
                 LastTriggerStopwatch.Restart();
@@ -72,10 +82,38 @@ namespace Dorssel.Utility
         {
             if (SendingEvent || (EventArgs.Count == 0))
             {
-                // nothing to schedule
+                // Nothing to schedule at this time.
                 return;
             }
-            Timer.Change(_LockedDebounceInterval, Timeout.InfiniteTimeSpan);
+
+            // Calculate the new timer delay.
+            // 1) Wait for another debounce interval since the last trigger.
+            var timeSpan = DebounceInterval.Subtract(LastTriggerStopwatch.Elapsed);
+            // 2) Maximize it to the debounce timeout since the first trigger.
+            if (DebounceTimeout != Timeout.InfiniteTimeSpan)
+            {
+                var timeout = DebounceTimeout.Subtract(FirstTriggerStopwatch.Elapsed);
+                if (timeSpan.CompareTo(timeout) > 0)
+                {
+                    timeSpan = timeout;
+                }
+            }
+            // 3) Minimize it to the backoff interval since the last handler was called.
+            if (LastHandlerFinished.IsRunning)
+            {
+                var backoff = BackoffInterval.Subtract(LastHandlerFinished.Elapsed);
+                if (timeSpan.CompareTo(backoff) < 0)
+                {
+                    timeSpan = backoff;
+                }
+            }
+            // 4) Sanitize ... we cannot go back in time.
+            if (timeSpan.CompareTo(TimeSpan.Zero) < 0)
+            {
+                timeSpan = TimeSpan.Zero;
+            }
+
+            Timer.Change(timeSpan, Timeout.InfiniteTimeSpan);
         }
 
         T LockedGet<T>(ref T field) where T : struct
