@@ -28,23 +28,23 @@ namespace Dorssel.Utility
         void OnTimer(object state)
         {
             var eventArgs = new DebouncedEventArgs();
+            bool sendNow = false;
             lock (LockObject)
             {
-                Debug.Assert(!SendingEvent);
-                if (SendingEvent || (EventArgs.Count == 0))
-                {
-                    return;
-                }
                 var temp = EventArgs;
                 EventArgs = eventArgs;
                 eventArgs = temp;
-                SendingEvent = true;
+                sendNow = !SendingEvent && (EventArgs.Count > 0);
+                SendingEvent = SendingEvent || sendNow;
             }
-            Debounced?.Invoke(this, eventArgs);
-            lock (LockObject)
+            if (sendNow)
             {
-                SendingEvent = false;
-                LockedReschedule();
+                Debounced?.Invoke(this, eventArgs);
+                lock (LockObject)
+                {
+                    SendingEvent = false;
+                    LockedReschedule();
+                }
             }
         }
 
