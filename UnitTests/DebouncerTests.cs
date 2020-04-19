@@ -10,6 +10,51 @@ namespace UnitTests
     [TestClass]
     public class DebouncerTests
     {
+        public static IEnumerable<object[]> PositiveTimeSpans
+        {
+            get
+            {
+                yield return new object[] { TimeSpan.MaxValue };
+                yield return new object[] { TimeSpan.FromDays(1) };
+                yield return new object[] { TimeSpan.FromHours(1) };
+                yield return new object[] { TimeSpan.FromMinutes(1) };
+                yield return new object[] { TimeSpan.FromSeconds(1) };
+                yield return new object[] { TimeSpan.FromMilliseconds(1) };
+                yield return new object[] { TimeSpan.FromTicks(1) };
+            }
+        }
+
+        public static IEnumerable<object[]> ZeroTimeSpan
+        {
+            get
+            {
+                yield return new object[] { TimeSpan.Zero };
+            }
+        }
+
+        public static IEnumerable<object[]> InfiniteTimeSpan
+        {
+            get
+            {
+                yield return new object[] { Timeout.InfiniteTimeSpan };
+            }
+        }
+
+        public static IEnumerable<object[]> NegativeTimeSpans
+        {
+            get
+            {
+                // NOTE: FromMilliseconds(-1) == InfiniteTimeSpan, a  magic value
+                yield return new object[] { TimeSpan.FromTicks(-1) };
+                yield return new object[] { TimeSpan.FromMilliseconds(-2) };
+                yield return new object[] { TimeSpan.FromSeconds(-1) };
+                yield return new object[] { TimeSpan.FromMinutes(-1) };
+                yield return new object[] { TimeSpan.FromHours(-1) };
+                yield return new object[] { TimeSpan.FromDays(-1) };
+                yield return new object[] { TimeSpan.MinValue };
+            }
+        }
+
         #region Constructor
         [TestMethod]
         public void ConstructorNoThrow()
@@ -37,6 +82,7 @@ namespace UnitTests
         }
         #endregion
 
+
         #region DebounceInterval
         [TestMethod]
         public void DebounceIntervalDefault()
@@ -45,19 +91,9 @@ namespace UnitTests
             Assert.AreEqual(debouncer.DebounceInterval, TimeSpan.Zero);
         }
 
-        public static IEnumerable<object[]> DebounceIntervalValidData
-        {
-            get
-            {
-                yield return new object[] { TimeSpan.MaxValue };
-                yield return new object[] { TimeSpan.FromMilliseconds(1) };
-                yield return new object[] { TimeSpan.FromMilliseconds(0.1) };
-                yield return new object[] { TimeSpan.Zero };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(DebounceIntervalValidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(PositiveTimeSpans))]
+        [DynamicData(nameof(ZeroTimeSpan))]
         public void DebounceIntervalValid(TimeSpan debounceInterval)
         {
             using var debouncer = new Debouncer
@@ -67,18 +103,9 @@ namespace UnitTests
             Assert.AreEqual(debouncer.DebounceInterval, debounceInterval);
         }
 
-        public static IEnumerable<object[]> DebounceIntervalInvalidData
-        {
-            get
-            {
-                yield return new object[] { Timeout.InfiniteTimeSpan };
-                yield return new object[] { TimeSpan.FromMilliseconds(-0.1) };
-                yield return new object[] { TimeSpan.MinValue };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(DebounceIntervalInvalidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
         public void DebounceIntervalInvalid(TimeSpan debounceInterval)
         {
             using var debouncer = new Debouncer()
@@ -102,6 +129,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void DebounceIntervalExceedsDebounceTimeout()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceTimeout = TimeSpan.FromSeconds(1)
+            };
+            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceInterval = TimeSpan.FromSeconds(2));
+        }
+
+        [TestMethod]
         public void DebounceIntervalAfterDispose()
         {
             var debouncer = new Debouncer();
@@ -118,19 +155,10 @@ namespace UnitTests
             Assert.AreEqual(debouncer.DebounceTimeout, Timeout.InfiniteTimeSpan);
         }
 
-        public static IEnumerable<object[]> DebounceTimeoutValidData
-        {
-            get
-            {
-                yield return new object[] { TimeSpan.MaxValue };
-                yield return new object[] { TimeSpan.FromMilliseconds(1) };
-                yield return new object[] { TimeSpan.FromMilliseconds(0.1) };
-                yield return new object[] { Timeout.InfiniteTimeSpan };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(DebounceTimeoutValidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(PositiveTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(ZeroTimeSpan))]
         public void DebounceTimeoutValid(TimeSpan debounceTimeout)
         {
             using var debouncer = new Debouncer
@@ -140,17 +168,8 @@ namespace UnitTests
             Assert.AreEqual(debouncer.DebounceTimeout, debounceTimeout);
         }
 
-        public static IEnumerable<object[]> DebounceTimeoutInvalidData
-        {
-            get
-            {
-                yield return new object[] { TimeSpan.FromMilliseconds(-0.1) };
-                yield return new object[] { TimeSpan.MinValue };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(DebounceTimeoutInvalidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(NegativeTimeSpans))]
         public void DebounceTimeoutInvalid(TimeSpan debounceTimeout)
         {
             using var debouncer = new Debouncer()
@@ -174,6 +193,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void DebounceTimeoutLessThanDebounceInterval()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.FromSeconds(2)
+            };
+            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceTimeout = TimeSpan.FromSeconds(1));
+        }
+
+        [TestMethod]
         public void DebounceTimeoutAfterDispose()
         {
             var debouncer = new Debouncer();
@@ -190,19 +219,9 @@ namespace UnitTests
             Assert.AreEqual(debouncer.BackoffInterval, TimeSpan.Zero);
         }
 
-        public static IEnumerable<object[]> BackoffIntervalValidData
-        {
-            get
-            {
-                yield return new object[] { TimeSpan.MaxValue };
-                yield return new object[] { TimeSpan.FromMilliseconds(1) };
-                yield return new object[] { TimeSpan.FromMilliseconds(0.1) };
-                yield return new object[] { TimeSpan.Zero };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(BackoffIntervalValidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(PositiveTimeSpans))]
+        [DynamicData(nameof(ZeroTimeSpan))]
         public void BackoffIntervalValid(TimeSpan backoffInterval)
         {
             using var debouncer = new Debouncer
@@ -212,18 +231,9 @@ namespace UnitTests
             Assert.AreEqual(debouncer.BackoffInterval, backoffInterval);
         }
 
-        public static IEnumerable<object[]> BackoffIntervalInvalidData
-        {
-            get
-            {
-                yield return new object[] { Timeout.InfiniteTimeSpan };
-                yield return new object[] { TimeSpan.FromMilliseconds(-0.1) };
-                yield return new object[] { TimeSpan.MinValue };
-            }
-        }
-
         [DataTestMethod]
-        [DynamicData(nameof(BackoffIntervalInvalidData), DynamicDataSourceType.Property)]
+        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
         public void BackoffIntervalInvalid(TimeSpan backoffInterval)
         {
             using var debouncer = new Debouncer()
