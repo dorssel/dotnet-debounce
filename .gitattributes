@@ -13,3 +13,4 @@
 
 *.csproj   text
 *.cs       text
+*.props    text
