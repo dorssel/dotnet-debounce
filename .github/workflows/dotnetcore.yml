@@ -28,7 +28,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2-preview
       with:
-        name: NuGet Package
+        name: nuget-package
         path: "**/*-master-*.nupkg"
     - name: Codecov
       uses: codecov/codecov-action@v1.0.6
