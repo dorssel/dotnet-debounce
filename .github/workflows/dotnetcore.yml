@@ -23,6 +23,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+    - name: Package
+      run: dotnet pack --configuration Release --no-build --version-suffix alpha
     - name: Codecov
       uses: codecov/codecov-action@v1.0.6
       with:
