@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Dorssel.Utility
@@ -16,46 +17,88 @@ namespace Dorssel.Utility
         public Debouncer()
         {
             Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+            TimingGranularity = TimeSpan.FromMilliseconds(1);
         }
 
+        // ...ST means Stopwatch.Ticks, as provided by Stopwatch.GetTimestamp()
+
+        const long InfiniteTicks = -1;
+
         readonly object LockObject = new object();
-        DebouncedEventArgs EventArgs = new DebouncedEventArgs();
-        readonly Stopwatch FirstTriggerStopwatch = new Stopwatch();
-        readonly Stopwatch LastTriggerStopwatch = new Stopwatch();
-        readonly Stopwatch LastHandlerFinished = new Stopwatch();
+        long Count = 0;
+        long LastRescheduleST = 0;
+        long FirstTriggerST = 0;
+        long LastTriggerST = 0;
+        long LastHandlerFinishedST = 0;
         readonly Timer Timer;
         bool SendingEvent = false;
 
         void OnTimer(object state)
         {
-            var eventArgs = new DebouncedEventArgs();
-            bool sendNow = false;
+            long count;
             lock (LockObject)
             {
-                // We need to invoke any handlers outside the lock. There can be a race between
-                // deciding to send here, and a reconfigure of one of the timings followed by a
-                // trigger. That can lead to setting and tripping the timer again before we finish
-                // sending. Hence, we need to guard against being called concurrently multiple times.
-                sendNow = !SendingEvent && (EventArgs.Count > 0);
-                if (sendNow)
+                if (SendingEvent)
                 {
-                    var temp = EventArgs;
-                    EventArgs = eventArgs;
-                    eventArgs = temp;
-                    SendingEvent = true;
+                    // We need to invoke any handlers outside the lock. There is a race between
+                    // deciding to send here, and a reconfigure of one of the timings followed by a
+                    // trigger. That can lead to setting and tripping the timer again before we finish
+                    // sending. Hence, we need to guard against being called concurrently multiple times.
+                    return;
                 }
+                count = Interlocked.Exchange(ref Count, 0);
+                if (count == 0)
+                {
+                    return;
+                }
+                SendingEvent = true;
             }
-            if (sendNow)
+            Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
+            lock (LockObject)
             {
-                // We won the race.
-                Debounced?.Invoke(this, eventArgs);
-                lock (LockObject)
+                var now = Stopwatch.GetTimestamp();
+                LastHandlerFinishedST = now;
+                SendingEvent = false;
+                LockedReschedule(now);
+            }
+        }
+
+        void LockedReschedule(long now)
+        {
+            if (SendingEvent || (Count == 0))
+            {
+                // Nothing to schedule at this time.
+                return;
+            }
+
+            // Calculate the new timer delay (in Stopwatch ticks first).
+            // 1) Wait for another debounce interval since the last trigger.
+            var ticks = LastTriggerST - now + DebounceIntervalST;
+            // 2) Maximize it to the debounce timeout since the first trigger.
+            if (DebounceTimeoutST != InfiniteTicks)
+            {
+                var timeout = FirstTriggerST - now + DebounceTimeoutST;
+                if (ticks > timeout)
                 {
-                    LastHandlerFinished.Restart();
-                    SendingEvent = false;
-                    LockedReschedule();
+                    ticks = timeout;
                 }
             }
+            // 3) Minimize it to the backoff interval since the last handler was called.
+            if (LastHandlerFinishedST > 0)
+            {
+                var backoff = LastHandlerFinishedST - now + BackoffIntervalST;
+                if (ticks < backoff)
+                {
+                    ticks = backoff;
+                }
+            }
+            // 4) Sanitize ... we cannot go back in time.
+            if (ticks < 0)
+            {
+                ticks = 0;
+            }
+
+            Timer.Change(TimeSpan.FromSeconds((double)ticks / Stopwatch.Frequency), Timeout.InfiniteTimeSpan);
         }
 
         #region IDebounce Support
@@ -63,60 +106,37 @@ namespace Dorssel.Utility
 
         public void Trigger()
         {
-            lock (LockObject)
+            if (Interlocked.Increment(ref Count) == 1)
             {
-                LockedThrowIfDisposed();
-                var now = DateTimeOffset.Now;
-                if (EventArgs.Count++ == 0)
+                lock (LockObject)
                 {
-                    EventArgs.FirstTrigger = now;
-                    FirstTriggerStopwatch.Restart();
+                    ThrowIfDisposed();
+                    long now = Stopwatch.GetTimestamp();
+                    FirstTriggerST = now;
+                    LastTriggerST = now;
+                    LockedReschedule(now);
                 }
-                EventArgs.LastTrigger = now;
-                LastTriggerStopwatch.Restart();
-                LockedReschedule();
+            }
+            else
+            {
+                long lastReschedule = Interlocked.Read(ref LastRescheduleST);
+                long now = Stopwatch.GetTimestamp();
+                if (now > lastReschedule + TimingGranularityST)
+                {
+                    if (Interlocked.CompareExchange(ref LastRescheduleST, now, lastReschedule) == lastReschedule)
+                    {
+                        lock (LockObject)
+                        {
+                            ThrowIfDisposed();
+                            LastTriggerST = now;
+                            LockedReschedule(now);
+                        }
+                    }
+                }
             }
         }
 
-        void LockedReschedule()
-        {
-            if (SendingEvent || (EventArgs.Count == 0))
-            {
-                // Nothing to schedule at this time.
-                return;
-            }
-
-            // Calculate the new timer delay.
-            // 1) Wait for another debounce interval since the last trigger.
-            var timeSpan = DebounceInterval.Subtract(LastTriggerStopwatch.Elapsed);
-            // 2) Maximize it to the debounce timeout since the first trigger.
-            if (DebounceTimeout != Timeout.InfiniteTimeSpan)
-            {
-                var timeout = DebounceTimeout.Subtract(FirstTriggerStopwatch.Elapsed);
-                if (timeSpan.CompareTo(timeout) > 0)
-                {
-                    timeSpan = timeout;
-                }
-            }
-            // 3) Minimize it to the backoff interval since the last handler was called.
-            if (LastHandlerFinished.IsRunning)
-            {
-                var backoff = BackoffInterval.Subtract(LastHandlerFinished.Elapsed);
-                if (timeSpan.CompareTo(backoff) < 0)
-                {
-                    timeSpan = backoff;
-                }
-            }
-            // 4) Sanitize ... we cannot go back in time.
-            if (timeSpan.CompareTo(TimeSpan.Zero) < 0)
-            {
-                timeSpan = TimeSpan.Zero;
-            }
-
-            Timer.Change(timeSpan, Timeout.InfiniteTimeSpan);
-        }
-
-        T LockedGet<T>(ref T field) where T : struct
+        TimeSpan GetField(ref TimeSpan field)
         {
             lock (LockObject)
             {
@@ -124,90 +144,109 @@ namespace Dorssel.Utility
             }
         }
 
-        TimeSpan _LockedDebounceInterval = TimeSpan.Zero;
+        void SetField(ref TimeSpan field, ref long tickField, TimeSpan value, bool allowZero, bool allowInfinite, Action? validate = null, [CallerMemberName] string fieldName = "")
+        {
+            lock (LockObject)
+            {
+                ThrowIfDisposed();
+                if (field == value)
+                {
+                    return;
+                }
+                long ticks;
+                if (value == Timeout.InfiniteTimeSpan)
+                {
+                    if (!allowInfinite)
+                    {
+                        throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be infinite (-1 ms).");
+                    }
+                    ticks = InfiniteTicks;
+                }
+                else if (value == TimeSpan.Zero)
+                {
+                    if (!allowZero)
+                    {
+                        throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be zero.");
+                    }
+                    ticks = 0;
+                }
+                else if (value < TimeSpan.Zero)
+                {
+                    throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be negative.");
+                }
+                else
+                {
+                    // guard against overflow
+                    decimal x = (decimal)value.TotalSeconds * Stopwatch.Frequency;
+                    ticks = (x > long.MaxValue) ? long.MaxValue : (long)x;
+                    if (ticks <= 0)
+                    {
+                        // map any TimeSpan > Zero to at least one tick
+                        ticks = 1;
+                    }
+                }
+                validate?.Invoke();
+                field = value;
+                if (tickField == ticks)
+                {
+                    return;
+                }
+                tickField = ticks;
+                LockedReschedule(Stopwatch.GetTimestamp());
+            }
+        }
+
+        long DebounceIntervalST = 0;
+        TimeSpan _DebounceInterval = TimeSpan.Zero;
         public TimeSpan DebounceInterval
         {
-            get => LockedGet(ref _LockedDebounceInterval);
-            set
+            get => GetField(ref _DebounceInterval);
+            set => SetField(ref _DebounceInterval, ref DebounceIntervalST, value, true, false, () =>
             {
-                if (value.CompareTo(TimeSpan.Zero) < 0)
+                if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && (value > _DebounceTimeout))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(DebounceInterval), $"{nameof(DebounceInterval)} must be non-negative.");
+                    throw new ArgumentException($"{nameof(DebounceInterval)} ({value}) must not exceed {nameof(DebounceTimeout)} ({DebounceTimeout}).", nameof(DebounceInterval));
                 }
-                lock (LockObject)
-                {
-                    LockedThrowIfDisposed();
-                    if (_LockedDebounceInterval == value)
-                    {
-                        return;
-                    }
-                    if ((_LockedDebounceTimeout != Timeout.InfiniteTimeSpan) && (value.CompareTo(_LockedDebounceTimeout) > 0))
-                    {
-                        throw new ArgumentException($"{nameof(DebounceInterval)} ({value}) must not exceed {nameof(DebounceTimeout)} ({DebounceTimeout}).", nameof(DebounceInterval));
-                    }
-                    _LockedDebounceInterval = value;
-                    LockedReschedule();
-                }
-            }
+            });
         }
 
-        TimeSpan _LockedDebounceTimeout = Timeout.InfiniteTimeSpan;
+        long DebounceTimeoutST = InfiniteTicks;
+        TimeSpan _DebounceTimeout = Timeout.InfiniteTimeSpan;
         public TimeSpan DebounceTimeout
         {
-            get => LockedGet(ref _LockedDebounceTimeout);
-            set
+            get => GetField(ref _DebounceTimeout);
+            set => SetField(ref _DebounceTimeout, ref DebounceTimeoutST, value, true, true, () =>
             {
-                if ((value != Timeout.InfiniteTimeSpan) && (value.CompareTo(TimeSpan.Zero) < 0))
+                if ((value != Timeout.InfiniteTimeSpan) && (value < _DebounceInterval))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(DebounceTimeout));
+                    throw new ArgumentException($"{nameof(DebounceTimeout)} ({value}) must not be less than {nameof(DebounceInterval)} ({DebounceInterval}).", nameof(DebounceTimeout));
                 }
-                lock (LockObject)
-                {
-                    LockedThrowIfDisposed();
-                    if (_LockedDebounceTimeout == value)
-                    {
-                        return;
-                    }
-                    if ((value != Timeout.InfiniteTimeSpan) && (value.CompareTo(_LockedDebounceInterval) < 0))
-                    {
-                        throw new ArgumentException($"{nameof(DebounceTimeout)} ({value}) must not be less than {nameof(DebounceInterval)} ({DebounceInterval}).", nameof(DebounceTimeout));
-                    }
-                    _LockedDebounceTimeout = value;
-                    LockedReschedule();
-                }
-            }
+            });
         }
 
-        TimeSpan _LockedBackoffInterval = TimeSpan.Zero;
+        long BackoffIntervalST = 0;
+        TimeSpan _BackoffInterval = TimeSpan.Zero;
         public TimeSpan BackoffInterval
         {
-            get => LockedGet(ref _LockedBackoffInterval);
-            set
-            {
-                if (value.CompareTo(TimeSpan.Zero) < 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(BackoffInterval), $"{nameof(BackoffInterval)} must be non-negative.");
-                }
-                lock (LockObject)
-                {
-                    LockedThrowIfDisposed();
-                    if (_LockedBackoffInterval == value)
-                    {
-                        return;
-                    }
-                    _LockedBackoffInterval = value;
-                    LockedReschedule();
-                }
-            }
+            get => GetField(ref _BackoffInterval);
+            set => SetField(ref _BackoffInterval, ref BackoffIntervalST, value, true, false);
+        }
+
+        long TimingGranularityST = 0;
+        TimeSpan _TimingGranularity = TimeSpan.Zero;
+        public TimeSpan TimingGranularity
+        {
+            get => GetField(ref _TimingGranularity);
+            set => SetField(ref _TimingGranularity, ref TimingGranularityST, value, true, false);
         }
         #endregion
 
         #region IDisposable Support
-        bool LockedIsDisposed = false;
+        volatile bool _IsDisposed = false;
 
-        void LockedThrowIfDisposed()
+        void ThrowIfDisposed()
         {
-            if (LockedIsDisposed)
+            if (_IsDisposed)
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
@@ -217,14 +256,14 @@ namespace Dorssel.Utility
         {
             lock (LockObject)
             {
-                if (LockedIsDisposed)
+                if (_IsDisposed)
                 {
                     return;
                 }
-                LockedIsDisposed = true;
+                _IsDisposed = true;
             }
             Timer.Dispose();
         }
-        #endregion
+#endregion
     }
 }

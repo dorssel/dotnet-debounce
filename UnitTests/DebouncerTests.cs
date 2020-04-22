@@ -312,9 +312,6 @@ namespace UnitTests
             {
                 Assert.AreSame(s, debouncer);
                 Assert.AreEqual(e.Count, 1L);
-                Assert.AreEqual(e.FirstTrigger, e.LastTrigger);
-                TimeSpan ago = DateTimeOffset.Now.Subtract(e.FirstTrigger);
-                Assert.IsTrue(Math.Abs(ago.Subtract(TimeSpan.FromMilliseconds(1000)).TotalMilliseconds) < 250);
                 ++callCount;
             };
             debouncer.Trigger();
