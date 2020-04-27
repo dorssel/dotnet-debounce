@@ -10,9 +10,9 @@ namespace UnitTests
     [TestClass]
     public class DebouncerTests
     {
-        static TimeSpan TimingUnit = TimeSpan.FromMilliseconds(50);
+        static readonly TimeSpan TimingUnit = TimeSpan.FromMilliseconds(50);
 
-        public static IEnumerable<object[]> PositiveTimeSpans
+        public static IEnumerable<object[]> NonNegativeTimeSpans
         {
             get
             {
@@ -23,13 +23,6 @@ namespace UnitTests
                 yield return new object[] { TimeSpan.FromSeconds(1) };
                 yield return new object[] { TimeSpan.FromMilliseconds(1) };
                 yield return new object[] { TimeSpan.FromTicks(1) };
-            }
-        }
-
-        public static IEnumerable<object[]> ZeroTimeSpan
-        {
-            get
-            {
                 yield return new object[] { TimeSpan.Zero };
             }
         }
@@ -59,11 +52,28 @@ namespace UnitTests
 
         #region Constructor
         [TestMethod]
-        public void ConstructorNoThrow()
+        public void ConstructorDefault()
         {
 #pragma warning disable CA2000 // Dispose objects before losing scope
             _ = new Debouncer();
 #pragma warning restore CA2000 // Dispose objects before losing scope
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
+        public void ConstructorTimingGranularityValid(TimeSpan timingGranularity)
+        {
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            _ = new Debouncer(timingGranularity);
+#pragma warning restore CA2000 // Dispose objects before losing scope
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
+        public void ConstructorTimingGranularityInvalid(TimeSpan timingGranularity)
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new Debouncer(timingGranularity));
         }
         #endregion
 
@@ -145,8 +155,7 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(PositiveTimeSpans))]
-        [DynamicData(nameof(ZeroTimeSpan))]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
         public void DebounceIntervalValid(TimeSpan debounceInterval)
         {
             using var debouncer = new Debouncer
@@ -209,9 +218,8 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(PositiveTimeSpans))]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
         [DynamicData(nameof(InfiniteTimeSpan))]
-        [DynamicData(nameof(ZeroTimeSpan))]
         public void DebounceTimeoutValid(TimeSpan debounceTimeout)
         {
             using var debouncer = new Debouncer
@@ -273,8 +281,7 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(PositiveTimeSpans))]
-        [DynamicData(nameof(ZeroTimeSpan))]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
         public void BackoffIntervalValid(TimeSpan backoffInterval)
         {
             using var debouncer = new Debouncer

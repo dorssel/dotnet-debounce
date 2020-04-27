@@ -103,10 +103,15 @@ namespace PerformanceTests
                     $"({handlers} handlers and {triggers - processed} missed)");
             }
 #endif
+            if (Environment.ProcessorCount < 3)
+            {
+                Console.WriteLine("Multi-threaded test require at least 3 CPU cores.");
+            }
             {
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMilliseconds(10)
+                    DebounceInterval = TimeSpan.FromMilliseconds(10),
+                    DebounceTimeout = TimeSpan.FromMilliseconds(100)
                 };
                 long handlers = 0;
                 long processed = 0;
@@ -115,7 +120,8 @@ namespace PerformanceTests
                     processed += e.Count;
                     ++handlers;
                 };
-                var tasks = new Task[Environment.ProcessorCount];
+                // Leave one CPU core for other stuff (including the timer callback thread).
+                var tasks = new Task[Environment.ProcessorCount - 1];
                 using var startEvent = new ManualResetEventSlim();
                 using var stopEvent = new ManualResetEventSlim();
                 long triggers = 0;
@@ -148,8 +154,8 @@ namespace PerformanceTests
                     stopwatch.Stop();
                     Task.WaitAll(tasks);
                 }
-                // allow the handler to be called, so we can check that everything is accounted for
-                Thread.Sleep(100);
+                // allow any remaining handlers to be called, so we can check that everything is accounted for
+                Thread.Sleep(200);
                 Console.WriteLine($"Concurrent trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
                     $"({handlers} handlers and {triggers - processed} missed, {debouncer.RescheduleCount} reschedules)");
             }
