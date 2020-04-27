@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+[assembly: InternalsVisibleTo("PerformanceTests")]
+
 namespace Dorssel.Utility
 {
     sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
@@ -24,9 +26,15 @@ namespace Dorssel.Utility
 
         const long InfiniteTicks = -1;
 
-        readonly object LockObject = new object();
-        long Count = 0;
+        /// <summary>Interlocked</summary>
+        long CountMinusOne = -1;
+        /// <summary>Interlocked</summary>
         long LastRescheduleST = 0;
+
+        /// <summary>PerformanceTests support</summary>
+        internal long RescheduleCount = 0;
+
+        readonly object LockObject = new object();
         long FirstTriggerST = 0;
         long LastTriggerST = 0;
         long LastHandlerFinishedST = 0;
@@ -35,7 +43,7 @@ namespace Dorssel.Utility
 
         void OnTimer(object state)
         {
-            long count;
+            long countMinusOne;
             lock (LockObject)
             {
                 if (SendingEvent)
@@ -46,16 +54,21 @@ namespace Dorssel.Utility
                     // sending. Hence, we need to guard against being called concurrently multiple times.
                     return;
                 }
-                count = Interlocked.Exchange(ref Count, 0);
-                if (count == 0)
+                countMinusOne = Interlocked.Exchange(ref CountMinusOne, -1);
+                if (countMinusOne < 0)
                 {
+                    // Either -1 (no event pending) or long.MinValue (already disposed).
                     return;
                 }
                 SendingEvent = true;
             }
-            Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
+            Debounced?.Invoke(this, new DebouncedEventArgs() { Count = countMinusOne + 1 });
             lock (LockObject)
             {
+                if (_IsDisposed)
+                {
+                    return;
+                }
                 var now = Stopwatch.GetTimestamp();
                 LastHandlerFinishedST = now;
                 SendingEvent = false;
@@ -65,7 +78,9 @@ namespace Dorssel.Utility
 
         void LockedReschedule(long now)
         {
-            if (SendingEvent || (Count == 0))
+            RescheduleCount++;
+
+            if (SendingEvent || (Interlocked.Read(ref CountMinusOne) < 0))
             {
                 // Nothing to schedule at this time.
                 return;
@@ -106,33 +121,64 @@ namespace Dorssel.Utility
 
         public void Trigger()
         {
-            if (Interlocked.Increment(ref Count) == 1)
+            // This function is thread-safe and optimized for concurrent calls.
+            // Optimization: prefer Interlocked over lock.
+
+            // We *must* increment the count, so do it immediately.
+            // A compare with 0 is fastest, hence CountMinusOne (instead of Count).
+            long newCountMinusOne = Interlocked.Increment(ref CountMinusOne);
+            if (newCountMinusOne > 0)
             {
+                // fast-path: This is the most likely path under stress.
+                // We are *not* the first to call Trigger() after an event. This means the timer is already running.
+                // Let's find out if we can skip calling Reschedule().
+                // NOTE: This is the reason why TimingGranularityST is a constant for this instance and cannot be
+                // dynamically updated like the other timings; we would need another Interlocked.Read here.
+                long lastReschedule = Interlocked.Read(ref LastRescheduleST);
+                long now = Stopwatch.GetTimestamp();
+                if (now - TimingGranularityST < lastReschedule)
+                {
+                    // fast-path: This is the most likely path under stress.
+                    // No need to Reschedule() as it was already called recently (within the timing granularity window).
+                    return;
+                }
+                // It appears we need to call Reschedule(), but other threads may think so too (race).
+                if (Interlocked.CompareExchange(ref LastRescheduleST, now, lastReschedule) != lastReschedule)
+                {
+                    // fast-path: This is the most likely path under stress.
+                    // We lost the race: another thread will call Reschedule(), so we won't.
+                    return;
+                }
                 lock (LockObject)
                 {
+                    // not-so-fast-path: This is not likely under stress.
+                    // Reschedule() must be called every now and then, and we get to do it.
                     ThrowIfDisposed();
-                    long now = Stopwatch.GetTimestamp();
-                    FirstTriggerST = now;
+                    LastTriggerST = now;
+                    LockedReschedule(now);
+                }
+            }
+            else if (newCountMinusOne == 0)
+            {
+                // not-so-fast-path: This is not likely under stress.
+                // The first trigger after an event *must* Reschedule().
+                // Update LastRescheduleST as soon as possible to prevent other threads to also call Reschedule().
+                long now = Stopwatch.GetTimestamp();
+                Interlocked.Exchange(ref LastRescheduleST, now);
+                lock (LockObject)
+                {
+                    // Reschedule() must be called every now and then, and we get to do it.
+                    ThrowIfDisposed();
+                    LastTriggerST = now;
                     LastTriggerST = now;
                     LockedReschedule(now);
                 }
             }
             else
             {
-                long lastReschedule = Interlocked.Read(ref LastRescheduleST);
-                long now = Stopwatch.GetTimestamp();
-                if (now > lastReschedule + TimingGranularityST)
-                {
-                    if (Interlocked.CompareExchange(ref LastRescheduleST, now, lastReschedule) == lastReschedule)
-                    {
-                        lock (LockObject)
-                        {
-                            ThrowIfDisposed();
-                            LastTriggerST = now;
-                            LockedReschedule(now);
-                        }
-                    }
-                }
+                // We were already disposed.
+                Interlocked.CompareExchange(ref CountMinusOne, long.MinValue, newCountMinusOne);
+                throw new ObjectDisposedException(GetType().FullName);
             }
         }
 
@@ -239,15 +285,16 @@ namespace Dorssel.Utility
             get => GetField(ref _TimingGranularity);
             set => SetField(ref _TimingGranularity, ref TimingGranularityST, value, true, false);
         }
-        #endregion
+#endregion
 
-        #region IDisposable Support
-        volatile bool _IsDisposed = false;
+#region IDisposable Support
+        bool _IsDisposed = false;
 
         void ThrowIfDisposed()
         {
             if (_IsDisposed)
             {
+                Interlocked.Exchange(ref CountMinusOne, long.MinValue);
                 throw new ObjectDisposedException(GetType().FullName);
             }
         }
@@ -260,6 +307,7 @@ namespace Dorssel.Utility
                 {
                     return;
                 }
+                Interlocked.Exchange(ref CountMinusOne, long.MinValue);
                 _IsDisposed = true;
             }
             Timer.Dispose();

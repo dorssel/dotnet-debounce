@@ -13,6 +13,7 @@ namespace PerformanceTests
 
         static void Main()
         {
+#if false
             {
                 using var debouncer = new Debouncer()
                 {
@@ -101,51 +102,7 @@ namespace PerformanceTests
                 Console.WriteLine($"Trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
                     $"({handlers} handlers and {triggers - processed} missed)");
             }
-            {
-                using var debouncer = new Debouncer()
-                {
-                    DebounceInterval = TimeSpan.FromMilliseconds(10)
-                };
-                long handlers = 0;
-                long processed = 0;
-                debouncer.Debounced += (s, e) =>
-                {
-                    processed += e.Count;
-                    ++handlers;
-                };
-                var threads = new Thread[Environment.ProcessorCount];
-                var triggers = new long[threads.Length];
-                var triggersPerSecond = new long[threads.Length];
-                for (int i = 0; i < threads.Length; ++i) {
-                    threads[i] = new Thread((data) =>
-                    {
-                        int index = (int)data!;
-                        var stopwatch = new Stopwatch();
-                        stopwatch.Start();
-                        do
-                        {
-                            for (int j = 0; j < TriggersPerRound; ++j)
-                            {
-                                debouncer.Trigger();
-                            }
-                            triggers[index] += TriggersPerRound;
-                        } while (stopwatch.ElapsedMilliseconds < 1000);
-                        stopwatch.Stop();
-                        triggersPerSecond[index] = (long)(triggers[index] / stopwatch.Elapsed.TotalSeconds);
-                        Thread.Sleep(100);
-                        Console.WriteLine($"Thread trigger speed: {triggersPerSecond[index]} triggers/s");
-                    });
-                }
-                for (int i = 0; i < threads.Length; ++i)
-                {
-                    threads[i].Start(i);
-                }
-                foreach (var thread in threads) {
-                    thread.Join();
-                }
-                Console.WriteLine($"Multithreaded trigger speed: {triggersPerSecond.Sum()} triggers/s " +
-                    $"({handlers} handlers and {triggers.Sum() - processed} missed)");
-            }
+#endif
             {
                 using var debouncer = new Debouncer()
                 {
@@ -159,34 +116,42 @@ namespace PerformanceTests
                     ++handlers;
                 };
                 var tasks = new Task[Environment.ProcessorCount];
-                var triggers = new long[tasks.Length];
-                var triggersPerSecond = new long[tasks.Length];
+                using var startEvent = new ManualResetEventSlim();
+                using var stopEvent = new ManualResetEventSlim();
+                long triggers = 0;
+                var stopwatch = new Stopwatch();
                 for (int i = 0; i < tasks.Length; ++i)
                 {
-                    int index = i;
                     tasks[i] = Task.Run(() =>
                     {
                         long threadTriggers = 0;
-                        var stopwatch = new Stopwatch();
-                        stopwatch.Start();
+                        startEvent.Wait();
                         do
                         {
-                            for (int j = 0; j < TriggersPerRound; ++j)
+                            for (int i = 0; i < TriggersPerRound; ++i)
                             {
                                 debouncer.Trigger();
                             }
                             threadTriggers += TriggersPerRound;
-                        } while (stopwatch.ElapsedMilliseconds < 1000);
-                        stopwatch.Stop();
-                        triggers[index] = threadTriggers;
-                        triggersPerSecond[index] = (long)(threadTriggers / stopwatch.Elapsed.TotalSeconds);
-                        Thread.Sleep(100);
-                        Console.WriteLine($"Task trigger speed: {triggersPerSecond[index]} triggers/s");
+                        } while (!stopEvent.IsSet);
+                        Interlocked.Add(ref triggers, threadTriggers);
                     });
                 }
-                Task.WaitAll(tasks);
-                Console.WriteLine($"Concurrent trigger speed: {triggersPerSecond.Sum()} triggers/s " +
-                    $"({handlers} handlers and {triggers.Sum() - processed} missed)");
+                // allow CLR to settle before starting the test
+                Thread.Sleep(100);
+                {
+                    // actual test
+                    stopwatch.Start();
+                    startEvent.Set();
+                    Thread.Sleep(1000);
+                    stopEvent.Set();
+                    stopwatch.Stop();
+                    Task.WaitAll(tasks);
+                }
+                // allow the handler to be called, so we can check that everything is accounted for
+                Thread.Sleep(100);
+                Console.WriteLine($"Concurrent trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
+                    $"({handlers} handlers and {triggers - processed} missed, {debouncer.RescheduleCount} reschedules)");
             }
         }
     }
