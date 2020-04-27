@@ -16,6 +16,5 @@ namespace Dorssel.Utility
         public TimeSpan DebounceInterval { get; set; }
         public TimeSpan DebounceTimeout { get; set; }
         public TimeSpan BackoffInterval { get; set; }
-        public TimeSpan TimingGranularity { get; set; }
     }
 }

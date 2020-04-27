@@ -19,11 +19,56 @@ namespace Dorssel.Utility
         public Debouncer()
         {
             Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
-            TimingGranularity = TimeSpan.FromMilliseconds(1);
+            TimingGranularityST = TimeSpanToStopwatchTicks(TimeSpan.FromMilliseconds(1));
+        }
+
+        public Debouncer(TimeSpan timingGranularity)
+        {
+            Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+            TimingGranularityST = TimeSpanToStopwatchTicks(timingGranularity, fieldName: nameof(timingGranularity));
+        }
+
+        static long TimeSpanToStopwatchTicks(TimeSpan value, bool allowZero = true, bool allowInfinite = false, Action? validate = null, string fieldName = "Internal.Error")
+        {
+            long ticks;
+            if (value == Timeout.InfiniteTimeSpan)
+            {
+                if (!allowInfinite)
+                {
+                    throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be infinite (-1 ms).");
+                }
+                ticks = InfiniteTicks;
+            }
+            else if (value == TimeSpan.Zero)
+            {
+                if (!allowZero)
+                {
+                    throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be zero.");
+                }
+                ticks = 0;
+            }
+            else if (value < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be negative.");
+            }
+            else
+            {
+                // guard against overflow
+                decimal x = (decimal)value.TotalSeconds * Stopwatch.Frequency;
+                ticks = (x > long.MaxValue) ? long.MaxValue : (long)x;
+                if (ticks <= 0)
+                {
+                    // map any TimeSpan > Zero to at least one tick
+                    ticks = 1;
+                }
+            }
+            validate?.Invoke();
+            return ticks;
         }
 
         // ...ST means Stopwatch.Ticks, as provided by Stopwatch.GetTimestamp()
 
+        readonly long TimingGranularityST;
         const long InfiniteTicks = -1;
 
         /// <summary>Interlocked</summary>
@@ -169,7 +214,7 @@ namespace Dorssel.Utility
                 {
                     // Reschedule() must be called every now and then, and we get to do it.
                     ThrowIfDisposed();
-                    LastTriggerST = now;
+                    FirstTriggerST = now;
                     LastTriggerST = now;
                     LockedReschedule(now);
                 }
@@ -199,39 +244,7 @@ namespace Dorssel.Utility
                 {
                     return;
                 }
-                long ticks;
-                if (value == Timeout.InfiniteTimeSpan)
-                {
-                    if (!allowInfinite)
-                    {
-                        throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be infinite (-1 ms).");
-                    }
-                    ticks = InfiniteTicks;
-                }
-                else if (value == TimeSpan.Zero)
-                {
-                    if (!allowZero)
-                    {
-                        throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be zero.");
-                    }
-                    ticks = 0;
-                }
-                else if (value < TimeSpan.Zero)
-                {
-                    throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be negative.");
-                }
-                else
-                {
-                    // guard against overflow
-                    decimal x = (decimal)value.TotalSeconds * Stopwatch.Frequency;
-                    ticks = (x > long.MaxValue) ? long.MaxValue : (long)x;
-                    if (ticks <= 0)
-                    {
-                        // map any TimeSpan > Zero to at least one tick
-                        ticks = 1;
-                    }
-                }
-                validate?.Invoke();
+                long ticks = TimeSpanToStopwatchTicks(value, allowZero, allowInfinite, validate, fieldName);
                 field = value;
                 if (tickField == ticks)
                 {
@@ -276,14 +289,6 @@ namespace Dorssel.Utility
         {
             get => GetField(ref _BackoffInterval);
             set => SetField(ref _BackoffInterval, ref BackoffIntervalST, value, true, false);
-        }
-
-        long TimingGranularityST = 0;
-        TimeSpan _TimingGranularity = TimeSpan.Zero;
-        public TimeSpan TimingGranularity
-        {
-            get => GetField(ref _TimingGranularity);
-            set => SetField(ref _TimingGranularity, ref TimingGranularityST, value, true, false);
         }
 #endregion
 
