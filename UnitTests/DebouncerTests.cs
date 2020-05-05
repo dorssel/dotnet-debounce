@@ -11,6 +11,11 @@ namespace UnitTests
     {
         static readonly TimeSpan TimingUnit = TimeSpan.FromMilliseconds(50);
 
+        /// <summary>
+        /// Some non-default TimeSpan that is also not equal to any of the valid/invalid TimeSpan test values.
+        /// </summary>
+        static readonly TimeSpan ArbitraryNonDefaultTimeSpan = TimeSpan.FromSeconds(Math.PI);
+
         public static IEnumerable<object[]> NonNegativeTimeSpans
         {
             get
@@ -140,8 +145,9 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer
             {
-                DebounceInterval = debounceInterval
+                DebounceInterval = ArbitraryNonDefaultTimeSpan
             };
+            debouncer.DebounceInterval = debounceInterval;
             Assert.AreEqual(debounceInterval, debouncer.DebounceInterval);
         }
 
@@ -236,8 +242,9 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer
             {
-                DebounceTimeout = debounceTimeout
+                DebounceTimeout = ArbitraryNonDefaultTimeSpan
             };
+            debouncer.DebounceTimeout = debounceTimeout;
             Assert.AreEqual(debounceTimeout, debouncer.DebounceTimeout);
         }
 
@@ -298,8 +305,9 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer
             {
-                BackoffInterval = backoffInterval
+                BackoffInterval = ArbitraryNonDefaultTimeSpan
             };
+            debouncer.BackoffInterval = backoffInterval;
             Assert.AreEqual(backoffInterval, debouncer.BackoffInterval);
         }
 
@@ -352,8 +360,9 @@ namespace UnitTests
             using var debouncer = new Debouncer
             {
                 DebounceInterval = TimeSpan.MaxValue,
-                TimingGranularity = timingGranularity
+                TimingGranularity = ArbitraryNonDefaultTimeSpan
             };
+            debouncer.TimingGranularity = timingGranularity;
             Assert.AreEqual(timingGranularity, debouncer.TimingGranularity);
         }
 
