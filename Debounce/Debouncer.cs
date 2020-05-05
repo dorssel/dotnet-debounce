@@ -43,14 +43,10 @@ namespace Dorssel.Utility
             lock (LockObject)
             {
                 ++TimerEvents;
-                if (IsDisposed)
+                if (!IsDisposed)
                 {
-                    // Not reliably testable.
-                    // This solves the race condition where the timer tripped and the thread that handles the
-                    // timer was scheduled but got pre-empted before this call. Then some other thread called Dispose().
-                    return;
+                    LockedReschedule();
                 }
-                LockedReschedule();
             }
         }
 
