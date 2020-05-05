@@ -74,12 +74,13 @@ namespace PerformanceTests
                 Console.WriteLine($"Handler speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
                     $"@ {(long)(handlers / stopwatch.Elapsed.TotalSeconds)} handlers/s and {triggers - processed} missed");
             }
+#endif
             {
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMilliseconds(10)
+                    DebounceInterval = TimeSpan.FromMilliseconds(10),
+                    TimingGranularity = TimeSpan.FromMilliseconds(1)
                 };
-                long triggers = 0;
                 long handlers = 0;
                 long processed = 0;
                 debouncer.Debounced += (s, e) =>
@@ -87,22 +88,41 @@ namespace PerformanceTests
                     processed += e.Count;
                     ++handlers;
                 };
+                using var startEvent = new ManualResetEventSlim();
+                using var stopEvent = new ManualResetEventSlim();
+                long triggers = 0;
                 var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                do
+                var task = Task.Run(() =>
                 {
-                    for (int i = 0; i < TriggersPerRound; ++i)
+                    long threadTriggers = 0;
+                    startEvent.Wait();
+                    do
                     {
-                        debouncer.Trigger();
-                    }
-                    triggers += TriggersPerRound;
-                } while (stopwatch.ElapsedMilliseconds < 1000);
-                stopwatch.Stop();
+                        for (int i = 0; i < TriggersPerRound; ++i)
+                        {
+                            debouncer.Trigger();
+                        }
+                        threadTriggers += TriggersPerRound;
+                    } while (!stopEvent.IsSet);
+                    Interlocked.Add(ref triggers, threadTriggers);
+                });
+                // allow CLR to settle before starting the test
                 Thread.Sleep(100);
-                Console.WriteLine($"Trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
-                    $"({handlers} handlers and {triggers - processed} missed)");
+                {
+                    // actual test
+                    stopwatch.Start();
+                    startEvent.Set();
+                    Thread.Sleep(1000);
+                    stopEvent.Set();
+                    stopwatch.Stop();
+                    task.Wait();
+                }
+                // allow any remaining handlers to be called, so we can check that everything is accounted for
+                Thread.Sleep(200);
+                Console.WriteLine($"Trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s\n\t" +
+                    $"({handlers} handlers, {triggers - processed} missed, {debouncer.RescheduleCount} reschedules, " +
+                    $"{debouncer.TimerChanges} timer changes, {debouncer.TimerEvents} timer events)");
             }
-#endif
             if (Environment.ProcessorCount < 3)
             {
                 Console.WriteLine("Multi-threaded test require at least 3 CPU cores.");
@@ -111,7 +131,7 @@ namespace PerformanceTests
                 using var debouncer = new Debouncer()
                 {
                     DebounceInterval = TimeSpan.FromMilliseconds(10),
-                    DebounceTimeout = TimeSpan.FromMilliseconds(100)
+                    TimingGranularity = TimeSpan.FromMilliseconds(1)
                 };
                 long handlers = 0;
                 long processed = 0;
@@ -156,8 +176,9 @@ namespace PerformanceTests
                 }
                 // allow any remaining handlers to be called, so we can check that everything is accounted for
                 Thread.Sleep(200);
-                Console.WriteLine($"Concurrent trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
-                    $"({handlers} handlers and {triggers - processed} missed, {debouncer.RescheduleCount} reschedules)");
+                Console.WriteLine($"Concurrent trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s\n\t" +
+                    $"({handlers} handlers, {triggers - processed} missed, {debouncer.RescheduleCount} reschedules, " +
+                    $"{debouncer.TimerChanges} timer changes, {debouncer.TimerEvents} timer events)");
             }
         }
     }

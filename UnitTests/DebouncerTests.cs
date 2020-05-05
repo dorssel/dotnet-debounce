@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Dorssel.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -58,23 +57,6 @@ namespace UnitTests
             _ = new Debouncer();
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
-
-        [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
-        public void ConstructorTimingGranularityValid(TimeSpan timingGranularity)
-        {
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            _ = new Debouncer(timingGranularity);
-#pragma warning restore CA2000 // Dispose objects before losing scope
-        }
-
-        [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
-        public void ConstructorTimingGranularityInvalid(TimeSpan timingGranularity)
-        {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new Debouncer(timingGranularity));
-        }
         #endregion
 
         #region Dispose
@@ -100,27 +82,20 @@ namespace UnitTests
             {
                 DebounceInterval = 2 * TimingUnit
             };
-            long callCount = 0;
-            debouncer.Debounced += (s, e) =>
-            {
-                Assert.AreSame(s, debouncer);
-                Assert.AreEqual(e.Count, 1L);
-                ++callCount;
-            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
             debouncer.Dispose();
-            Assert.AreEqual(callCount, 0L);
-            Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(callCount, 0L);
+            Assert.AreEqual(0, wrapper.HandlerCount);
         }
 
         [TestMethod]
         public void DisposeDuringHandler()
         {
             var debouncer = new Debouncer();
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
             using var done = new ManualResetEventSlim();
-            debouncer.Debounced += (s, e) =>
+            wrapper.Debounced += (s, e) =>
             {
                 Thread.Sleep(2 * TimingUnit);
                 done.Set();
@@ -128,21 +103,26 @@ namespace UnitTests
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
             debouncer.Dispose();
-            done.Wait();
+            Assert.IsTrue(done.Wait(2 * TimingUnit));
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
         }
-   
+
         [TestMethod]
         public void DisposeFromHandler()
         {
             using var debouncer = new Debouncer();
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
             using var done = new ManualResetEventSlim();
-            debouncer.Debounced += (s, e) =>
+            wrapper.Debounced += (s, e) =>
             {
                 debouncer.Dispose();
                 done.Set();
             };
             debouncer.Trigger();
-            done.Wait();
+            Assert.IsTrue(done.Wait(TimingUnit));
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
         }
         #endregion
 
@@ -151,7 +131,7 @@ namespace UnitTests
         public void DebounceIntervalDefault()
         {
             using var debouncer = new Debouncer();
-            Assert.AreEqual(debouncer.DebounceInterval, TimeSpan.Zero);
+            Assert.AreEqual(TimeSpan.Zero, debouncer.DebounceInterval);
         }
 
         [DataTestMethod]
@@ -162,7 +142,7 @@ namespace UnitTests
             {
                 DebounceInterval = debounceInterval
             };
-            Assert.AreEqual(debouncer.DebounceInterval, debounceInterval);
+            Assert.AreEqual(debounceInterval, debouncer.DebounceInterval);
         }
 
         [DataTestMethod]
@@ -175,7 +155,7 @@ namespace UnitTests
                 DebounceInterval = TimeSpan.FromMilliseconds(1)
             };
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceInterval = debounceInterval);
-            Assert.AreEqual(debouncer.DebounceInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
         }
 
         [TestMethod]
@@ -185,9 +165,19 @@ namespace UnitTests
             {
                 DebounceInterval = TimeSpan.FromMilliseconds(1)
             };
-            Assert.AreEqual(debouncer.DebounceInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
             debouncer.DebounceInterval = TimeSpan.FromMilliseconds(1);
-            Assert.AreEqual(debouncer.DebounceInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
+        }
+
+        [TestMethod]
+        public void DebounceIntervalEqualsDebounceTimeout()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceTimeout = TimeSpan.FromSeconds(1)
+            };
+            debouncer.DebounceInterval = TimeSpan.FromSeconds(1);
         }
 
         [TestMethod]
@@ -198,6 +188,28 @@ namespace UnitTests
                 DebounceTimeout = TimeSpan.FromSeconds(1)
             };
             Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceInterval = TimeSpan.FromSeconds(2));
+        }
+
+        [TestMethod]
+        public void DebounceIntervalEqualsTimingGranularity()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.FromSeconds(2),
+                TimingGranularity = TimeSpan.FromSeconds(1)
+            };
+            debouncer.DebounceInterval = TimeSpan.FromSeconds(1);
+        }
+
+        [TestMethod]
+        public void DebounceIntervalLessThanTimingGranularity()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.FromSeconds(2),
+                TimingGranularity = TimeSpan.FromSeconds(2)
+            };
+            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceInterval = TimeSpan.FromSeconds(1));
         }
 
         [TestMethod]
@@ -214,7 +226,7 @@ namespace UnitTests
         public void DebounceTimeoutDefault()
         {
             using var debouncer = new Debouncer();
-            Assert.AreEqual(debouncer.DebounceTimeout, Timeout.InfiniteTimeSpan);
+            Assert.AreEqual(Timeout.InfiniteTimeSpan, debouncer.DebounceTimeout);
         }
 
         [DataTestMethod]
@@ -226,7 +238,7 @@ namespace UnitTests
             {
                 DebounceTimeout = debounceTimeout
             };
-            Assert.AreEqual(debouncer.DebounceTimeout, debounceTimeout);
+            Assert.AreEqual(debounceTimeout, debouncer.DebounceTimeout);
         }
 
         [DataTestMethod]
@@ -238,7 +250,7 @@ namespace UnitTests
                 DebounceTimeout = TimeSpan.FromMilliseconds(1)
             };
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceTimeout = debounceTimeout);
-            Assert.AreEqual(debouncer.DebounceTimeout, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceTimeout);
         }
 
         [TestMethod]
@@ -248,9 +260,9 @@ namespace UnitTests
             {
                 DebounceTimeout = TimeSpan.FromMilliseconds(1)
             };
-            Assert.AreEqual(debouncer.DebounceTimeout, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceTimeout);
             debouncer.DebounceTimeout = TimeSpan.FromMilliseconds(1);
-            Assert.AreEqual(debouncer.DebounceTimeout, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceTimeout);
         }
 
         [TestMethod]
@@ -277,7 +289,7 @@ namespace UnitTests
         public void BackoffIntervalDefault()
         {
             using var debouncer = new Debouncer();
-            Assert.AreEqual(debouncer.BackoffInterval, TimeSpan.Zero);
+            Assert.AreEqual(TimeSpan.Zero, debouncer.BackoffInterval);
         }
 
         [DataTestMethod]
@@ -288,7 +300,7 @@ namespace UnitTests
             {
                 BackoffInterval = backoffInterval
             };
-            Assert.AreEqual(debouncer.BackoffInterval, backoffInterval);
+            Assert.AreEqual(backoffInterval, debouncer.BackoffInterval);
         }
 
         [DataTestMethod]
@@ -301,7 +313,7 @@ namespace UnitTests
                 BackoffInterval = TimeSpan.FromMilliseconds(1)
             };
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.BackoffInterval = backoffInterval);
-            Assert.AreEqual(debouncer.BackoffInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
         }
 
         [TestMethod]
@@ -311,9 +323,9 @@ namespace UnitTests
             {
                 BackoffInterval = TimeSpan.FromMilliseconds(1)
             };
-            Assert.AreEqual(debouncer.BackoffInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
             debouncer.BackoffInterval = TimeSpan.FromMilliseconds(1);
-            Assert.AreEqual(debouncer.BackoffInterval, TimeSpan.FromMilliseconds(1));
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
         }
 
         [TestMethod]
@@ -322,6 +334,82 @@ namespace UnitTests
             var debouncer = new Debouncer();
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.BackoffInterval = TimeSpan.Zero);
+        }
+        #endregion
+
+        #region TimingGranularity
+        [TestMethod]
+        public void TimingGranularityDefault()
+        {
+            using var debouncer = new Debouncer();
+            Assert.AreEqual(TimeSpan.Zero, debouncer.TimingGranularity);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
+        public void TimingGranularityValid(TimeSpan timingGranularity)
+        {
+            using var debouncer = new Debouncer
+            {
+                DebounceInterval = TimeSpan.MaxValue,
+                TimingGranularity = timingGranularity
+            };
+            Assert.AreEqual(timingGranularity, debouncer.TimingGranularity);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
+        public void TimingGranularityInvalid(TimeSpan timingGranularity)
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.MaxValue,
+                TimingGranularity = TimeSpan.FromMilliseconds(2)
+            };
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.TimingGranularity = timingGranularity);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
+        }
+
+        [TestMethod]
+        public void TimingGranularityUnchanged()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.MaxValue,
+                TimingGranularity = TimeSpan.FromMilliseconds(2)
+            };
+            Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
+            debouncer.TimingGranularity = TimeSpan.FromMilliseconds(2);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
+        }
+
+        [TestMethod]
+        public void TimingGranularityEqualsDebounceInterval()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.FromSeconds(1)
+            };
+            debouncer.TimingGranularity = TimeSpan.FromSeconds(1);
+        }
+
+        [TestMethod]
+        public void TimingGranularityExceedsDebounceInterval()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.FromSeconds(1)
+            };
+            Assert.ThrowsException<ArgumentException>(() => debouncer.TimingGranularity = TimeSpan.FromSeconds(2));
+        }
+
+        [TestMethod]
+        public void TimingGranularityAfterDispose()
+        {
+            var debouncer = new Debouncer();
+            debouncer.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.TimingGranularity = TimeSpan.Zero);
         }
         #endregion
 
@@ -348,16 +436,11 @@ namespace UnitTests
         public void TriggerSingle()
         {
             using var debouncer = new Debouncer();
-            long callCount = 0;
-            debouncer.Debounced += (s, e) =>
-            {
-                Assert.AreSame(s, debouncer);
-                Assert.AreEqual(e.Count, 1L);
-                ++callCount;
-            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(callCount, 1L);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -365,20 +448,94 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.FromMilliseconds(100)
+                DebounceInterval = 2 * TimingUnit
             };
-            long callCount = 0;
-            debouncer.Debounced += (s, e) =>
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(0, wrapper.TriggerCount);
+            Assert.AreEqual(0, wrapper.HandlerCount);
+            Thread.Sleep(2 * TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TriggersWithTimeout()
+        {
+            using var debouncer = new Debouncer()
             {
-                Assert.AreSame(s, debouncer);
-                Assert.AreEqual(e.Count, 1L);
-                ++callCount;
+                DebounceInterval = 2 * TimingUnit,
+                DebounceTimeout = 4 * TimingUnit
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            for (int i = 0; i < 6; ++i)
+            {
+                debouncer.Trigger();
+                Thread.Sleep(TimingUnit);
+            }
+            Assert.AreEqual(1, wrapper.HandlerCount);
+            Thread.Sleep(2 * TimingUnit);
+            Assert.AreEqual(6, wrapper.TriggerCount);
+            Assert.AreEqual(2, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TriggerCoalescence()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = 2 * TimingUnit,
+                TimingGranularity = TimingUnit
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            for (int i = 0; i < 10; ++i)
+            {
+                debouncer.Trigger();
+            }
+            Thread.Sleep(4 * TimingUnit);
+            Assert.AreEqual(10, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TriggerFromHandler()
+        {
+            using var debouncer = new Debouncer();
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+
+            wrapper.Debounced += (s, e) =>
+            {
+                if (wrapper.HandlerCount == 1)
+                {
+                    debouncer.Trigger();
+                }
             };
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(callCount, 0L);
+            Assert.AreEqual(2, wrapper.TriggerCount);
+            Assert.AreEqual(2, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TriggerDuringBackoff()
+        {
+            using var debouncer = new Debouncer()
+            {
+                BackoffInterval = 3 * TimingUnit
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
             Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(callCount, 1L);
+            Assert.AreEqual(2, wrapper.TriggerCount);
+            Assert.AreEqual(2, wrapper.HandlerCount);
         }
         #endregion
     }
