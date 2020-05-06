@@ -84,60 +84,86 @@ namespace Dorssel.Utility
 
             RescheduleCount++;
 
+            TimeSpan sinceFirstTrigger = FirstTrigger.Elapsed;
+            TimeSpan sinceLastTrigger = LastTrigger.Elapsed;
+
             long countMinusOne = Interlocked.Read(ref InterlockedCountMinusOne);
-            if ((countMinusOne >= 0) && !FirstTrigger.IsRunning)
+            if (countMinusOne >= 0)
             {
-                FirstTrigger.Restart();
+                // There are triggers that we have not yet processed.
+                if (!FirstTrigger.IsRunning)
+                {
+                    // Start coalescing triggers.
+                    FirstTrigger.Start();
+                    LastTrigger.Start();
+                }
+                if (sinceLastTrigger >= _TimingGranularity)
+                {
+                    // Accumulate the coalesced triggers.
+                    Count += (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                    countMinusOne = -1;
+                    LastTrigger.Restart();
+                    sinceLastTrigger = TimeSpan.Zero;
+                }
             }
-            long totalCount = Count + (countMinusOne + 1);
-            if (totalCount == 0)
+            else if (Count == 0)
             {
+                // No triggers, and nothing accumulated before: we are idle.
                 return;
             }
 
-            LastTrigger.Start();
-
+            TimeSpan dueTime = Timeout.InfiniteTimeSpan;
             if (SendingEvent)
             {
-                return;
-            }
-
-            if ((_BackoffInterval > TimeSpan.Zero) && LastHandlerFinished.IsRunning)
-            {
-                var sinceLastHandlerFinished = LastHandlerFinished.Elapsed;
-                if (_BackoffInterval > sinceLastHandlerFinished)
-                {
-                    ++TimerChanges;
-                    Timer.Change(_BackoffInterval - sinceLastHandlerFinished, Timeout.InfiniteTimeSpan);
-                    return;
-                }
-            }
-
-            var sinceFirstTrigger = FirstTrigger.Elapsed;
-            var sinceLastTrigger = LastTrigger.Elapsed;
-
-            if (sinceLastTrigger >= _DebounceInterval)
-            {
-                LockedHandleNow();
-                return;
-            }
-            if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout)
-            {
-                LockedHandleNow();
-                return;
-            }
-
-            if (sinceLastTrigger > _TimingGranularity)
-            {
-                countMinusOne = Interlocked.Exchange(ref InterlockedCountMinusOne, -1);
+                // We are already sending an event, so we only need a timer if we are coalescing triggers.
                 if (countMinusOne >= 0)
                 {
-                    Count += (countMinusOne + 1);
-                    LastTrigger.Restart();
+                    // We are coalescing triggers.
+                    dueTime = _TimingGranularity;
                 }
             }
+            else
+            {
+                // We are not currently sending an event, so check to see if we need to send one now.
+                var sinceLastHandlerFinished = LastHandlerFinished.IsRunning ? LastHandlerFinished.Elapsed : TimeSpan.MaxValue;
+                if (sinceLastHandlerFinished >= _BackoffInterval)
+                {
+                    // We are not within any backoff interval, so we may send an event if needed.
+                    if (sinceLastTrigger >= _DebounceInterval)
+                    {
+                        LockedHandleNow();
+                        return;
+                    }
+                    if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout)
+                    {
+                        LockedHandleNow();
+                        return;
+                    }
+                }
+
+                // We are not sending an event, so wait until we should send it (with increasing priority):
+                // 1) Start with the debouncing interval.
+                dueTime = _DebounceInterval - sinceLastTrigger;
+                // 2) Override with the debouncing timeout (if any) if that is sooner.
+                if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && (dueTime > _DebounceTimeout - sinceFirstTrigger))
+                {
+                    dueTime = _DebounceTimeout - sinceFirstTrigger;
+                }
+                // 3) Override with the backoff interval if that is later.
+                if (dueTime < _BackoffInterval - sinceLastHandlerFinished)
+                {
+                    dueTime = _BackoffInterval - sinceLastHandlerFinished;
+                }
+                // 4) Override with the timing granularity if we are currently coalescing triggers and if that is sooner.
+                if ((countMinusOne >= 0) && (dueTime > _TimingGranularity))
+                {
+                    dueTime = _TimingGranularity;
+                }
+            }
+
+            // Now set (or cancel) our timer.
             ++TimerChanges;
-            Timer.Change(_TimingGranularity, Timeout.InfiniteTimeSpan);
+            Timer.Change(dueTime, Timeout.InfiniteTimeSpan);
         }
 
         #region IDebounce Support
@@ -150,7 +176,7 @@ namespace Dorssel.Utility
             {
                 // fast-path
                 return;
-            } 
+            }
             else if (newCountMinusOne == 0)
             {
                 // not-so-fast-path: This is not likely under stress.
@@ -252,36 +278,31 @@ namespace Dorssel.Utility
                 }
             });
         }
-#endregion
+        #endregion
 
-#region IDisposable Support
+        #region IDisposable Support
         bool IsDisposed = false;
 
         void ThrowIfDisposed()
         {
             if (IsDisposed)
             {
-                Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue);
                 throw new ObjectDisposedException(GetType().FullName);
             }
         }
 
         public void Dispose()
         {
-            Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue);
-            lock (LockObject)
+            if (Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) >= -1)
             {
-                if (IsDisposed)
+                // not yet disposed
+                lock (LockObject)
                 {
-                    return;
+                    IsDisposed = true;
                 }
-                FirstTrigger.Reset();
-                LastTrigger.Reset();
-                LastHandlerFinished.Reset();
-                IsDisposed = true;
+                Timer.Dispose();
             }
-            Timer.Dispose();
         }
-#endregion
+        #endregion
     }
 }

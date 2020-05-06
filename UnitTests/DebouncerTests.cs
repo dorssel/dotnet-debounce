@@ -546,6 +546,25 @@ namespace UnitTests
             Assert.AreEqual(2, wrapper.TriggerCount);
             Assert.AreEqual(2, wrapper.HandlerCount);
         }
+
+        [TestMethod]
+        public void CoalesceDuringHandler()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimingUnit,
+                TimingGranularity = TimingUnit / 10,
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            wrapper.Debounced += (s,e) => Thread.Sleep(2 * TimingUnit);
+            debouncer.Trigger();
+            Thread.Sleep(2 * TimingUnit);
+            debouncer.Trigger();
+            debouncer.Trigger();
+            Thread.Sleep(5 * TimingUnit);
+            Assert.AreEqual(3, wrapper.TriggerCount);
+            Assert.AreEqual(2, wrapper.HandlerCount);
+        }
         #endregion
     }
 }

@@ -78,8 +78,8 @@ namespace PerformanceTests
             {
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMilliseconds(10),
-                    TimingGranularity = TimeSpan.FromMilliseconds(1)
+                    DebounceInterval = TimeSpan.FromMilliseconds(100),
+                    TimingGranularity = TimeSpan.FromMilliseconds(10)
                 };
                 long handlers = 0;
                 long processed = 0;
@@ -130,8 +130,8 @@ namespace PerformanceTests
             {
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMilliseconds(10),
-                    TimingGranularity = TimeSpan.FromMilliseconds(1)
+                    DebounceInterval = TimeSpan.FromMilliseconds(100),
+                    TimingGranularity = TimeSpan.FromMilliseconds(10)
                 };
                 long handlers = 0;
                 long processed = 0;
