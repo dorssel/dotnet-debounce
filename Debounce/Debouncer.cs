@@ -23,12 +23,25 @@ namespace Dorssel.Utility
 
         long InterlockedCountMinusOne = -1;
 
-        /// <summary>Test support</summary>
-        internal long RescheduleCount = 0;
-        /// <summary>Test support</summary>
-        internal long TimerChanges = 0;
-        /// <summary>Test support</summary>
-        internal long TimerEvents = 0;
+        internal struct BenchmarkCounters
+        {
+            public long TriggersReported;
+            public long HandlersCalled;
+            public long RescheduleCount;
+            public long TimerChanges;
+            public long TimerEvents;
+        }
+        BenchmarkCounters _Benchmark;
+        internal BenchmarkCounters Benchmark
+        {
+            get
+            {
+                lock (LockObject)
+                {
+                    return _Benchmark;
+                };
+            }
+        }
 
         readonly object LockObject = new object();
         long Count = 0;
@@ -36,13 +49,14 @@ namespace Dorssel.Utility
         readonly Stopwatch LastTrigger = new Stopwatch();
         readonly Stopwatch LastHandlerFinished = new Stopwatch();
         readonly Timer Timer;
+        bool TimerActive = false;
         bool SendingEvent = false;
 
         void OnTimer(object state)
         {
             lock (LockObject)
             {
-                ++TimerEvents;
+                ++_Benchmark.TimerEvents;
                 if (!IsDisposed)
                 {
                     LockedReschedule();
@@ -50,44 +64,16 @@ namespace Dorssel.Utility
             }
         }
 
-        void LockedHandleNow()
-        {
-            Debug.Assert(!SendingEvent);
-            Debug.Assert(!IsDisposed);
-
-            long count = Count + (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
-            Debug.Assert(count > 0);
-
-            FirstTrigger.Reset();
-            LastTrigger.Reset();
-            Count = 0;
-            SendingEvent = true;
-            Task.Run(() =>
-            {
-                Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
-                lock (LockObject)
-                {
-                    if (IsDisposed)
-                    {
-                        return;
-                    }
-                    LastHandlerFinished.Restart();
-                    SendingEvent = false;
-                    LockedReschedule();
-                }
-            });
-        }
-
         void LockedReschedule()
         {
             Debug.Assert(!IsDisposed);
 
-            RescheduleCount++;
+            ++_Benchmark.RescheduleCount;
 
-            TimeSpan sinceFirstTrigger = FirstTrigger.Elapsed;
-            TimeSpan sinceLastTrigger = LastTrigger.Elapsed;
+            var sinceFirstTrigger = FirstTrigger.Elapsed;
+            var sinceLastTrigger = LastTrigger.Elapsed;
 
-            long countMinusOne = Interlocked.Read(ref InterlockedCountMinusOne);
+            var countMinusOne = Interlocked.Read(ref InterlockedCountMinusOne);
             if (countMinusOne >= 0)
             {
                 // There are triggers that we have not yet processed.
@@ -112,7 +98,7 @@ namespace Dorssel.Utility
                 return;
             }
 
-            TimeSpan dueTime = Timeout.InfiniteTimeSpan;
+            var dueTime = Timeout.InfiniteTimeSpan;
             if (SendingEvent)
             {
                 // We are already sending an event, so we only need a timer if we are coalescing triggers.
@@ -129,14 +115,30 @@ namespace Dorssel.Utility
                 if (sinceLastHandlerFinished >= _BackoffInterval)
                 {
                     // We are not within any backoff interval, so we may send an event if needed.
-                    if (sinceLastTrigger >= _DebounceInterval)
+                    if ((sinceLastTrigger >= _DebounceInterval) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
                     {
-                        LockedHandleNow();
-                        return;
-                    }
-                    if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout)
-                    {
-                        LockedHandleNow();
+                        var count = Count + (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+
+                        FirstTrigger.Reset();
+                        LastTrigger.Reset();
+                        Count = 0;
+                        SendingEvent = true;
+                        Task.Run(() =>
+                        {
+                            Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
+                            lock (LockObject)
+                            {
+                                _Benchmark.TriggersReported += count;
+                                ++_Benchmark.HandlersCalled;
+                                if (IsDisposed)
+                                {
+                                    return;
+                                }
+                                LastHandlerFinished.Restart();
+                                SendingEvent = false;
+                                LockedReschedule();
+                            }
+                        });
                         return;
                     }
                 }
@@ -162,8 +164,18 @@ namespace Dorssel.Utility
             }
 
             // Now set (or cancel) our timer.
-            ++TimerChanges;
-            Timer.Change(dueTime, Timeout.InfiniteTimeSpan);
+            if (TimerActive || (dueTime != Timeout.InfiniteTimeSpan))
+            {
+                ++_Benchmark.TimerChanges;
+                // System.Timer works with milliseconds, where -1 (== 2^32 - 1 == uint.MaxValue) means infinite
+                // and 2^32 - 2 (or uint.MaxValue - 1) is the actual maximum.
+                if (dueTime > TimeSpan.FromMilliseconds(uint.MaxValue - 1))
+                {
+                    dueTime = TimeSpan.FromMilliseconds(uint.MaxValue - 1);
+                }
+                Timer.Change(dueTime, Timeout.InfiniteTimeSpan);
+            }
+            TimerActive = dueTime != Timeout.InfiniteTimeSpan;
         }
 
         #region IDebounce Support
@@ -171,7 +183,7 @@ namespace Dorssel.Utility
 
         public void Trigger()
         {
-            long newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);
+            var newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);
             if (newCountMinusOne > 0)
             {
                 // fast-path

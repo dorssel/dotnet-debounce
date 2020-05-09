@@ -478,7 +478,7 @@ namespace UnitTests
                 DebounceTimeout = 4 * TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
-            for (int i = 0; i < 6; ++i)
+            for (var i = 0; i < 6; ++i)
             {
                 debouncer.Trigger();
                 Thread.Sleep(TimingUnit);
@@ -498,7 +498,7 @@ namespace UnitTests
                 TimingGranularity = TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
-            for (int i = 0; i < 10; ++i)
+            for (var i = 0; i < 10; ++i)
             {
                 debouncer.Trigger();
             }
@@ -556,7 +556,7 @@ namespace UnitTests
                 TimingGranularity = TimingUnit / 10,
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
-            wrapper.Debounced += (s,e) => Thread.Sleep(2 * TimingUnit);
+            wrapper.Debounced += (s, e) => Thread.Sleep(2 * TimingUnit);
             debouncer.Trigger();
             Thread.Sleep(2 * TimingUnit);
             debouncer.Trigger();
@@ -564,6 +564,25 @@ namespace UnitTests
             Thread.Sleep(5 * TimingUnit);
             Assert.AreEqual(3, wrapper.TriggerCount);
             Assert.AreEqual(2, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TimingMaximum()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceInterval = TimeSpan.MaxValue,
+                TimingGranularity = TimeSpan.MaxValue,
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(0, wrapper.HandlerCount);
+            debouncer.TimingGranularity = TimeSpan.Zero;
+            debouncer.DebounceInterval = TimeSpan.Zero;
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
         }
         #endregion
     }

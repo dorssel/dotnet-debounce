@@ -1,184 +1,155 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dorssel.Utility;
 
 namespace PerformanceTests
 {
+    sealed class BenchmarkTest : IDisposable
+    {
+        public BenchmarkTest(Debouncer debouncer)
+        {
+            Debouncer = debouncer;
+            Stopwatch.Start();
+        }
+
+        public bool IsFinished { get => CancellationTokenSource.IsCancellationRequested; }
+
+        public void WaitUntilFinished()
+        {
+            CancellationTokenSource.Token.WaitHandle.WaitOne();
+        }
+
+        readonly Debouncer Debouncer;
+        readonly Stopwatch Stopwatch = new Stopwatch();
+        readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+
+        public void Trigger1k()
+        {
+            for (var i = 0; i < 100; ++i)
+            {
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+                Debouncer.Trigger();
+            }
+        }
+
+        public void Dispose()
+        {
+            // make sure any remaining handlers are called immediately
+            Debouncer.BackoffInterval = TimeSpan.Zero;
+            Debouncer.TimingGranularity = TimeSpan.Zero;
+            Debouncer.DebounceInterval = TimeSpan.Zero;
+            Stopwatch.Stop();
+            // the final handler will be called on some other thread, make sure it has finished
+            Thread.Sleep(100);
+            var benchmark = Debouncer.Benchmark;
+            Console.WriteLine($"   time (ms):         {Stopwatch.ElapsedMilliseconds}");
+            Console.WriteLine($"   triggers reported: {benchmark.TriggersReported}");
+            Console.WriteLine($"   handlers called:   {benchmark.HandlersCalled}");
+            Console.WriteLine($"   reschedules:       {benchmark.RescheduleCount}");
+            Console.WriteLine($"   timer changes:     {benchmark.TimerChanges}");
+            Console.WriteLine($"   timer events:      {benchmark.TimerEvents}");
+            Console.WriteLine();
+
+            CancellationTokenSource.Dispose();
+            Debouncer.Dispose();
+        }
+    }
+
     static class Program
     {
-        const long TriggersPerRound = 1000;
-
         static void Main()
         {
-#if false
             {
+                Console.WriteLine("Single-threaded trigger speed (coaslesced)");
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMinutes(1)
+                    DebounceInterval = TimeSpan.MaxValue,
+                    TimingGranularity = TimeSpan.MaxValue
                 };
-                var stopwatch = new Stopwatch();
-                long triggers = 0;
-                stopwatch.Start();
-                do
+
+                using var test = new BenchmarkTest(debouncer);
+                while (!test.IsFinished)
                 {
-                    for (int i = 0; i < TriggersPerRound; ++i)
-                    {
-                        debouncer.Trigger();
-                    }
-                    triggers += TriggersPerRound;
-                } while (stopwatch.ElapsedMilliseconds < 1000);
-                stopwatch.Stop();
-                Console.WriteLine($"Coalescence speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s");
-            }
-            {
-                using var debouncer = new Debouncer();
-                var stopwatch = new Stopwatch();
-                long triggers = 0;
-                stopwatch.Start();
-                do
-                {
-                    for (int i = 0; i < TriggersPerRound; ++i)
-                    {
-                        debouncer.Trigger();
-                    }
-                    triggers += TriggersPerRound;
-                } while (stopwatch.ElapsedMilliseconds < 1000);
-                stopwatch.Stop();
-                Console.WriteLine($"Serialization speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s");
-            }
-            {
-                using var debouncer = new Debouncer();
-                long triggers = 0;
-                long handlers = 0;
-                long processed = 0;
-                debouncer.Debounced += (s, e) =>
-                {
-                    processed += e.Count;
-                    ++handlers;
-                };
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                do
-                {
-                    for (int i = 0; i < TriggersPerRound; ++i)
-                    {
-                        debouncer.Trigger();
-                    }
-                    triggers += TriggersPerRound;
-                } while (stopwatch.ElapsedMilliseconds < 1000);
-                stopwatch.Stop();
-                Thread.Sleep(100);
-                Console.WriteLine($"Handler speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s " +
-                    $"@ {(long)(handlers / stopwatch.Elapsed.TotalSeconds)} handlers/s and {triggers - processed} missed");
-            }
-#endif
-            {
-                using var debouncer = new Debouncer()
-                {
-                    DebounceInterval = TimeSpan.FromMilliseconds(100),
-                    TimingGranularity = TimeSpan.FromMilliseconds(10)
-                };
-                long handlers = 0;
-                long processed = 0;
-                debouncer.Debounced += (s, e) =>
-                {
-                    processed += e.Count;
-                    ++handlers;
-                };
-                using var startEvent = new ManualResetEventSlim();
-                using var stopEvent = new ManualResetEventSlim();
-                long triggers = 0;
-                var stopwatch = new Stopwatch();
-                var task = Task.Run(() =>
-                {
-                    long threadTriggers = 0;
-                    startEvent.Wait();
-                    do
-                    {
-                        for (int i = 0; i < TriggersPerRound; ++i)
-                        {
-                            debouncer.Trigger();
-                        }
-                        threadTriggers += TriggersPerRound;
-                    } while (!stopEvent.IsSet);
-                    Interlocked.Add(ref triggers, threadTriggers);
-                });
-                // allow CLR to settle before starting the test
-                Thread.Sleep(100);
-                {
-                    // actual test
-                    stopwatch.Start();
-                    startEvent.Set();
-                    Thread.Sleep(1000);
-                    stopEvent.Set();
-                    stopwatch.Stop();
-                    task.Wait();
+                    test.Trigger1k();
                 }
-                // allow any remaining handlers to be called, so we can check that everything is accounted for
-                Thread.Sleep(200);
-                Console.WriteLine($"Trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s\n\t" +
-                    $"({handlers} handlers, {triggers - processed} missed, {debouncer.RescheduleCount} reschedules, " +
-                    $"{debouncer.TimerChanges} timer changes, {debouncer.TimerEvents} timer events)");
-            }
-            if (Environment.ProcessorCount < 3)
-            {
-                Console.WriteLine("Multi-threaded test require at least 3 CPU cores.");
             }
             {
+                Console.WriteLine("Multi-threaded trigger speed (coaslesced)");
                 using var debouncer = new Debouncer()
                 {
-                    DebounceInterval = TimeSpan.FromMilliseconds(100),
-                    TimingGranularity = TimeSpan.FromMilliseconds(10)
+                    DebounceInterval = TimeSpan.MaxValue,
+                    TimingGranularity = TimeSpan.MaxValue
                 };
-                long handlers = 0;
-                long processed = 0;
-                debouncer.Debounced += (s, e) =>
-                {
-                    processed += e.Count;
-                    ++handlers;
-                };
-                // Leave one CPU core for other stuff (including the timer callback thread).
+
+                using var test = new BenchmarkTest(debouncer);
                 var tasks = new Task[Environment.ProcessorCount - 1];
-                using var startEvent = new ManualResetEventSlim();
-                using var stopEvent = new ManualResetEventSlim();
-                long triggers = 0;
-                var stopwatch = new Stopwatch();
-                for (int i = 0; i < tasks.Length; ++i)
+                foreach (ref var task in tasks.AsSpan())
                 {
-                    tasks[i] = Task.Run(() =>
+                    task = Task.Run(() =>
                     {
-                        long threadTriggers = 0;
-                        startEvent.Wait();
-                        do
+                        while (!test.IsFinished)
                         {
-                            for (int i = 0; i < TriggersPerRound; ++i)
-                            {
-                                debouncer.Trigger();
-                            }
-                            threadTriggers += TriggersPerRound;
-                        } while (!stopEvent.IsSet);
-                        Interlocked.Add(ref triggers, threadTriggers);
+                            test.Trigger1k();
+                        }
                     });
                 }
-                // allow CLR to settle before starting the test
-                Thread.Sleep(100);
+                Task.WaitAll(tasks);
+            }
+            {
+                Console.WriteLine("Handler speed (self induced)");
+                using var debouncer = new Debouncer();
+                void handler(object? s, IDebouncedEventArgs e)
                 {
-                    // actual test
-                    stopwatch.Start();
-                    startEvent.Set();
-                    Thread.Sleep(1000);
-                    stopEvent.Set();
-                    stopwatch.Stop();
-                    Task.WaitAll(tasks);
+                    debouncer.Trigger();
                 }
-                // allow any remaining handlers to be called, so we can check that everything is accounted for
-                Thread.Sleep(200);
-                Console.WriteLine($"Concurrent trigger speed: {(long)(triggers / stopwatch.Elapsed.TotalSeconds)} triggers/s\n\t" +
-                    $"({handlers} handlers, {triggers - processed} missed, {debouncer.RescheduleCount} reschedules, " +
-                    $"{debouncer.TimerChanges} timer changes, {debouncer.TimerEvents} timer events)");
+                debouncer.Debounced += handler;
+
+                using var test = new BenchmarkTest(debouncer);
+                debouncer.Trigger();
+                test.WaitUntilFinished();
+                debouncer.Debounced -= handler;
+            }
+            {
+                // BUGBUG: should be coalescing triggers while handling events!
+                Console.WriteLine("Handler speed (single-threaded triggers)");
+                using var debouncer = new Debouncer();
+                debouncer.Debounced += (s, e) => { };
+
+                using var test = new BenchmarkTest(debouncer);
+                while (!test.IsFinished)
+                {
+                    test.Trigger1k();
+                }
+            }
+            {
+                // BUGBUG: should be coalescing triggers while handling events!
+                Console.WriteLine("Handler speed (multi-threaded triggers)");
+                using var debouncer = new Debouncer();
+                debouncer.Debounced += (s, e) => { };
+
+                using var test = new BenchmarkTest(debouncer);
+                var tasks = new Task[Environment.ProcessorCount - 1];
+                foreach (ref var task in tasks.AsSpan())
+                {
+                    task = Task.Run(() =>
+                    {
+                        while (!test.IsFinished)
+                        {
+                            test.Trigger1k();
+                        }
+                    });
+                }
+                Task.WaitAll(tasks);
             }
         }
     }
