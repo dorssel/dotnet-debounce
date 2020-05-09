@@ -494,7 +494,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = 2 * TimingUnit,
+                DebounceInterval = TimingUnit,
                 TimingGranularity = TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
