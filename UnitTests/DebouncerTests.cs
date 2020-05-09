@@ -584,6 +584,18 @@ namespace UnitTests
             Assert.AreEqual(1, wrapper.TriggerCount);
             Assert.AreEqual(1, wrapper.HandlerCount);
         }
+
+        [TestMethod]
+        public void BenchMarkDefaults()
+        {
+            using var debouncer = new Debouncer();
+            var benchmark = debouncer.Benchmark;
+            Assert.AreEqual(0, benchmark.HandlersCalled);
+            Assert.AreEqual(0, benchmark.TriggersReported);
+            Assert.AreEqual(0, benchmark.RescheduleCount);
+            Assert.AreEqual(0, benchmark.TimerChanges);
+            Assert.AreEqual(0, benchmark.TimerEvents);
+        }
         #endregion
     }
 }

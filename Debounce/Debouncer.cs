@@ -39,7 +39,7 @@ namespace Dorssel.Utility
                 lock (LockObject)
                 {
                     return _Benchmark;
-                };
+                }
             }
         }
 
