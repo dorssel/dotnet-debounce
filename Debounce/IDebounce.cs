@@ -2,14 +2,9 @@
 
 namespace Dorssel.Utility
 {
-    public interface IDebouncedEventArgs
-    {
-        public long Count { get; }
-    }
-
     public interface IDebounce : IDisposable
     {
-        event EventHandler<IDebouncedEventArgs>? Debounced;
+        event EventHandler<DebouncedEventArgs>? Debounced;
 
         void Trigger();
 

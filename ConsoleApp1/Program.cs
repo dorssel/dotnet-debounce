@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ConsoleApp1
 {
+    [ExcludeFromCodeCoverage]
     static class Program
     {
         internal static void Main()
@@ -13,12 +15,12 @@ namespace ConsoleApp1
             Console.WriteLine("Hello World! Привет мир! Γειά σου Κόσμε!");
             Console.WriteLine(IntPtr.Size);
             Console.WriteLine(Stopwatch.Frequency);
-            long start = Stopwatch.GetTimestamp();
-            long old_seconds = 0;
+            var start = Stopwatch.GetTimestamp();
+            var old_seconds = 0L;
             while (true)
             {
-                long now = Stopwatch.GetTimestamp();
-                long seconds = (long)((double)(now - start) / Stopwatch.Frequency);
+                var now = Stopwatch.GetTimestamp();
+                var seconds = (long)((double)(now - start) / Stopwatch.Frequency);
                 if (old_seconds != seconds)
                 {
                     Console.WriteLine($"{seconds}: {now}");

@@ -9,11 +9,6 @@ using System.Threading.Tasks;
 
 namespace Dorssel.Utility
 {
-    sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
-    {
-        public long Count { get; set; }
-    }
-
     public sealed class Debouncer : IDebounce
     {
         public Debouncer()
@@ -25,11 +20,11 @@ namespace Dorssel.Utility
 
         internal struct BenchmarkCounters
         {
-            public long TriggersReported;
-            public long HandlersCalled;
-            public long RescheduleCount;
-            public long TimerChanges;
-            public long TimerEvents;
+            public ulong TriggersReported;
+            public ulong HandlersCalled;
+            public ulong RescheduleCount;
+            public ulong TimerChanges;
+            public ulong TimerEvents;
         }
         BenchmarkCounters _Benchmark;
         internal BenchmarkCounters Benchmark
@@ -44,7 +39,7 @@ namespace Dorssel.Utility
         }
 
         readonly object LockObject = new object();
-        long Count = 0;
+        ulong Count = 0;
         readonly Stopwatch FirstTrigger = new Stopwatch();
         readonly Stopwatch LastTrigger = new Stopwatch();
         readonly Stopwatch LastHandlerStarted = new Stopwatch();
@@ -87,7 +82,7 @@ namespace Dorssel.Utility
                 if (sinceLastTrigger >= _TimingGranularity)
                 {
                     // Accumulate the coalesced triggers.
-                    Count += (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                    Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
                     countMinusOne = -1;
                     LastTrigger.Restart();
                     sinceLastTrigger = TimeSpan.Zero;
@@ -120,7 +115,7 @@ namespace Dorssel.Utility
                     if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
                     {
                         // Sending event now, so accumulate all coalesced triggers.
-                        var count = Count + (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                        var count = Count + (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
 
                         FirstTrigger.Reset();
                         LastTrigger.Reset();
@@ -130,7 +125,7 @@ namespace Dorssel.Utility
                         // Must call handler asynchronously and outside the lock.
                         Task.Run(() =>
                         {
-                            Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
+                            Debounced?.Invoke(this, new DebouncedEventArgs((ulong)count));
                             lock (LockObject)
                             {
                                 // Handler has finished.
@@ -190,7 +185,7 @@ namespace Dorssel.Utility
         }
 
         #region IDebounce Support
-        public event EventHandler<IDebouncedEventArgs>? Debounced;
+        public event EventHandler<DebouncedEventArgs>? Debounced;
 
         public void Trigger()
         {

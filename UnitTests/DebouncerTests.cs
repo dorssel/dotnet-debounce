@@ -93,7 +93,7 @@ namespace UnitTests
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
             debouncer.Dispose();
-            Assert.AreEqual(0, wrapper.HandlerCount);
+            Assert.AreEqual(0UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -111,8 +111,8 @@ namespace UnitTests
             Thread.Sleep(TimingUnit);
             debouncer.Dispose();
             Assert.IsTrue(done.Wait(2 * TimingUnit));
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -128,8 +128,8 @@ namespace UnitTests
             };
             debouncer.Trigger();
             Assert.IsTrue(done.Wait(TimingUnit));
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
         #endregion
 
@@ -406,6 +406,35 @@ namespace UnitTests
         }
         #endregion
 
+        #region EventHandler
+        [TestMethod]
+        public void EventHandlerAcceptsEventArgs()
+        {
+            static void Handler(object? sender, EventArgs eventArgs) { }
+
+            using var debouncer = new Debouncer();
+            debouncer.Debounced += Handler;
+        }
+
+        [TestMethod]
+        public void EventHandlerAcceptsDebouncedEventArgs()
+        {
+            static void Handler(object? sender, DebouncedEventArgs debouncedEventArgs) { }
+
+            using var debouncer = new Debouncer();
+            debouncer.Debounced += Handler;
+        }
+
+        [TestMethod]
+        public void EventHandlerAcceptsIDebouncedEventArgs()
+        {
+            static void Handler(object? sender, IDebouncedEventArgs debouncedEventArgs) { }
+
+            using var debouncer = new Debouncer();
+            debouncer.Debounced += Handler;
+        }
+        #endregion
+
         #region Trigger
         [TestMethod]
         public void TriggerWithoutHandlers()
@@ -432,8 +461,8 @@ namespace UnitTests
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -446,11 +475,11 @@ namespace UnitTests
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(0, wrapper.TriggerCount);
-            Assert.AreEqual(0, wrapper.HandlerCount);
+            Assert.AreEqual(0UL, wrapper.TriggerCount);
+            Assert.AreEqual(0UL, wrapper.HandlerCount);
             Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -467,10 +496,10 @@ namespace UnitTests
                 debouncer.Trigger();
                 Thread.Sleep(TimingUnit);
             }
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
             Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(6, wrapper.TriggerCount);
-            Assert.AreEqual(2, wrapper.HandlerCount);
+            Assert.AreEqual(6UL, wrapper.TriggerCount);
+            Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -487,8 +516,8 @@ namespace UnitTests
                 debouncer.Trigger();
             }
             Thread.Sleep(4 * TimingUnit);
-            Assert.AreEqual(10, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(10UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -506,8 +535,8 @@ namespace UnitTests
             };
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(2, wrapper.TriggerCount);
-            Assert.AreEqual(2, wrapper.HandlerCount);
+            Assert.AreEqual(2UL, wrapper.TriggerCount);
+            Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -520,15 +549,15 @@ namespace UnitTests
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
             Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(2, wrapper.TriggerCount);
-            Assert.AreEqual(2, wrapper.HandlerCount);
+            Assert.AreEqual(2UL, wrapper.TriggerCount);
+            Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -541,15 +570,15 @@ namespace UnitTests
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
             Thread.Sleep(2 * TimingUnit);
-            Assert.AreEqual(2, wrapper.TriggerCount);
-            Assert.AreEqual(2, wrapper.HandlerCount);
+            Assert.AreEqual(2UL, wrapper.TriggerCount);
+            Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
@@ -567,8 +596,8 @@ namespace UnitTests
             debouncer.Trigger();
             debouncer.Trigger();
             Thread.Sleep(5 * TimingUnit);
-            Assert.AreEqual(3, wrapper.TriggerCount);
-            Assert.AreEqual(2, wrapper.HandlerCount);
+            Assert.AreEqual(3UL, wrapper.TriggerCount);
+            Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
         #endregion
 
@@ -583,24 +612,24 @@ namespace UnitTests
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(0, wrapper.HandlerCount);
+            Assert.AreEqual(0UL, wrapper.HandlerCount);
             debouncer.TimingGranularity = TimeSpan.Zero;
             debouncer.DebounceWindow = TimeSpan.Zero;
             Thread.Sleep(TimingUnit);
-            Assert.AreEqual(1, wrapper.TriggerCount);
-            Assert.AreEqual(1, wrapper.HandlerCount);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
 
         [TestMethod]
-        public void BenchMarkDefaults()
+        public void BenchmarkDefaults()
         {
             using var debouncer = new Debouncer();
             var benchmark = debouncer.Benchmark;
-            Assert.AreEqual(0, benchmark.HandlersCalled);
-            Assert.AreEqual(0, benchmark.TriggersReported);
-            Assert.AreEqual(0, benchmark.RescheduleCount);
-            Assert.AreEqual(0, benchmark.TimerChanges);
-            Assert.AreEqual(0, benchmark.TimerEvents);
+            Assert.AreEqual(0UL, benchmark.HandlersCalled);
+            Assert.AreEqual(0UL, benchmark.TriggersReported);
+            Assert.AreEqual(0UL, benchmark.RescheduleCount);
+            Assert.AreEqual(0UL, benchmark.TimerChanges);
+            Assert.AreEqual(0UL, benchmark.TimerEvents);
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Dorssel.Utility;
 
 namespace PerformanceTests
 {
+    [ExcludeFromCodeCoverage]
     static class Program
     {
         sealed class BenchmarkTest : IDisposable
@@ -75,7 +77,7 @@ namespace PerformanceTests
             using var debouncer = new Debouncer()
             {
                 DebounceWindow = coalesce ? TimeSpan.MaxValue : TimeSpan.Zero,
-                // with a fixed DebounceWindow of 0, this will coalesce during the handler
+                // with a fixed DebounceWindow of 0, this will only coalesce during the handler
                 TimingGranularity = TimeSpan.MaxValue
             };
 
