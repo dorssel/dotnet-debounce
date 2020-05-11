@@ -13,9 +13,10 @@ namespace Dorssel.Utility
 
         void Trigger();
 
-        public TimeSpan DebounceInterval { get; set; }
+        public TimeSpan DebounceWindow { get; set; }
         public TimeSpan DebounceTimeout { get; set; }
-        public TimeSpan BackoffInterval { get; set; }
+        public TimeSpan EventSpacing { get; set; }
+        public TimeSpan HandlerSpacing { get; set; }
         public TimeSpan TimingGranularity { get; set; }
     }
 }

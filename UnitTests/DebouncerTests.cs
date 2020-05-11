@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Dorssel.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class DebouncerTests
     {
         static readonly TimeSpan TimingUnit = TimeSpan.FromMilliseconds(50);
@@ -85,7 +87,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = 2 * TimingUnit
+                DebounceWindow = 2 * TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
@@ -131,99 +133,57 @@ namespace UnitTests
         }
         #endregion
 
-        #region DebounceInterval
+        #region DebounceWindow
         [TestMethod]
-        public void DebounceIntervalDefault()
+        public void DebounceWindowDefault()
         {
             using var debouncer = new Debouncer();
-            Assert.AreEqual(TimeSpan.Zero, debouncer.DebounceInterval);
+            Assert.AreEqual(TimeSpan.Zero, debouncer.DebounceWindow);
         }
 
         [DataTestMethod]
         [DynamicData(nameof(NonNegativeTimeSpans))]
-        public void DebounceIntervalValid(TimeSpan debounceInterval)
+        public void DebounceWindowValid(TimeSpan DebounceWindow)
         {
             using var debouncer = new Debouncer
             {
-                DebounceInterval = ArbitraryNonDefaultTimeSpan
+                DebounceWindow = ArbitraryNonDefaultTimeSpan
             };
-            debouncer.DebounceInterval = debounceInterval;
-            Assert.AreEqual(debounceInterval, debouncer.DebounceInterval);
+            debouncer.DebounceWindow = DebounceWindow;
+            Assert.AreEqual(DebounceWindow, debouncer.DebounceWindow);
         }
 
         [DataTestMethod]
         [DynamicData(nameof(NegativeTimeSpans))]
         [DynamicData(nameof(InfiniteTimeSpan))]
-        public void DebounceIntervalInvalid(TimeSpan debounceInterval)
+        public void DebounceWindowInvalid(TimeSpan DebounceWindow)
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.FromMilliseconds(1)
+                DebounceWindow = TimeSpan.FromMilliseconds(1)
             };
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceInterval = debounceInterval);
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceWindow = DebounceWindow);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceWindow);
         }
 
         [TestMethod]
-        public void DebounceIntervalUnchanged()
+        public void DebounceWindowUnchanged()
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.FromMilliseconds(1)
+                DebounceWindow = TimeSpan.FromMilliseconds(1)
             };
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
-            debouncer.DebounceInterval = TimeSpan.FromMilliseconds(1);
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceInterval);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceWindow);
+            debouncer.DebounceWindow = TimeSpan.FromMilliseconds(1);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceWindow);
         }
 
         [TestMethod]
-        public void DebounceIntervalEqualsDebounceTimeout()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceTimeout = TimeSpan.FromSeconds(1)
-            };
-            debouncer.DebounceInterval = TimeSpan.FromSeconds(1);
-        }
-
-        [TestMethod]
-        public void DebounceIntervalExceedsDebounceTimeout()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceTimeout = TimeSpan.FromSeconds(1)
-            };
-            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceInterval = TimeSpan.FromSeconds(2));
-        }
-
-        [TestMethod]
-        public void DebounceIntervalEqualsTimingGranularity()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceInterval = TimeSpan.FromSeconds(2),
-                TimingGranularity = TimeSpan.FromSeconds(1)
-            };
-            debouncer.DebounceInterval = TimeSpan.FromSeconds(1);
-        }
-
-        [TestMethod]
-        public void DebounceIntervalLessThanTimingGranularity()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceInterval = TimeSpan.FromSeconds(2),
-                TimingGranularity = TimeSpan.FromSeconds(2)
-            };
-            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceInterval = TimeSpan.FromSeconds(1));
-        }
-
-        [TestMethod]
-        public void DebounceIntervalAfterDispose()
+        public void DebounceWindowAfterDispose()
         {
             var debouncer = new Debouncer();
             debouncer.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceInterval = TimeSpan.Zero);
+            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceWindow = TimeSpan.Zero);
         }
         #endregion
 
@@ -273,16 +233,6 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void DebounceTimeoutLessThanDebounceInterval()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceInterval = TimeSpan.FromSeconds(2)
-            };
-            Assert.ThrowsException<ArgumentException>(() => debouncer.DebounceTimeout = TimeSpan.FromSeconds(1));
-        }
-
-        [TestMethod]
         public void DebounceTimeoutAfterDispose()
         {
             var debouncer = new Debouncer();
@@ -291,57 +241,111 @@ namespace UnitTests
         }
         #endregion
 
-        #region Backoff
+        #region EventSpacing
         [TestMethod]
-        public void BackoffIntervalDefault()
+        public void EventSpacingDefault()
         {
             using var debouncer = new Debouncer();
-            Assert.AreEqual(TimeSpan.Zero, debouncer.BackoffInterval);
+            Assert.AreEqual(TimeSpan.Zero, debouncer.EventSpacing);
         }
 
         [DataTestMethod]
         [DynamicData(nameof(NonNegativeTimeSpans))]
-        public void BackoffIntervalValid(TimeSpan backoffInterval)
+        public void EventSpacingValid(TimeSpan eventSpacing)
         {
             using var debouncer = new Debouncer
             {
-                BackoffInterval = ArbitraryNonDefaultTimeSpan
+                EventSpacing = ArbitraryNonDefaultTimeSpan
             };
-            debouncer.BackoffInterval = backoffInterval;
-            Assert.AreEqual(backoffInterval, debouncer.BackoffInterval);
+            debouncer.EventSpacing = eventSpacing;
+            Assert.AreEqual(eventSpacing, debouncer.EventSpacing);
         }
 
         [DataTestMethod]
         [DynamicData(nameof(NegativeTimeSpans))]
         [DynamicData(nameof(InfiniteTimeSpan))]
-        public void BackoffIntervalInvalid(TimeSpan backoffInterval)
+        public void EventSpacingInvalid(TimeSpan eventSpacing)
         {
             using var debouncer = new Debouncer()
             {
-                BackoffInterval = TimeSpan.FromMilliseconds(1)
+                EventSpacing = TimeSpan.FromMilliseconds(1)
             };
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.BackoffInterval = backoffInterval);
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.EventSpacing = eventSpacing);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.EventSpacing);
         }
 
         [TestMethod]
-        public void BackoffIntervalUnchanged()
+        public void EventSpacingUnchanged()
         {
             using var debouncer = new Debouncer()
             {
-                BackoffInterval = TimeSpan.FromMilliseconds(1)
+                EventSpacing = TimeSpan.FromMilliseconds(1)
             };
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
-            debouncer.BackoffInterval = TimeSpan.FromMilliseconds(1);
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.BackoffInterval);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.EventSpacing);
+            debouncer.EventSpacing = TimeSpan.FromMilliseconds(1);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.EventSpacing);
         }
 
         [TestMethod]
-        public void BackoffIntervalAfterDispose()
+        public void EventSpacingAfterDispose()
         {
             var debouncer = new Debouncer();
             debouncer.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.BackoffInterval = TimeSpan.Zero);
+            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.EventSpacing = TimeSpan.Zero);
+        }
+        #endregion
+
+        #region HandlerSpacing
+        [TestMethod]
+        public void HandlerSpacingDefault()
+        {
+            using var debouncer = new Debouncer();
+            Assert.AreEqual(TimeSpan.Zero, debouncer.HandlerSpacing);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NonNegativeTimeSpans))]
+        public void HandlerSpacingValid(TimeSpan HandlerSpacing)
+        {
+            using var debouncer = new Debouncer
+            {
+                HandlerSpacing = ArbitraryNonDefaultTimeSpan
+            };
+            debouncer.HandlerSpacing = HandlerSpacing;
+            Assert.AreEqual(HandlerSpacing, debouncer.HandlerSpacing);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(InfiniteTimeSpan))]
+        public void HandlerSpacingInvalid(TimeSpan HandlerSpacing)
+        {
+            using var debouncer = new Debouncer()
+            {
+                HandlerSpacing = TimeSpan.FromMilliseconds(1)
+            };
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.HandlerSpacing = HandlerSpacing);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.HandlerSpacing);
+        }
+
+        [TestMethod]
+        public void HandlerSpacingUnchanged()
+        {
+            using var debouncer = new Debouncer()
+            {
+                HandlerSpacing = TimeSpan.FromMilliseconds(1)
+            };
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.HandlerSpacing);
+            debouncer.HandlerSpacing = TimeSpan.FromMilliseconds(1);
+            Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.HandlerSpacing);
+        }
+
+        [TestMethod]
+        public void HandlerSpacingAfterDispose()
+        {
+            var debouncer = new Debouncer();
+            debouncer.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => debouncer.HandlerSpacing = TimeSpan.Zero);
         }
         #endregion
 
@@ -359,7 +363,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer
             {
-                DebounceInterval = TimeSpan.MaxValue,
+                DebounceWindow = TimeSpan.MaxValue,
                 TimingGranularity = ArbitraryNonDefaultTimeSpan
             };
             debouncer.TimingGranularity = timingGranularity;
@@ -373,7 +377,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.MaxValue,
+                DebounceWindow = TimeSpan.MaxValue,
                 TimingGranularity = TimeSpan.FromMilliseconds(2)
             };
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.TimingGranularity = timingGranularity);
@@ -385,32 +389,12 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.MaxValue,
+                DebounceWindow = TimeSpan.MaxValue,
                 TimingGranularity = TimeSpan.FromMilliseconds(2)
             };
             Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
             debouncer.TimingGranularity = TimeSpan.FromMilliseconds(2);
             Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
-        }
-
-        [TestMethod]
-        public void TimingGranularityEqualsDebounceInterval()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceInterval = TimeSpan.FromSeconds(1)
-            };
-            debouncer.TimingGranularity = TimeSpan.FromSeconds(1);
-        }
-
-        [TestMethod]
-        public void TimingGranularityExceedsDebounceInterval()
-        {
-            using var debouncer = new Debouncer()
-            {
-                DebounceInterval = TimeSpan.FromSeconds(1)
-            };
-            Assert.ThrowsException<ArgumentException>(() => debouncer.TimingGranularity = TimeSpan.FromSeconds(2));
         }
 
         [TestMethod]
@@ -457,7 +441,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = 2 * TimingUnit
+                DebounceWindow = 2 * TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
@@ -474,7 +458,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = 2 * TimingUnit,
+                DebounceWindow = 2 * TimingUnit,
                 DebounceTimeout = 4 * TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
@@ -494,7 +478,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimingUnit,
+                DebounceWindow = TimingUnit,
                 TimingGranularity = TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
@@ -527,11 +511,32 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void TriggerDuringBackoff()
+        public void TriggerDuringHandlerSpacing()
         {
             using var debouncer = new Debouncer()
             {
-                BackoffInterval = 3 * TimingUnit
+                HandlerSpacing = 3 * TimingUnit
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
+            debouncer.Trigger();
+            Thread.Sleep(TimingUnit);
+            Assert.AreEqual(1, wrapper.TriggerCount);
+            Assert.AreEqual(1, wrapper.HandlerCount);
+            Thread.Sleep(2 * TimingUnit);
+            Assert.AreEqual(2, wrapper.TriggerCount);
+            Assert.AreEqual(2, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void TriggerDuringEventSpacing()
+        {
+            using var debouncer = new Debouncer()
+            {
+                EventSpacing = 3 * TimingUnit
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
@@ -552,7 +557,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimingUnit,
+                DebounceWindow = TimingUnit,
                 TimingGranularity = TimingUnit / 10,
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
@@ -565,13 +570,14 @@ namespace UnitTests
             Assert.AreEqual(3, wrapper.TriggerCount);
             Assert.AreEqual(2, wrapper.HandlerCount);
         }
+        #endregion
 
         [TestMethod]
         public void TimingMaximum()
         {
             using var debouncer = new Debouncer()
             {
-                DebounceInterval = TimeSpan.MaxValue,
+                DebounceWindow = TimeSpan.MaxValue,
                 TimingGranularity = TimeSpan.MaxValue,
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
@@ -579,7 +585,7 @@ namespace UnitTests
             Thread.Sleep(TimingUnit);
             Assert.AreEqual(0, wrapper.HandlerCount);
             debouncer.TimingGranularity = TimeSpan.Zero;
-            debouncer.DebounceInterval = TimeSpan.Zero;
+            debouncer.DebounceWindow = TimeSpan.Zero;
             Thread.Sleep(TimingUnit);
             Assert.AreEqual(1, wrapper.TriggerCount);
             Assert.AreEqual(1, wrapper.HandlerCount);
@@ -596,6 +602,5 @@ namespace UnitTests
             Assert.AreEqual(0, benchmark.TimerChanges);
             Assert.AreEqual(0, benchmark.TimerEvents);
         }
-        #endregion
     }
 }

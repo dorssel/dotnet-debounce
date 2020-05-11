@@ -47,6 +47,7 @@ namespace Dorssel.Utility
         long Count = 0;
         readonly Stopwatch FirstTrigger = new Stopwatch();
         readonly Stopwatch LastTrigger = new Stopwatch();
+        readonly Stopwatch LastHandlerStarted = new Stopwatch();
         readonly Stopwatch LastHandlerFinished = new Stopwatch();
         readonly Timer Timer;
         bool TimerActive = false;
@@ -111,23 +112,28 @@ namespace Dorssel.Utility
             else
             {
                 // We are not currently sending an event, so check to see if we need to send one now.
+                var sinceLastHandlerStarted = LastHandlerStarted.IsRunning ? LastHandlerStarted.Elapsed : TimeSpan.MaxValue;
                 var sinceLastHandlerFinished = LastHandlerFinished.IsRunning ? LastHandlerFinished.Elapsed : TimeSpan.MaxValue;
-                if (sinceLastHandlerFinished >= _BackoffInterval)
+                if ((sinceLastHandlerStarted >= _EventSpacing) && (sinceLastHandlerFinished >= _HandlerSpacing))
                 {
                     // We are not within any backoff interval, so we may send an event if needed.
-                    if ((sinceLastTrigger >= _DebounceInterval) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
+                    if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
                     {
+                        // Sending event now, so accumulate all coalesced triggers.
                         var count = Count + (Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
 
                         FirstTrigger.Reset();
                         LastTrigger.Reset();
                         Count = 0;
                         SendingEvent = true;
+                        LastHandlerStarted.Restart();
+                        // Must call handler asynchronously and outside the lock.
                         Task.Run(() =>
                         {
                             Debounced?.Invoke(this, new DebouncedEventArgs() { Count = count });
                             lock (LockObject)
                             {
+                                // Handler has finished.
                                 _Benchmark.TriggersReported += count;
                                 ++_Benchmark.HandlersCalled;
                                 if (IsDisposed)
@@ -145,18 +151,23 @@ namespace Dorssel.Utility
 
                 // We are not sending an event, so wait until we should send it (with increasing priority):
                 // 1) Start with the debouncing interval.
-                dueTime = _DebounceInterval - sinceLastTrigger;
+                dueTime = _DebounceWindow - sinceLastTrigger;
                 // 2) Override with the debouncing timeout (if any) if that is sooner.
                 if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && (dueTime > _DebounceTimeout - sinceFirstTrigger))
                 {
                     dueTime = _DebounceTimeout - sinceFirstTrigger;
                 }
-                // 3) Override with the backoff interval if that is later.
-                if (dueTime < _BackoffInterval - sinceLastHandlerFinished)
+                // 3) Override with the event spacing if that is later.
+                if (dueTime < _EventSpacing - sinceLastHandlerStarted)
                 {
-                    dueTime = _BackoffInterval - sinceLastHandlerFinished;
+                    dueTime = _EventSpacing - sinceLastHandlerStarted;
                 }
-                // 4) Override with the timing granularity if we are currently coalescing triggers and if that is sooner.
+                // 4) Override with the handler spacing if that is later.
+                if (dueTime < _HandlerSpacing - sinceLastHandlerFinished)
+                {
+                    dueTime = _HandlerSpacing - sinceLastHandlerFinished;
+                }
+                // 5) Override with the timing granularity if we are currently coalescing triggers and if that is sooner.
                 if ((countMinusOne >= 0) && (dueTime > _TimingGranularity))
                 {
                     dueTime = _TimingGranularity;
@@ -215,7 +226,7 @@ namespace Dorssel.Utility
             }
         }
 
-        void SetField(ref TimeSpan field, TimeSpan value, bool allowInfinite, Action? validate = null, [CallerMemberName] string fieldName = "")
+        void SetField(ref TimeSpan field, TimeSpan value, bool allowInfinite, [CallerMemberName] string fieldName = "")
         {
             lock (LockObject)
             {
@@ -235,60 +246,44 @@ namespace Dorssel.Utility
                 {
                     throw new ArgumentOutOfRangeException(fieldName, $"{fieldName} must not be negative.");
                 }
-                validate?.Invoke();
                 field = value;
                 LockedReschedule();
             }
         }
 
-        TimeSpan _DebounceInterval = TimeSpan.Zero;
-        public TimeSpan DebounceInterval
+        TimeSpan _DebounceWindow = TimeSpan.Zero;
+        public TimeSpan DebounceWindow
         {
-            get => GetField(ref _DebounceInterval);
-            set => SetField(ref _DebounceInterval, value, false, () =>
-            {
-                if (value < _TimingGranularity)
-                {
-                    throw new ArgumentException($"{nameof(DebounceInterval)} ({value}) must not be less than {nameof(TimingGranularity)} ({_TimingGranularity}).", nameof(DebounceInterval));
-                }
-                if ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && (value > _DebounceTimeout))
-                {
-                    throw new ArgumentException($"{nameof(DebounceInterval)} ({value}) must not exceed {nameof(DebounceTimeout)} ({_DebounceTimeout}).", nameof(DebounceInterval));
-                }
-            });
+            get => GetField(ref _DebounceWindow);
+            set => SetField(ref _DebounceWindow, value, false);
         }
 
         TimeSpan _DebounceTimeout = Timeout.InfiniteTimeSpan;
         public TimeSpan DebounceTimeout
         {
             get => GetField(ref _DebounceTimeout);
-            set => SetField(ref _DebounceTimeout, value, true, () =>
-            {
-                if ((value != Timeout.InfiniteTimeSpan) && (value < _DebounceInterval))
-                {
-                    throw new ArgumentException($"{nameof(DebounceTimeout)} ({value}) must not be less than {nameof(DebounceInterval)} ({_DebounceInterval}).", nameof(DebounceTimeout));
-                }
-            });
+            set => SetField(ref _DebounceTimeout, value, true);
         }
 
-        TimeSpan _BackoffInterval = TimeSpan.Zero;
-        public TimeSpan BackoffInterval
+        TimeSpan _EventSpacing = TimeSpan.Zero;
+        public TimeSpan EventSpacing
         {
-            get => GetField(ref _BackoffInterval);
-            set => SetField(ref _BackoffInterval, value, false);
+            get => GetField(ref _EventSpacing);
+            set => SetField(ref _EventSpacing, value, false);
+        }
+
+        TimeSpan _HandlerSpacing = TimeSpan.Zero;
+        public TimeSpan HandlerSpacing
+        {
+            get => GetField(ref _HandlerSpacing);
+            set => SetField(ref _HandlerSpacing, value, false);
         }
 
         TimeSpan _TimingGranularity = TimeSpan.Zero;
         public TimeSpan TimingGranularity
         {
             get => GetField(ref _TimingGranularity);
-            set => SetField(ref _TimingGranularity, value, false, () =>
-            {
-                if (value > _DebounceInterval)
-                {
-                    throw new ArgumentException($"{nameof(TimingGranularity)} ({value}) must not exceed {nameof(DebounceInterval)} ({_DebounceInterval}).", nameof(TimingGranularity));
-                }
-            });
+            set => SetField(ref _TimingGranularity, value, false);
         }
         #endregion
 
