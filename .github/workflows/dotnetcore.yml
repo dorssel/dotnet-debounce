@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -25,12 +24,12 @@ jobs:
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Package
       run: dotnet pack --configuration Release --no-build --version-suffix master-$GITHUB_SHA
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2-preview
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
       with:
         name: nuget-package
         path: "**/*-master-*.nupkg"
     - name: Codecov
-      uses: codecov/codecov-action@v1.0.6
+      uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
