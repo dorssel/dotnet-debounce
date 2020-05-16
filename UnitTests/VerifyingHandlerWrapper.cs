@@ -13,12 +13,12 @@ namespace UnitTests
             Debouncer.Debounced += OnDebounced;
         }
 
-        public event EventHandler<DebouncedEventArgs>? Debounced;
+        public event EventHandler<IDebouncedEventArgs>? Debounced;
 
         public ulong HandlerCount { get; private set; }
         public ulong TriggerCount { get; private set; }
 
-        void OnDebounced(object? sender, DebouncedEventArgs debouncedEventArgs)
+        void OnDebounced(object? sender, IDebouncedEventArgs debouncedEventArgs)
         {
             // sender *must* be the original debouncer object
             Assert.AreSame(Debouncer, sender);

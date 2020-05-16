@@ -2,9 +2,9 @@
 
 namespace Dorssel.Utility
 {
-    public sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
+    sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
     {
-        internal DebouncedEventArgs(ulong count)
+        public DebouncedEventArgs(ulong count)
         {
             if (count == 0)
             {

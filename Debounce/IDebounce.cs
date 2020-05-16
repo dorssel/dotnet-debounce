@@ -4,7 +4,7 @@ namespace Dorssel.Utility
 {
     public interface IDebounce : IDisposable
     {
-        event EventHandler<DebouncedEventArgs>? Debounced;
+        event EventHandler<IDebouncedEventArgs>? Debounced;
 
         void Trigger();
 

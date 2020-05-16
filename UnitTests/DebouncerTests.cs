@@ -11,7 +11,9 @@ namespace UnitTests
     [ExcludeFromCodeCoverage]
     public class DebouncerTests
     {
-        static readonly TimeSpan TimingUnit = TimeSpan.FromMilliseconds(50);
+        static TimeSpan TimingUnits(double count) => TimeSpan.FromMilliseconds(50 * count);
+
+        static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
 
         /// <summary>
         /// Some non-default TimeSpan that is also not equal to any of the valid/invalid TimeSpan test values.
@@ -56,7 +58,7 @@ namespace UnitTests
             }
         }
 
-        #region Constructor
+#region Constructor
         [TestMethod]
         public void ConstructorDefault()
         {
@@ -64,9 +66,9 @@ namespace UnitTests
             _ = new Debouncer();
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
-        #endregion
+#endregion
 
-        #region Dispose
+#region Dispose
         [TestMethod]
         public void DisposeNoThrow()
         {
@@ -87,11 +89,11 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceWindow = 2 * TimingUnit
+                DebounceWindow = TimingUnits(2)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             debouncer.Dispose();
             Assert.AreEqual(0UL, wrapper.HandlerCount);
         }
@@ -104,13 +106,13 @@ namespace UnitTests
             using var done = new ManualResetEventSlim();
             wrapper.Debounced += (s, e) =>
             {
-                Thread.Sleep(2 * TimingUnit);
+                Sleep(2);
                 done.Set();
             };
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             debouncer.Dispose();
-            Assert.IsTrue(done.Wait(2 * TimingUnit));
+            Assert.IsTrue(done.Wait(TimingUnits(2)));
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
@@ -127,13 +129,13 @@ namespace UnitTests
                 done.Set();
             };
             debouncer.Trigger();
-            Assert.IsTrue(done.Wait(TimingUnit));
+            Assert.IsTrue(done.Wait(TimingUnits(1)));
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
-        #endregion
+#endregion
 
-        #region DebounceWindow
+#region DebounceWindow
         [TestMethod]
         public void DebounceWindowDefault()
         {
@@ -185,9 +187,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceWindow = TimeSpan.Zero);
         }
-        #endregion
+#endregion
 
-        #region DebounceTimeout
+#region DebounceTimeout
         [TestMethod]
         public void DebounceTimeoutDefault()
         {
@@ -239,9 +241,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceTimeout = TimeSpan.Zero);
         }
-        #endregion
+#endregion
 
-        #region EventSpacing
+#region EventSpacing
         [TestMethod]
         public void EventSpacingDefault()
         {
@@ -293,9 +295,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.EventSpacing = TimeSpan.Zero);
         }
-        #endregion
+#endregion
 
-        #region HandlerSpacing
+#region HandlerSpacing
         [TestMethod]
         public void HandlerSpacingDefault()
         {
@@ -347,9 +349,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.HandlerSpacing = TimeSpan.Zero);
         }
-        #endregion
+#endregion
 
-        #region TimingGranularity
+#region TimingGranularity
         [TestMethod]
         public void TimingGranularityDefault()
         {
@@ -404,27 +406,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.TimingGranularity = TimeSpan.Zero);
         }
-        #endregion
+#endregion
 
-        #region EventHandler
-        [TestMethod]
-        public void EventHandlerAcceptsEventArgs()
-        {
-            static void Handler(object? sender, EventArgs eventArgs) { }
-
-            using var debouncer = new Debouncer();
-            debouncer.Debounced += Handler;
-        }
-
-        [TestMethod]
-        public void EventHandlerAcceptsDebouncedEventArgs()
-        {
-            static void Handler(object? sender, DebouncedEventArgs debouncedEventArgs) { }
-
-            using var debouncer = new Debouncer();
-            debouncer.Debounced += Handler;
-        }
-
+#region EventHandler
         [TestMethod]
         public void EventHandlerAcceptsIDebouncedEventArgs()
         {
@@ -433,9 +417,9 @@ namespace UnitTests
             using var debouncer = new Debouncer();
             debouncer.Debounced += Handler;
         }
-        #endregion
+#endregion
 
-        #region Trigger
+#region Trigger
         [TestMethod]
         public void TriggerWithoutHandlers()
         {
@@ -443,7 +427,7 @@ namespace UnitTests
                 using var debouncer = new Debouncer();
                 debouncer.Trigger();
             }
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
         }
 
         [TestMethod]
@@ -460,7 +444,7 @@ namespace UnitTests
             using var debouncer = new Debouncer();
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
@@ -470,14 +454,14 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceWindow = 2 * TimingUnit
+                DebounceWindow = TimingUnits(2)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(0UL, wrapper.TriggerCount);
             Assert.AreEqual(0UL, wrapper.HandlerCount);
-            Thread.Sleep(2 * TimingUnit);
+            Sleep(2);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
@@ -487,17 +471,17 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceWindow = 2 * TimingUnit,
-                DebounceTimeout = 4 * TimingUnit
+                DebounceWindow = TimingUnits(2),
+                DebounceTimeout = TimingUnits(4)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             for (var i = 0; i < 6; ++i)
             {
                 debouncer.Trigger();
-                Thread.Sleep(TimingUnit);
+                Sleep(1);
             }
             Assert.AreEqual(1UL, wrapper.HandlerCount);
-            Thread.Sleep(2 * TimingUnit);
+            Sleep(2);
             Assert.AreEqual(6UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
@@ -507,15 +491,15 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceWindow = TimingUnit,
-                TimingGranularity = TimingUnit
+                DebounceWindow = TimingUnits(1),
+                TimingGranularity = TimingUnits(1)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             for (var i = 0; i < 10; ++i)
             {
                 debouncer.Trigger();
             }
-            Thread.Sleep(4 * TimingUnit);
+            Sleep(4);
             Assert.AreEqual(10UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
@@ -534,7 +518,7 @@ namespace UnitTests
                 }
             };
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(2UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
@@ -544,18 +528,18 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                HandlerSpacing = 3 * TimingUnit
+                HandlerSpacing = TimingUnits(3)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
-            Thread.Sleep(2 * TimingUnit);
+            Sleep(2);
             Assert.AreEqual(2UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
@@ -565,18 +549,18 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                EventSpacing = 3 * TimingUnit
+                EventSpacing = TimingUnits(3)
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
-            Thread.Sleep(2 * TimingUnit);
+            Sleep(2);
             Assert.AreEqual(2UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
@@ -586,20 +570,20 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer()
             {
-                DebounceWindow = TimingUnit,
-                TimingGranularity = TimingUnit / 10,
+                DebounceWindow = TimingUnits(1),
+                TimingGranularity = TimingUnits(0.1),
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
-            wrapper.Debounced += (s, e) => Thread.Sleep(2 * TimingUnit);
+            wrapper.Debounced += (s, e) => Sleep(2);
             debouncer.Trigger();
-            Thread.Sleep(2 * TimingUnit);
+            Sleep(2);
             debouncer.Trigger();
             debouncer.Trigger();
-            Thread.Sleep(5 * TimingUnit);
+            Sleep(5);
             Assert.AreEqual(3UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
-        #endregion
+#endregion
 
         [TestMethod]
         public void TimingMaximum()
@@ -611,11 +595,11 @@ namespace UnitTests
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(0UL, wrapper.HandlerCount);
             debouncer.TimingGranularity = TimeSpan.Zero;
             debouncer.DebounceWindow = TimeSpan.Zero;
-            Thread.Sleep(TimingUnit);
+            Sleep(1);
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }

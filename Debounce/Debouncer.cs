@@ -185,7 +185,7 @@ namespace Dorssel.Utility
         }
 
         #region IDebounce Support
-        public event EventHandler<DebouncedEventArgs>? Debounced;
+        public event EventHandler<IDebouncedEventArgs>? Debounced;
 
         public void Trigger()
         {
