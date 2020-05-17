@@ -15,8 +15,8 @@ namespace PerformanceTests
             public BenchmarkTest(Debouncer debouncer)
             {
                 Debouncer = debouncer;
-                Stopwatch.Start();
                 CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+                Stopwatch.Start();
             }
 
             public bool IsFinished { get => CancellationTokenSource.IsCancellationRequested; }
@@ -96,12 +96,12 @@ namespace PerformanceTests
             Task.WaitAll(tasks);
         }
 
+        // we're testing the performance of the Debouncer, not of the CLR thread scheduler,
+        // so leave one processor free.
+        static readonly uint MaxTasks = (uint)Environment.ProcessorCount - 1;
+
         static void Main()
         {
-            // we're testing the performance of the Debouncer, not of the CLR thread scheduler,
-            // so leave one processor free.
-            var MaxTasks = (uint)Environment.ProcessorCount - 1;
-
             Console.WriteLine("Single-threaded trigger speed");
             TriggerTest(1, false);
 
@@ -135,6 +135,28 @@ namespace PerformanceTests
             {
                 Console.WriteLine("Handler speed");
                 using var debouncer = new Debouncer();
+                void handler(object? s, IDebouncedEventArgs e)
+                {
+                    // each handler triggers the next
+                    debouncer.Trigger();
+                }
+                debouncer.Debounced += handler;
+
+                using var test = new BenchmarkTest(debouncer);
+                // start the chain
+                debouncer.Trigger();
+                test.WaitUntilFinished();
+                debouncer.Debounced -= handler;
+            }
+
+            {
+                Console.WriteLine("Timer speed");
+                using var debouncer = new Debouncer()
+                {
+                    // smallest value > 0
+                    DebounceWindow = TimeSpan.FromTicks(1),
+                    TimingGranularity = TimeSpan.FromTicks(1)
+                };
                 void handler(object? s, IDebouncedEventArgs e)
                 {
                     // each handler triggers the next
