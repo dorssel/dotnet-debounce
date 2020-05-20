@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Dorssel.Utility;
@@ -8,55 +7,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests
 {
     [TestClass]
+    [TestCategory("Production")]
     [ExcludeFromCodeCoverage]
     public class DebouncerTests
     {
         static TimeSpan TimingUnits(double count) => TimeSpan.FromMilliseconds(50 * count);
 
         static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
-
-        /// <summary>
-        /// Some non-default TimeSpan that is also not equal to any of the valid/invalid TimeSpan test values.
-        /// </summary>
-        static readonly TimeSpan ArbitraryNonDefaultTimeSpan = TimeSpan.FromSeconds(Math.PI);
-
-        public static IEnumerable<object[]> NonNegativeTimeSpans
-        {
-            get
-            {
-                yield return new object[] { TimeSpan.MaxValue };
-                yield return new object[] { TimeSpan.FromDays(1) };
-                yield return new object[] { TimeSpan.FromHours(1) };
-                yield return new object[] { TimeSpan.FromMinutes(1) };
-                yield return new object[] { TimeSpan.FromSeconds(1) };
-                yield return new object[] { TimeSpan.FromMilliseconds(1) };
-                yield return new object[] { TimeSpan.FromTicks(1) };
-                yield return new object[] { TimeSpan.Zero };
-            }
-        }
-
-        public static IEnumerable<object[]> InfiniteTimeSpan
-        {
-            get
-            {
-                yield return new object[] { Timeout.InfiniteTimeSpan };
-            }
-        }
-
-        public static IEnumerable<object[]> NegativeTimeSpans
-        {
-            get
-            {
-                // NOTE: FromMilliseconds(-1) == InfiniteTimeSpan, a  magic value
-                yield return new object[] { TimeSpan.FromTicks(-1) };
-                yield return new object[] { TimeSpan.FromMilliseconds(-2) };
-                yield return new object[] { TimeSpan.FromSeconds(-1) };
-                yield return new object[] { TimeSpan.FromMinutes(-1) };
-                yield return new object[] { TimeSpan.FromHours(-1) };
-                yield return new object[] { TimeSpan.FromDays(-1) };
-                yield return new object[] { TimeSpan.MinValue };
-            }
-        }
 
 #region Constructor
         [TestMethod]
@@ -144,20 +101,20 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
+        [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
         public void DebounceWindowValid(TimeSpan DebounceWindow)
         {
             using var debouncer = new Debouncer
             {
-                DebounceWindow = ArbitraryNonDefaultTimeSpan
+                DebounceWindow = TimeSpanData.ArbitraryNonDefault
             };
             debouncer.DebounceWindow = DebounceWindow;
             Assert.AreEqual(DebounceWindow, debouncer.DebounceWindow);
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
+        [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
         public void DebounceWindowInvalid(TimeSpan DebounceWindow)
         {
             using var debouncer = new Debouncer()
@@ -198,20 +155,20 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
+        [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
         public void DebounceTimeoutValid(TimeSpan debounceTimeout)
         {
             using var debouncer = new Debouncer
             {
-                DebounceTimeout = ArbitraryNonDefaultTimeSpan
+                DebounceTimeout = TimeSpanData.ArbitraryNonDefault
             };
             debouncer.DebounceTimeout = debounceTimeout;
             Assert.AreEqual(debounceTimeout, debouncer.DebounceTimeout);
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
+        [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
         public void DebounceTimeoutInvalid(TimeSpan debounceTimeout)
         {
             using var debouncer = new Debouncer()
@@ -252,20 +209,20 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
+        [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
         public void EventSpacingValid(TimeSpan eventSpacing)
         {
             using var debouncer = new Debouncer
             {
-                EventSpacing = ArbitraryNonDefaultTimeSpan
+                EventSpacing = TimeSpanData.ArbitraryNonDefault
             };
             debouncer.EventSpacing = eventSpacing;
             Assert.AreEqual(eventSpacing, debouncer.EventSpacing);
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
+        [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
         public void EventSpacingInvalid(TimeSpan eventSpacing)
         {
             using var debouncer = new Debouncer()
@@ -306,20 +263,20 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
+        [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
         public void HandlerSpacingValid(TimeSpan HandlerSpacing)
         {
             using var debouncer = new Debouncer
             {
-                HandlerSpacing = ArbitraryNonDefaultTimeSpan
+                HandlerSpacing = TimeSpanData.ArbitraryNonDefault
             };
             debouncer.HandlerSpacing = HandlerSpacing;
             Assert.AreEqual(HandlerSpacing, debouncer.HandlerSpacing);
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
+        [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
         public void HandlerSpacingInvalid(TimeSpan HandlerSpacing)
         {
             using var debouncer = new Debouncer()
@@ -360,21 +317,21 @@ namespace UnitTests
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NonNegativeTimeSpans))]
+        [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
         public void TimingGranularityValid(TimeSpan timingGranularity)
         {
             using var debouncer = new Debouncer
             {
                 DebounceWindow = TimeSpan.MaxValue,
-                TimingGranularity = ArbitraryNonDefaultTimeSpan
+                TimingGranularity = TimeSpanData.ArbitraryNonDefault
             };
             debouncer.TimingGranularity = timingGranularity;
             Assert.AreEqual(timingGranularity, debouncer.TimingGranularity);
         }
 
         [DataTestMethod]
-        [DynamicData(nameof(NegativeTimeSpans))]
-        [DynamicData(nameof(InfiniteTimeSpan))]
+        [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
+        [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
         public void TimingGranularityInvalid(TimeSpan timingGranularity)
         {
             using var debouncer = new Debouncer()

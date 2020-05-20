@@ -8,6 +8,7 @@ using Testable;
 namespace TestableUnitTests
 {
     [TestClass]
+    [TestCategory("Example")]
     [ExcludeFromCodeCoverage]
     public class TestableClassTests
     {

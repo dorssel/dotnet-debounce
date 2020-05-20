@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests
 {
     [TestClass]
+    [TestCategory("Production")]
     [ExcludeFromCodeCoverage]
     public class DebouncedEventArgsTests
     {
