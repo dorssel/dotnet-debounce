@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<h1>Demo of using Debouncer in blazor.</h1>
+
+<p>This is a minor adaptation of the default blazor Counter demo that comes with the .NET Core SDK.</p>
+
+<p>
+    The counter has been replaced by GlobalCounter, a singeleton that is injected in every Counter page instance.
+    This means the state is shared among all browsers that have the Counter page open; the Increment button increments the global counter.
+</p>
+
+<p>
+    Since the counter implements the INotifyPropertyChanged interface and the Counter page subscribes to the event, every page will automatically
+    update to the new value. You can try this  by opening multiple browser windows to the Counter page and click the increment button.
+    The counter fires a PropertyChanged event for every increment, so you might think that repeatedly clicking the Increment button generates a lot of page updates.
+    But it doesn't, because the Counter page debounces, coalesces, and throttles the update events!
+</p>
+
+<p>
+    As an ultimate test, the Counter page also has a stress test mode where a background task is started that increments the counter in a tight loop.
+    Of course, the stress test checkbox is automatically synchronized between browsers as well, as it also is part of INotifyPropertyChanged.
+    How many increments per second can it handle, considering every single increment fires exactly one PropertChanged event? Try it...
+</p>

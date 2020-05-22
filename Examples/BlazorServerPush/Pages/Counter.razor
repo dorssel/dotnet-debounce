@@ -1,0 +1,61 @@
+﻿@page "/counter"
+
+@inject GlobalCounter GlobalCounter
+
+@implements IDisposable
+
+@using System.ComponentModel
+@using Dorssel.Utility
+
+<h1>Counter</h1>
+
+<p>Current count: @GlobalCounter.Count</p>
+<p>Stress: <input type="checkbox" @bind="@GlobalCounter.Enabled" /></p>
+<button class="btn btn-primary" @onclick="GlobalCounter.Increment">Increment</button>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GlobalCounter.PropertyChanged += OnPropertyChanged;
+        Debouncer.Debounced += OnDebounced;
+        base.OnInitialized();
+    }
+
+    void OnPropertyChanged(object sender, PropertyChangedEventArgs ev)
+    {
+        // don't react immediately, but debounce all changes
+        Debouncer.Trigger();
+    }
+
+    void OnDebounced(object? sender, IDebouncedEventArgs ev)
+    {
+        // now it is time to render the new state
+        InvokeAsync(() => StateHasChanged()).Wait();
+    }
+
+    Debouncer Debouncer = new Debouncer()
+    {
+        // 10 ms means that we are snappy for single updates
+        DebounceWindow = TimeSpan.FromMilliseconds(10),
+        // 100 ms means that when stressed we are more relaxed and update max 10 times per second
+        DebounceTimeout = TimeSpan.FromMilliseconds(100),
+        // to avoid the renderer itself from getting stressed, separate renders by 20 ms
+        HandlerSpacing = TimeSpan.FromMilliseconds(20),
+        // when multi-threading, it is a good idea to coalesce for about 10% of the DebounceWindow
+        TimingGranularity = TimeSpan.FromMilliseconds(1),
+    };
+
+    bool IsDisposed = false;
+
+    public void Dispose()
+    {
+        if (!IsDisposed)
+        {
+            // often forgotten: clean up when done
+            GlobalCounter.PropertyChanged -= OnPropertyChanged;
+            Debouncer.Debounced -= OnDebounced;
+            Debouncer.Dispose();
+            IsDisposed = true;
+        }
+    }
+}

@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestableUnitTests", "Exampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testable", "Examples\Testable\Testable.csproj", "{27A07D4E-AD8D-4863-AAB8-3DAEDAF55170}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorServerPush", "Examples\BlazorServerPush\BlazorServerPush.csproj", "{C8153F1E-38A2-4056-960C-2AD4DF270A77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{27A07D4E-AD8D-4863-AAB8-3DAEDAF55170}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27A07D4E-AD8D-4863-AAB8-3DAEDAF55170}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27A07D4E-AD8D-4863-AAB8-3DAEDAF55170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +61,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{84F16265-C09A-45EC-BE12-4BE49B909174} = {8BBBC033-56AA-4A5B-80C6-FC66C6F6D508}
 		{27A07D4E-AD8D-4863-AAB8-3DAEDAF55170} = {8BBBC033-56AA-4A5B-80C6-FC66C6F6D508}
+		{C8153F1E-38A2-4056-960C-2AD4DF270A77} = {8BBBC033-56AA-4A5B-80C6-FC66C6F6D508}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {261F778F-2938-46B8-86A4-6F83DBD95710}
