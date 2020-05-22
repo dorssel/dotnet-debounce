@@ -26,7 +26,8 @@ namespace TestableUnitTests
         [TestMethod]
         public void ConstructorThrowsOnNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
                 using var _ = new TestableClass(null!);
             });
         }

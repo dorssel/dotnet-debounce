@@ -27,7 +27,7 @@ namespace Testable
                 // Real Debouncer will never call with null arguments, but we can mock it!
                 return;
             }
-            
+
             if (debouncedEventArgs.Count == 0)
             {
                 // Real DebouncedEventArgs will never contain Count == 0, but we can mock it!

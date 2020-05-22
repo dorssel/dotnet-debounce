@@ -15,7 +15,7 @@ namespace UnitTests
 
         static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
 
-#region Constructor
+        #region Constructor
         [TestMethod]
         public void ConstructorDefault()
         {
@@ -23,9 +23,9 @@ namespace UnitTests
             _ = new Debouncer();
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
-#endregion
+        #endregion
 
-#region Dispose
+        #region Dispose
         [TestMethod]
         public void DisposeNoThrow()
         {
@@ -90,9 +90,9 @@ namespace UnitTests
             Assert.AreEqual(1UL, wrapper.TriggerCount);
             Assert.AreEqual(1UL, wrapper.HandlerCount);
         }
-#endregion
+        #endregion
 
-#region DebounceWindow
+        #region DebounceWindow
         [TestMethod]
         public void DebounceWindowDefault()
         {
@@ -144,9 +144,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceWindow = TimeSpan.Zero);
         }
-#endregion
+        #endregion
 
-#region DebounceTimeout
+        #region DebounceTimeout
         [TestMethod]
         public void DebounceTimeoutDefault()
         {
@@ -198,9 +198,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceTimeout = TimeSpan.Zero);
         }
-#endregion
+        #endregion
 
-#region EventSpacing
+        #region EventSpacing
         [TestMethod]
         public void EventSpacingDefault()
         {
@@ -252,9 +252,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.EventSpacing = TimeSpan.Zero);
         }
-#endregion
+        #endregion
 
-#region HandlerSpacing
+        #region HandlerSpacing
         [TestMethod]
         public void HandlerSpacingDefault()
         {
@@ -306,9 +306,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.HandlerSpacing = TimeSpan.Zero);
         }
-#endregion
+        #endregion
 
-#region TimingGranularity
+        #region TimingGranularity
         [TestMethod]
         public void TimingGranularityDefault()
         {
@@ -363,9 +363,9 @@ namespace UnitTests
             debouncer.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => debouncer.TimingGranularity = TimeSpan.Zero);
         }
-#endregion
+        #endregion
 
-#region EventHandler
+        #region EventHandler
         [TestMethod]
         public void EventHandlerAcceptsIDebouncedEventArgs()
         {
@@ -374,9 +374,9 @@ namespace UnitTests
             using var debouncer = new Debouncer();
             debouncer.Debounced += Handler;
         }
-#endregion
+        #endregion
 
-#region Trigger
+        #region Trigger
         [TestMethod]
         public void TriggerWithoutHandlers()
         {
@@ -540,7 +540,7 @@ namespace UnitTests
             Assert.AreEqual(3UL, wrapper.TriggerCount);
             Assert.AreEqual(2UL, wrapper.HandlerCount);
         }
-#endregion
+        #endregion
 
         [TestMethod]
         public void TimingMaximum()
