@@ -2,9 +2,11 @@
 
 namespace Dorssel.Utility
 {
+    public delegate void DebouncedEventHandler(object sender, IDebouncedEventArgs e);
+
     public interface IDebounce : IDisposable
     {
-        event EventHandler<IDebouncedEventArgs>? Debounced;
+        event DebouncedEventHandler Debounced;
 
         void Trigger();
 

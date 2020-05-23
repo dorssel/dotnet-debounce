@@ -27,7 +27,7 @@
         Debouncer.Trigger();
     }
 
-    void OnDebounced(object? sender, IDebouncedEventArgs ev)
+    void OnDebounced(object sender, IDebouncedEventArgs ev)
     {
         // now it is time to render the new state
         InvokeAsync(() => StateHasChanged()).Wait();

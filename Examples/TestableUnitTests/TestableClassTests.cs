@@ -16,11 +16,11 @@ namespace TestableUnitTests
         public void ConstructorHappyFlow()
         {
             var debounce = new Mock<IDebounce>();
-            debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<IDebouncedEventArgs>>());
+            debounce.SetupAdd(m => m.Debounced += It.IsAny<DebouncedEventHandler>());
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.VerifyAdd(m => m.Debounced += It.IsAny<EventHandler<IDebouncedEventArgs>>(), Times.Once());
+            debounce.VerifyAdd(m => m.Debounced += It.IsAny<DebouncedEventHandler>(), Times.Once());
         }
 
         [TestMethod]
@@ -36,11 +36,11 @@ namespace TestableUnitTests
         public void DisposeUnregisters()
         {
             var debounce = new Mock<IDebounce>();
-            debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<IDebouncedEventArgs>>());
+            debounce.SetupRemove(m => m.Debounced -= It.IsAny<DebouncedEventHandler>());
 
             using (new TestableClass(debounce.Object)) { }
 
-            debounce.VerifyRemove(m => m.Debounced -= It.IsAny<EventHandler<IDebouncedEventArgs>>(), Times.Once());
+            debounce.VerifyRemove(m => m.Debounced -= It.IsAny<DebouncedEventHandler>(), Times.Once());
         }
 
 

@@ -369,7 +369,7 @@ namespace UnitTests
         [TestMethod]
         public void EventHandlerAcceptsIDebouncedEventArgs()
         {
-            static void Handler(object? sender, IDebouncedEventArgs debouncedEventArgs) { }
+            static void Handler(object sender, IDebouncedEventArgs debouncedEventArgs) { }
 
             using var debouncer = new Debouncer();
             debouncer.Debounced += Handler;

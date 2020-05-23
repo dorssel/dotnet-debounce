@@ -135,7 +135,7 @@ namespace PerformanceTests
             {
                 Console.WriteLine("Handler speed");
                 using var debouncer = new Debouncer();
-                void handler(object? s, IDebouncedEventArgs e)
+                void handler(object s, IDebouncedEventArgs e)
                 {
                     // each handler triggers the next
                     debouncer.Trigger();
@@ -157,7 +157,7 @@ namespace PerformanceTests
                     DebounceWindow = TimeSpan.FromTicks(1),
                     TimingGranularity = TimeSpan.FromTicks(1)
                 };
-                void handler(object? s, IDebouncedEventArgs e)
+                void handler(object s, IDebouncedEventArgs e)
                 {
                     // each handler triggers the next
                     debouncer.Trigger();

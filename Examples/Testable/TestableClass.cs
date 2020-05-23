@@ -15,7 +15,7 @@ namespace Testable
             Debounce.Debounced += OnDebouncedEvents;
         }
 
-        void OnDebouncedEvents(object? sender, IDebouncedEventArgs debouncedEventArgs)
+        void OnDebouncedEvents(object sender, IDebouncedEventArgs debouncedEventArgs)
         {
             if (sender == null)
             {
