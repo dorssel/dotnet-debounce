@@ -3,9 +3,11 @@
 
 .gitattributes   text
 .gitignore       text
+.editorconfig    text
 
 *.md    text
 *.txt   text
+*LICENSE   text
 
 *.yml   text
 
@@ -14,3 +16,20 @@
 *.csproj   text
 *.cs       text
 *.props    text
+
+# don't diff minified files
+*.min.css       text -diff
+*.min.css.map   text -diff
+
+# don't diff icons and fonts
+*.ico    binary
+*.eot    binary
+*.otf    binary
+*.svg    text -diff
+*.ttf    binary
+*.woff   binary
+
+*.razor    text
+*.cshtml   text
+*.json     text
+*.css      text
