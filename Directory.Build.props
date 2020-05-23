@@ -1,8 +1,13 @@
 <Project>
 
   <PropertyGroup>
+    <!-- Use the latest .NET Core SDK -->
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- Use the latest C# Language standard -->
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
+    
+    <!-- Common defaults -->
     <IsPackable>false</IsPackable>
     <Authors>Frans van Dorsselaer</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -12,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Use the latest Code Analysis tooling -->
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

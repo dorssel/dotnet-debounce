@@ -1,5 +1,10 @@
 <Project>
 
+  <PropertyGroup>
+    <!-- Be strict when testing -->
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- Use the latest MSTest unit test tooling -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
