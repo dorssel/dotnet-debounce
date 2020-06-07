@@ -8,12 +8,29 @@ namespace Dorssel.Utility
     {
         event DebouncedEventHandler Debounced;
 
+        /// <summary>Accumulates one more trigger.</summary>
+        /// <exception cref="ObjectDisposedException" />
         void Trigger();
 
-        public TimeSpan DebounceWindow { get; set; }
-        public TimeSpan DebounceTimeout { get; set; }
-        public TimeSpan EventSpacing { get; set; }
-        public TimeSpan HandlerSpacing { get; set; }
-        public TimeSpan TimingGranularity { get; set; }
+        /// <summary>Gets or sets the <see cref="TimeSpan"/> within which new calls to <see cref="Trigger"/> will restart the debounce timer.</summary>
+        /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
+        /// <exception cref="ObjectDisposedException" />
+        TimeSpan DebounceWindow { get; set; }
+
+        /// <summary>Gets or sets the <see cref="TimeSpan"/> since the first <see cref="Trigger"/> after the which a new <see cref="Debounced"/> event will fire.</summary>
+        /// <exception cref="ObjectDisposedException" />
+        TimeSpan DebounceTimeout { get; set; }
+
+        /// <summary>Gets or sets the minimum <see cref="TimeSpan"/> between two consecutive starts of the <see cref="Debounced"/> event.</summary>
+        /// <exception cref="ObjectDisposedException" />
+        TimeSpan EventSpacing { get; set; }
+
+        /// <summary>Gets or sets the minimum <see cref="TimeSpan"/> between the end of one <see cref="Debounced"/> event handler invocation and the start of the next.</summary>
+        /// <exception cref="ObjectDisposedException" />
+        TimeSpan HandlerSpacing { get; set; }
+
+        /// <summary>Gets or sets the <see cref="TimeSpan"/> within which multiple calls to <see cref="Trigger"/> will be coalesced without rescheduling the timer.</summary>
+        /// <exception cref="ObjectDisposedException" />
+        TimeSpan TimingGranularity { get; set; }
     }
 }
