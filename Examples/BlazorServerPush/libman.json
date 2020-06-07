@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "blazor.polyfill@3.0.8",
+      "destination": "wwwroot/libman/blazor.polyfill/",
+      "files": [ "blazor.polyfill.min.js" ]
+    },
+    {
+      "library": "bootstrap@4.5.0",
+      "destination": "wwwroot/libman/bootstrap/",
+      "files": [
+        "dist/css/bootstrap.min.css",
+        "dist/css/bootstrap.min.css.map"
+      ]
+    },
+    {
+      "library": "open-iconic@1.1.1",
+      "destination": "wwwroot/libman/open-iconic/",
+      "files": [
+        "font/css/open-iconic-bootstrap.min.css",
+        "font/fonts/*"
+      ]
+    }
+  ]
+}

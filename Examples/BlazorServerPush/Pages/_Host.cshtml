@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BlazorServerPush</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="libman/bootstrap/dist/css/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
 </head>
 <body>
@@ -37,7 +37,7 @@
             && (userAgents.FirstOrDefault() is string userAgent)
             && System.Text.RegularExpressions.Regex.IsMatch(userAgent, @"MSIE \d|Trident.*rv:"))
         {
-            <script src="js/blazor.polyfill.min.js"></script>
+            <script src="libman/blazor.polyfill/blazor.polyfill.min.js"></script>
         }
     }
     <script src="_framework/blazor.server.js"></script>

@@ -3,3 +3,4 @@ obj/
 .vs/
 TestResults/
 *.user
+Examples/BlazorServerPush/wwwroot/libman/
