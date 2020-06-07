@@ -213,6 +213,24 @@ namespace Dorssel.Utility
             }
         }
 
+        public ulong Reset()
+        {
+            lock (LockObject)
+            {
+                if (!IsDisposed)
+                {
+                    Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                }
+                var count = Count;
+                Count = 0;
+                if (!IsDisposed)
+                {
+                    LockedReschedule();
+                }
+                return count;
+            }
+        }
+
         TimeSpan GetField(ref TimeSpan field)
         {
             lock (LockObject)
@@ -295,14 +313,14 @@ namespace Dorssel.Utility
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) >= -1)
+            lock (LockObject)
             {
-                // not yet disposed
-                lock (LockObject)
+                if (!IsDisposed)
                 {
+                    Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) + 1);
+                    Timer.Dispose();
                     IsDisposed = true;
                 }
-                Timer.Dispose();
             }
         }
         #endregion

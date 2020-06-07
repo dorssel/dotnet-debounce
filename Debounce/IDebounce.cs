@@ -12,6 +12,11 @@ namespace Dorssel.Utility
         /// <exception cref="ObjectDisposedException" />
         void Trigger();
 
+        /// <summary>Resets the accumulated trigger count to 0 and cancels any ongoing debouncing.</summary>
+        /// <remarks>This method may be called even after <see cref="IDisposable.Dispose"/> has been called.</remarks>
+        /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
+        ulong Reset();
+
         /// <summary>Gets or sets the <see cref="TimeSpan"/> within which new calls to <see cref="Trigger"/> will restart the debounce timer.</summary>
         /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
         /// <exception cref="ObjectDisposedException" />

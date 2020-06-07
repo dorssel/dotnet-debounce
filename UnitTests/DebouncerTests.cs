@@ -542,6 +542,60 @@ namespace UnitTests
         }
         #endregion
 
+        #region Reset
+        [TestMethod]
+        public void ResetWhileIdle()
+        {
+            {
+                using var debouncer = new Debouncer();
+                Assert.AreEqual(0UL, debouncer.Reset());
+            }
+        }
+
+        [TestMethod]
+        public void ResetAfterDispose()
+        {
+            using var debouncer = new Debouncer();
+            debouncer.Dispose();
+            Assert.AreEqual(0UL, debouncer.Reset());
+        }
+
+        [TestMethod]
+        public void ResetDuringDebounce()
+        {
+            using var debouncer = new Debouncer()
+            {
+                DebounceWindow = TimingUnits(1)
+            };
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+            debouncer.Trigger();
+            Assert.AreEqual(1UL, debouncer.Reset());
+            Sleep(2);
+            Assert.AreEqual(0UL, wrapper.TriggerCount);
+            Assert.AreEqual(0UL, wrapper.HandlerCount);
+        }
+
+        [TestMethod]
+        public void ResetFromHandler()
+        {
+            using var debouncer = new Debouncer();
+            using var wrapper = new VerifyingHandlerWrapper(debouncer);
+
+            wrapper.Debounced += (s, e) =>
+            {
+                if (wrapper.HandlerCount == 1)
+                {
+                    debouncer.Trigger();
+                    Assert.AreEqual(1UL, debouncer.Reset());
+                }
+            };
+            debouncer.Trigger();
+            Sleep(1);
+            Assert.AreEqual(1UL, wrapper.TriggerCount);
+            Assert.AreEqual(1UL, wrapper.HandlerCount);
+        }
+        #endregion
+
         [TestMethod]
         public void TimingMaximum()
         {
