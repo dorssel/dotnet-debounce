@@ -6,7 +6,7 @@ For each listed major.minor version, only the latest release contains all the se
 i.e. the release with the highest 'x' in 'major.minor.x'.
 
 Please consult https://github.com/dorssel/TestRepo/issues for any known outstanding security
-vulnerabilies in the latest releases.
+vulnerabilities in the latest releases.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -15,7 +15,6 @@ vulnerabilies in the latest releases.
 
 ## Reporting a Vulnerability
 
-Please report vulnerabilities by creating an issue: https://github.com/dorssel/TestRepo/issues,
-clearly stating the exact version that exhibits the vulnerability.
+Please report vulnerabilities by creating an issue: https://github.com/dorssel/TestRepo/issues.
 
 Any reported security issues for supported versions will be resolved as soon as possible.
