@@ -5,7 +5,7 @@ namespace BlazorServerPush
 {
     public class GlobalCounter : NotifyPropertyChanged
     {
-        long _Count = 0;
+        long _Count;
         public long Count
         {
             get { return Interlocked.Read(ref _Count); }
@@ -17,7 +17,7 @@ namespace BlazorServerPush
             OnNotifyPropertyChanged(nameof(Count));
         }
 
-        bool _Enabled = false;
+        bool _Enabled;
         public bool Enabled
         {
             get { return _Enabled; }
@@ -40,6 +40,6 @@ namespace BlazorServerPush
             }
         }
 
-        volatile uint Generation = 0;
+        volatile uint Generation;
     }
 }

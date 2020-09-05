@@ -47,7 +47,7 @@ namespace Testable
         readonly IDebounce Debounce;
 
         #region IDisposable Support
-        bool IsDisposed = false;
+        bool IsDisposed;
 
         public void Dispose()
         {

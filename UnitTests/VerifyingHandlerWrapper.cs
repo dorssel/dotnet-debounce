@@ -37,10 +37,10 @@ namespace UnitTests
         }
 
         readonly IDebounce Debouncer;
-        int ReentrancyCount = 0;
+        int ReentrancyCount;
 
         #region IDisposable Support
-        int IsDisposed = 0;
+        int IsDisposed;
 
         public void Dispose()
         {

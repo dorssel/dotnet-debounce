@@ -39,14 +39,14 @@ namespace Dorssel.Utility
         }
 
         readonly object LockObject = new object();
-        ulong Count = 0;
+        ulong Count;
         readonly Stopwatch FirstTrigger = new Stopwatch();
         readonly Stopwatch LastTrigger = new Stopwatch();
         readonly Stopwatch LastHandlerStarted = new Stopwatch();
         readonly Stopwatch LastHandlerFinished = new Stopwatch();
         readonly Timer Timer;
-        bool TimerActive = false;
-        bool SendingEvent = false;
+        bool TimerActive;
+        bool SendingEvent;
 
         void OnTimer(object state)
         {
@@ -301,7 +301,7 @@ namespace Dorssel.Utility
         #endregion
 
         #region IDisposable Support
-        bool IsDisposed = false;
+        bool IsDisposed;
 
         void ThrowIfDisposed()
         {
