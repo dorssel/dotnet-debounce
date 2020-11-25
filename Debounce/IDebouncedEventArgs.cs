@@ -2,6 +2,6 @@
 {
     public interface IDebouncedEventArgs
     {
-        public ulong Count { get; }
+        public long Count { get; }
     }
 }

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+[assembly: CLSCompliant(true)]
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("PerformanceTests")]
 
@@ -125,7 +126,7 @@ namespace Dorssel.Utility
                         // Must call handler asynchronously and outside the lock.
                         Task.Run(() =>
                         {
-                            Debounced?.Invoke(this, new DebouncedEventArgs((ulong)count));
+                            Debounced?.Invoke(this, new DebouncedEventArgs((long)count));
                             lock (LockObject)
                             {
                                 // Handler has finished.
@@ -213,7 +214,7 @@ namespace Dorssel.Utility
             }
         }
 
-        public ulong Reset()
+        public long Reset()
         {
             lock (LockObject)
             {
@@ -227,7 +228,7 @@ namespace Dorssel.Utility
                 {
                     LockedReschedule();
                 }
-                return count;
+                return (long)count;
             }
         }
 

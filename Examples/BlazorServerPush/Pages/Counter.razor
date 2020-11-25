@@ -21,7 +21,7 @@
         base.OnInitialized();
     }
 
-    void OnPropertyChanged(object sender, PropertyChangedEventArgs ev)
+    void OnPropertyChanged(object? sender, PropertyChangedEventArgs ev)
     {
         // don't react immediately, but debounce all changes
         Debouncer.Trigger();

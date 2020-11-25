@@ -28,7 +28,7 @@ namespace UnitTests
             Assert.AreEqual(Interlocked.Increment(ref ReentrancyCount), 1);
 
             ++HandlerCount;
-            TriggerCount += debouncedEventArgs.Count;
+            TriggerCount += (ulong)debouncedEventArgs.Count;
 
             Debounced?.Invoke(this, debouncedEventArgs);
 

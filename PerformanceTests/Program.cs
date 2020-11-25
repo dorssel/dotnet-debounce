@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dorssel.Utility;
 
+[assembly: CLSCompliant(true)]
+
 namespace PerformanceTests
 {
     [ExcludeFromCodeCoverage]

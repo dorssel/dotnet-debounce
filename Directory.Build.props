@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <!-- Use the latest .NET Core SDK -->
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <!-- Use the latest C# Language standard -->
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     
     <!-- Common defaults -->
     <IsPackable>false</IsPackable>
@@ -15,13 +17,5 @@
     <PackageProjectUrl>https://github.com/dorssel/TestRepo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dorssel/TestRepo.git</RepositoryUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!-- Use the latest Code Analysis tooling -->
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
 </Project>

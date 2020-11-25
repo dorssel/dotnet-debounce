@@ -15,10 +15,10 @@ namespace UnitTests
         {
             get
             {
-                yield return new object[] { 1UL };
-                yield return new object[] { 2UL };
-                yield return new object[] { ulong.MaxValue - 1 };
-                yield return new object[] { ulong.MaxValue };
+                yield return new object[] { 1L };
+                yield return new object[] { 2L };
+                yield return new object[] { long.MaxValue - 1 };
+                yield return new object[] { long.MaxValue };
             }
         }
 
@@ -26,13 +26,16 @@ namespace UnitTests
         {
             get
             {
-                yield return new object[] { 0UL };
+                yield return new object[] { 0L };
+                yield return new object[] { -1L };
+                yield return new object[] { long.MinValue + 1 };
+                yield return new object[] { long.MinValue };
             }
         }
 
         [DataTestMethod]
         [DynamicData(nameof(ValidCounts))]
-        public void ConstructorCountValid(ulong count)
+        public void ConstructorCountValid(long count)
         {
             var debouncedEventArgs = new DebouncedEventArgs(count);
             Assert.AreEqual(count, debouncedEventArgs.Count);
@@ -40,7 +43,7 @@ namespace UnitTests
 
         [DataTestMethod]
         [DynamicData(nameof(InvalidCounts))]
-        public void ConstructorCountInvalid(ulong count)
+        public void ConstructorCountInvalid(long count)
         {
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
         }

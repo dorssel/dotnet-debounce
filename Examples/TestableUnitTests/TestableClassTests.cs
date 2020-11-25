@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Testable;
 
+[assembly: CLSCompliant(true)]
+
 namespace TestableUnitTests
 {
     [TestClass]
@@ -101,11 +103,23 @@ namespace TestableUnitTests
         }
 
         [TestMethod]
+        public void HandlerNegativeCount()
+        {
+            var debounce = new Mock<IDebounce>();
+            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
+            debouncedEventArgs.SetupGet(m => m.Count).Returns(-42);
+
+            using var _ = new TestableClass(debounce.Object);
+
+            debounce.Raise(m => m.Debounced += null, debounce.Object, debouncedEventArgs.Object);
+        }
+
+        [TestMethod]
         public void HandlerMaxCount()
         {
             var debounce = new Mock<IDebounce>();
             var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(ulong.MaxValue);
+            debouncedEventArgs.SetupGet(m => m.Count).Returns(long.MaxValue);
 
             using var _ = new TestableClass(debounce.Object);
 

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Dorssel.Utility;
 
+[assembly: CLSCompliant(true)]
 [assembly: InternalsVisibleTo("TestableUnitTests")]
 
 namespace Testable
@@ -28,12 +29,12 @@ namespace Testable
                 return;
             }
 
-            if (debouncedEventArgs.Count == 0)
+            if (debouncedEventArgs.Count < 1)
             {
-                // Real DebouncedEventArgs will never contain Count == 0, but we can mock it!
+                // Real DebouncedEventArgs will never contain Count < 1, but we can mock it!
                 Debug.WriteLine("Safety first: we even covered this impossible case.");
             }
-            else if (debouncedEventArgs.Count == ulong.MaxValue)
+            else if (debouncedEventArgs.Count == long.MaxValue)
             {
                 // It would take ages to reach this Count value for real DebouncedEventArgs, but we can mock it! 
                 Debug.WriteLine("Corner case galore.");

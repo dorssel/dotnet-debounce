@@ -4,6 +4,8 @@ using System.Threading;
 using Dorssel.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+[assembly: CLSCompliant(true)]
+
 namespace UnitTests
 {
     [TestClass]
@@ -548,7 +550,7 @@ namespace UnitTests
         {
             {
                 using var debouncer = new Debouncer();
-                Assert.AreEqual(0UL, debouncer.Reset());
+                Assert.AreEqual(0L, debouncer.Reset());
             }
         }
 
@@ -557,7 +559,7 @@ namespace UnitTests
         {
             using var debouncer = new Debouncer();
             debouncer.Dispose();
-            Assert.AreEqual(0UL, debouncer.Reset());
+            Assert.AreEqual(0L, debouncer.Reset());
         }
 
         [TestMethod]
@@ -569,7 +571,7 @@ namespace UnitTests
             };
             using var wrapper = new VerifyingHandlerWrapper(debouncer);
             debouncer.Trigger();
-            Assert.AreEqual(1UL, debouncer.Reset());
+            Assert.AreEqual(1L, debouncer.Reset());
             Sleep(2);
             Assert.AreEqual(0UL, wrapper.TriggerCount);
             Assert.AreEqual(0UL, wrapper.HandlerCount);
@@ -586,7 +588,7 @@ namespace UnitTests
                 if (wrapper.HandlerCount == 1)
                 {
                     debouncer.Trigger();
-                    Assert.AreEqual(1UL, debouncer.Reset());
+                    Assert.AreEqual(1L, debouncer.Reset());
                 }
             };
             debouncer.Trigger();
