@@ -30,12 +30,7 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    @if (Request.Headers.TryGetValue("User-Agent", out var userAgents)
-      && (userAgents.FirstOrDefault() is string userAgent)
-      && System.Text.RegularExpressions.Regex.IsMatch(userAgent, @"MSIE \d|Trident.*rv:"))
-    {
-        <script src="libman/blazor.polyfill/blazor.polyfill.min.js"></script>
-    }
+    <script src="_framework/blazor.polyfill.min.js"></script>
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

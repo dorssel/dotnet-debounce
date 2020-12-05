@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Blazor.Polyfill.Server;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,6 +16,7 @@ namespace BlazorServerPush
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazorPolyfill();
             services.AddSingleton<GlobalCounter>();
         }
 
@@ -31,6 +33,7 @@ namespace BlazorServerPush
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseBlazorPolyfill();
             app.UseStaticFiles();
 
             app.UseRouting();
