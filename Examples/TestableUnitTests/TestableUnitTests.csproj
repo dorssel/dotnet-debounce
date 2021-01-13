@@ -3,7 +3,7 @@
   <Import Project="..\..\UnitTest.Build.props" />
 
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="Moq" Version="4.15.2" />
   </ItemGroup>
 
   <ItemGroup>
