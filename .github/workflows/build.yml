@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+#
+# SPDX-License-Identifier: MIT
+
 name: Build
 
 on:
@@ -14,7 +18,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Setup .NET Core SDK
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
