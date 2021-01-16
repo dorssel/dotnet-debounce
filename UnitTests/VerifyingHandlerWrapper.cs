@@ -1,4 +1,8 @@
-﻿using System;
+﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+//
+// SPDX-License-Identifier: MIT
+
+using System;
 using System.Threading;
 using Dorssel.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -1,4 +1,8 @@
-﻿using System.Threading;
+﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+//
+// SPDX-License-Identifier: MIT
+
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorServerPush

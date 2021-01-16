@@ -1,4 +1,10 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly">
+﻿@*
+    SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+
+    SPDX-License-Identifier: MIT
+*@
+
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>

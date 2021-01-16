@@ -1,4 +1,8 @@
-﻿using System;
+﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+//
+// SPDX-License-Identifier: MIT
+
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;

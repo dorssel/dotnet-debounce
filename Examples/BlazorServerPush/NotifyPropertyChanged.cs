@@ -1,4 +1,8 @@
-﻿using System.ComponentModel;
+﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+//
+// SPDX-License-Identifier: MIT
+
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace BlazorServerPush

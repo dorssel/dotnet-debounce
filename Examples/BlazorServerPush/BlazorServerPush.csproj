@@ -1,4 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+
+SPDX-License-Identifier: MIT
+-->
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <PackageReference Include="BlazorPolyfill.Server" Version="5.0.100.5" />
