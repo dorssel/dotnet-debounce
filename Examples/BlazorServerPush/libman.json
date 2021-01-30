@@ -7,7 +7,7 @@
   "defaultProvider": "unpkg",
   "libraries": [
     {
-      "library": "bootstrap@4.5.3",
+      "library": "bootstrap@4.6.0",
       "destination": "wwwroot/libman/bootstrap/",
       "files": [
         "dist/css/bootstrap.min.css",

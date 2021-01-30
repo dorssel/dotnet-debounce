@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
   <Import Project="..\..\UnitTest.Build.props" />
 
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.15.2" />
+    <PackageReference Include="Moq" Version="4.16.0" />
   </ItemGroup>
 
   <ItemGroup>
