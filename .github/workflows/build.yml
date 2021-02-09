@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -29,12 +31,12 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Package
-      run: dotnet pack --configuration Release --no-build --version-suffix master-$GITHUB_SHA
+      run: dotnet pack --configuration Release --no-build
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
         name: nuget-package
-        path: "**/*-master-*.nupkg"
+        path: "**/*.nupkg"
     - name: Codecov
       uses: codecov/codecov-action@v1
       with:
