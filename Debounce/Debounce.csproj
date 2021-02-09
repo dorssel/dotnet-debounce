@@ -7,15 +7,12 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework></TargetFramework>
     <TargetFrameworks>netstandard1.2;netstandard2.0</TargetFrameworks>
     <RootNamespace>Dorssel.Utility</RootNamespace>
     <AssemblyName>Dorssel.Utility.Debounce</AssemblyName>
     <IsPackable>true</IsPackable>
     <Title>Event Debouncer</Title>
     <Description>Coalesces and throttles incoming concurrent events into one.</Description>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.1.0</FileVersion>
   </PropertyGroup>
 
 </Project>
