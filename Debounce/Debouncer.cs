@@ -12,10 +12,16 @@ using System.Threading.Tasks;
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("PerformanceTests")]
 
-namespace Dorssel.Utility
+namespace Dorssel.Utilities
 {
+    /// <summary>
+    /// This class implements the <see cref="IDebounce"/> interface.
+    /// </summary>
     public sealed class Debouncer : IDebounce
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Debouncer"/> class.
+        /// </summary>
         public Debouncer()
         {
             Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
@@ -190,8 +196,10 @@ namespace Dorssel.Utility
         }
 
         #region IDebounce Support
+        /// <inheritdoc/>
         public event DebouncedEventHandler? Debounced;
 
+        /// <inheritdoc/>
         public void Trigger()
         {
             var newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);
@@ -218,6 +226,7 @@ namespace Dorssel.Utility
             }
         }
 
+        /// <inheritdoc/>
         public long Reset()
         {
             lock (LockObject)
@@ -270,6 +279,7 @@ namespace Dorssel.Utility
         }
 
         TimeSpan _DebounceWindow = TimeSpan.Zero;
+        /// <inheritdoc/>
         public TimeSpan DebounceWindow
         {
             get => GetField(ref _DebounceWindow);
@@ -277,6 +287,7 @@ namespace Dorssel.Utility
         }
 
         TimeSpan _DebounceTimeout = Timeout.InfiniteTimeSpan;
+        /// <inheritdoc/>
         public TimeSpan DebounceTimeout
         {
             get => GetField(ref _DebounceTimeout);
@@ -284,6 +295,7 @@ namespace Dorssel.Utility
         }
 
         TimeSpan _EventSpacing = TimeSpan.Zero;
+        /// <inheritdoc/>
         public TimeSpan EventSpacing
         {
             get => GetField(ref _EventSpacing);
@@ -291,6 +303,7 @@ namespace Dorssel.Utility
         }
 
         TimeSpan _HandlerSpacing = TimeSpan.Zero;
+        /// <inheritdoc/>
         public TimeSpan HandlerSpacing
         {
             get => GetField(ref _HandlerSpacing);
@@ -298,6 +311,7 @@ namespace Dorssel.Utility
         }
 
         TimeSpan _TimingGranularity = TimeSpan.Zero;
+        /// <inheritdoc/>
         public TimeSpan TimingGranularity
         {
             get => GetField(ref _TimingGranularity);
@@ -316,6 +330,7 @@ namespace Dorssel.Utility
             }
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             lock (LockObject)

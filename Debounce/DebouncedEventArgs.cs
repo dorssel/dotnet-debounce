@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Dorssel.Utility
+namespace Dorssel.Utilities
 {
     sealed class DebouncedEventArgs : EventArgs, IDebouncedEventArgs
     {

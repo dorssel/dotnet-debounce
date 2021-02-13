@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Dorssel.Utility;
+using Dorssel.Utilities;
 
 [assembly: CLSCompliant(true)]
 [assembly: InternalsVisibleTo("TestableUnitTests")]

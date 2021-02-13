@@ -4,12 +4,24 @@
 
 using System;
 
-namespace Dorssel.Utility
+namespace Dorssel.Utilities
 {
+    /// <summary>
+    /// Represents the method that will handle a <see cref="IDebounce.Debounced"/> event.
+    /// </summary>
+    /// <param name="sender">The instance implementing <see cref="IDebounce"/> that originated this event.</param>
+    /// <param name="e">The event details.</param>
     public delegate void DebouncedEventHandler(object sender, IDebouncedEventArgs e);
 
+    /// <summary>
+    /// This interface specifies the public API for the <see cref="Debouncer"/> class.
+    /// </summary>
     public interface IDebounce : IDisposable
     {
+        /// <summary>
+        /// This event will be sent when <see cref="Trigger"/> has been called one or more times and
+        /// the debounce timer times out.
+        /// </summary>
         event DebouncedEventHandler Debounced;
 
         /// <summary>Accumulates one more trigger.</summary>

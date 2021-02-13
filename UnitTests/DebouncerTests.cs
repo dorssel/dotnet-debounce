@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using Dorssel.Utility;
+using Dorssel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: CLSCompliant(true)]

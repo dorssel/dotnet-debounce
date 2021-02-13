@@ -12,9 +12,13 @@ SPDX-License-Identifier: MIT
     <!-- Use the latest C# Language standard -->
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <!-- Be very strict -->
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>5</WarningLevel>
+
     <!-- Common defaults -->
     <IsPackable>false</IsPackable>
     <Authors>Frans van Dorsselaer</Authors>

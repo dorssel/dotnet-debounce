@@ -4,7 +4,7 @@
 
 using System;
 using System.Threading;
-using Dorssel.Utility;
+using Dorssel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests

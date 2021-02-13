@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Dorssel.Utility;
+using Dorssel.Utilities;
 
 [assembly: CLSCompliant(true)]
 
