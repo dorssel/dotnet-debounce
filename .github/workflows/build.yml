@@ -41,6 +41,8 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1
     - name: Documentation
       run: msbuild Documentation -t:restore,build
     - name: Upload Documentation Artifact
