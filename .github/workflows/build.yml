@@ -13,7 +13,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout
@@ -32,7 +32,7 @@ jobs:
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Package
       run: dotnet pack --configuration Release --no-build
-    - name: Upload a Build Artifact
+    - name: Upload Package Artifact
       uses: actions/upload-artifact@v2
       with:
         name: nuget-package
@@ -41,3 +41,14 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1
+    - name: Documentation Dependencies
+      run: msbuild Documentation -t:restore
+    - name: Documentation
+      run: msbuild Documentation
+    - name: Upload Documentation Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: documentation
+        path: "Documentation/bin"
