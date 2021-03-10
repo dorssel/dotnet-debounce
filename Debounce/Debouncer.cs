@@ -49,12 +49,12 @@ namespace Dorssel.Utilities
             }
         }
 
-        readonly object LockObject = new object();
+        readonly object LockObject = new();
         ulong Count;
-        readonly Stopwatch FirstTrigger = new Stopwatch();
-        readonly Stopwatch LastTrigger = new Stopwatch();
-        readonly Stopwatch LastHandlerStarted = new Stopwatch();
-        readonly Stopwatch LastHandlerFinished = new Stopwatch();
+        readonly Stopwatch FirstTrigger = new();
+        readonly Stopwatch LastTrigger = new();
+        readonly Stopwatch LastHandlerStarted = new();
+        readonly Stopwatch LastHandlerFinished = new();
         readonly Timer Timer;
         bool TimerActive;
         bool SendingEvent;
@@ -197,7 +197,7 @@ namespace Dorssel.Utilities
 
         #region IDebounce Support
         /// <inheritdoc/>
-        public event DebouncedEventHandler? Debounced;
+        public event EventHandler<DebouncedEventArgs>? Debounced;
 
         /// <inheritdoc/>
         public void Trigger()

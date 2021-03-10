@@ -33,7 +33,7 @@ namespace PerformanceTests
             }
 
             readonly Debouncer Debouncer;
-            readonly Stopwatch Stopwatch = new Stopwatch();
+            readonly Stopwatch Stopwatch = new();
             readonly CancellationTokenSource CancellationTokenSource;
 
             public void Trigger1k()
@@ -141,7 +141,7 @@ namespace PerformanceTests
             {
                 Console.WriteLine("Handler speed");
                 using var debouncer = new Debouncer();
-                void handler(object s, IDebouncedEventArgs e)
+                void handler(object? s, DebouncedEventArgs e)
                 {
                     // each handler triggers the next
                     debouncer.Trigger();
@@ -163,7 +163,7 @@ namespace PerformanceTests
                     DebounceWindow = TimeSpan.FromTicks(1),
                     TimingGranularity = TimeSpan.FromTicks(1)
                 };
-                void handler(object s, IDebouncedEventArgs e)
+                void handler(object? s, DebouncedEventArgs e)
                 {
                     // each handler triggers the next
                     debouncer.Trigger();

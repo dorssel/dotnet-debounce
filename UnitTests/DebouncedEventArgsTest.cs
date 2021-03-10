@@ -51,5 +51,36 @@ namespace UnitTests
         {
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
         }
+
+        class DerivedDebouncedEventArgs : DebouncedEventArgs
+        {
+            public DerivedDebouncedEventArgs(long count, bool boundsCheck)
+                : base(count, boundsCheck)
+            { }
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(ValidCounts))]
+        public void ProtectedConstructorBoundsCheckedValid(long count)
+        {
+            var debouncedEventArgs = new DerivedDebouncedEventArgs(count, true);
+            Assert.AreEqual(count, debouncedEventArgs.Count);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(InvalidCounts))]
+        public void ProtectedConstructorBoundsCheckedInvalid(long count)
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(ValidCounts))]
+        [DynamicData(nameof(InvalidCounts))]
+        public void ProtectedConstructorBoundsUnchecked(long count)
+        {
+            var debouncedEventArgs = new DerivedDebouncedEventArgs(count, false);
+            Assert.AreEqual(count, debouncedEventArgs.Count);
+        }
     }
 }

@@ -373,9 +373,9 @@ namespace UnitTests
 
         #region EventHandler
         [TestMethod]
-        public void EventHandlerAcceptsIDebouncedEventArgs()
+        public void EventHandlerAcceptsDebouncedEventArgs()
         {
-            static void Handler(object sender, IDebouncedEventArgs debouncedEventArgs) { }
+            static void Handler(object? sender, DebouncedEventArgs debouncedEventArgs) { }
 
             using var debouncer = new Debouncer();
             debouncer.Debounced += Handler;

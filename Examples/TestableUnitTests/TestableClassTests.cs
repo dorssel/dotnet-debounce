@@ -13,6 +13,14 @@ using Testable;
 
 namespace TestableUnitTests
 {
+    class MockDebouncedEventArgs : DebouncedEventArgs
+    {
+        public MockDebouncedEventArgs(long count)
+            : base(count, false)
+        {
+        }
+    }
+
     [TestClass]
     [TestCategory("Example")]
     [ExcludeFromCodeCoverage]
@@ -22,11 +30,11 @@ namespace TestableUnitTests
         public void ConstructorHappyFlow()
         {
             var debounce = new Mock<IDebounce>();
-            debounce.SetupAdd(m => m.Debounced += It.IsAny<DebouncedEventHandler>());
+            debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>());
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.VerifyAdd(m => m.Debounced += It.IsAny<DebouncedEventHandler>(), Times.Once());
+            debounce.VerifyAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
         }
 
         [TestMethod]
@@ -42,11 +50,11 @@ namespace TestableUnitTests
         public void DisposeUnregisters()
         {
             var debounce = new Mock<IDebounce>();
-            debounce.SetupRemove(m => m.Debounced -= It.IsAny<DebouncedEventHandler>());
+            debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>());
 
             using (new TestableClass(debounce.Object)) { }
 
-            debounce.VerifyRemove(m => m.Debounced -= It.IsAny<DebouncedEventHandler>(), Times.Once());
+            debounce.VerifyRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
         }
 
 
@@ -76,12 +84,10 @@ namespace TestableUnitTests
         public void HandlerAcceptsNullSender()
         {
             var debounce = new Mock<IDebounce>();
-            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(1);
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.Raise(m => m.Debounced += null, null, debouncedEventArgs.Object);
+            debounce.Raise(m => m.Debounced += null, null, new DebouncedEventArgs(1));
         }
 
         [TestMethod]
@@ -98,48 +104,40 @@ namespace TestableUnitTests
         public void HandlerZeroCount()
         {
             var debounce = new Mock<IDebounce>();
-            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(0);
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.Raise(m => m.Debounced += null, debounce.Object, debouncedEventArgs.Object);
+            debounce.Raise(m => m.Debounced += null, debounce.Object, new MockDebouncedEventArgs(0));
         }
 
         [TestMethod]
         public void HandlerNegativeCount()
         {
             var debounce = new Mock<IDebounce>();
-            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(-42);
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.Raise(m => m.Debounced += null, debounce.Object, debouncedEventArgs.Object);
+            debounce.Raise(m => m.Debounced += null, debounce.Object, new MockDebouncedEventArgs(-42));
         }
 
         [TestMethod]
         public void HandlerMaxCount()
         {
             var debounce = new Mock<IDebounce>();
-            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(long.MaxValue);
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.Raise(m => m.Debounced += null, debounce.Object, debouncedEventArgs.Object);
+            debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs(long.MaxValue));
         }
 
         [TestMethod]
         public void HandlerHappyFlow()
         {
             var debounce = new Mock<IDebounce>();
-            var debouncedEventArgs = new Mock<IDebouncedEventArgs>();
-            debouncedEventArgs.SetupGet(m => m.Count).Returns(1);
 
             using var _ = new TestableClass(debounce.Object);
 
-            debounce.Raise(m => m.Debounced += null, debounce.Object, debouncedEventArgs.Object);
+            debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs(1));
         }
     }
 }
