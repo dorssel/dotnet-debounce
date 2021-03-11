@@ -1,0 +1,20 @@
+<Project>
+  <ItemGroup>
+    <!-- all -->
+    <PackageVersion Include="GitVersion.MsBuild" Version="5.6.6" />
+    
+    <!-- unit tests -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="2.2.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="2.2.1" />
+    <PackageVersion Include="Moq" Version="4.16.1" />
+    <PackageVersion Include="coverlet.collector" Version="3.0.3" />
+
+    <!-- documentation -->
+    <PackageVersion Include="docfx.console" Version="2.56.7" />
+
+    <!-- blazor -->
+    <PackageVersion Include="BlazorPolyfill.Server" Version="5.0.102" />
+    <PackageVersion Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
+  </ItemGroup>
+</Project>

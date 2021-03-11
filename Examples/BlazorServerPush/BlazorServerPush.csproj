@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <PackageReference Include="BlazorPolyfill.Server" Version="5.0.102" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
+    <PackageReference Include="BlazorPolyfill.Server" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" />
   </ItemGroup>
 
   <ItemGroup>

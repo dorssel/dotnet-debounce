@@ -18,6 +18,7 @@ SPDX-License-Identifier: MIT
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>5</WarningLevel>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
     <!-- Common defaults -->
     <IsPackable>false</IsPackable>
@@ -29,7 +30,7 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.6" >
+    <PackageReference Include="GitVersion.MsBuild">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
