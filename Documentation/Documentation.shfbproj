@@ -89,9 +89,8 @@ SPDX-License-Identifier: MIT
   <!-- Import the common build targets during NuGet restore because before the packages are being installed, $(SHFBROOT) is not set yet -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="'$(MSBuildRestoreSessionId)' != ''" />
   <ItemGroup>
-    <!-- IMPORTANT: Update the package versions to the latest releases. -->
-    <PackageReference Include="EWSoftware.SHFB" Version="2020.3.6" />
-    <PackageReference Include="EWSoftware.SHFB.NETFramework" Version="4.8.0" />
+    <PackageReference Include="EWSoftware.SHFB" />
+    <PackageReference Include="EWSoftware.SHFB.NETFramework" />
   </ItemGroup>
   <!-- Import the SHFB build targets during build -->
   <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" Condition="'$(MSBuildRestoreSessionId)' == ''" />

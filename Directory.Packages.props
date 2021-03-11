@@ -1,3 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+
+SPDX-License-Identifier: MIT
+-->
 <Project>
   <ItemGroup>
     <!-- all -->
@@ -11,6 +17,8 @@
     <PackageVersion Include="coverlet.collector" Version="3.0.3" />
 
     <!-- documentation -->
+    <PackageVersion Include="EWSoftware.SHFB" Version="2020.3.6" />
+    <PackageVersion Include="EWSoftware.SHFB.NETFramework" Version="4.8.0" />
     <PackageVersion Include="docfx.console" Version="2.56.7" />
 
     <!-- blazor -->
