@@ -26,12 +26,10 @@ jobs:
         dotnet-version: 5.0.x
     - name: Cache
       uses: actions/cache@v2
-      id: cache
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
     - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
@@ -51,7 +49,6 @@ jobs:
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1
     - name: Documentation Dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       run: msbuild Documentation -t:restore
     - name: Documentation
       run: msbuild Documentation
