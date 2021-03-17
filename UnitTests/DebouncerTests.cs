@@ -9,12 +9,12 @@ using Dorssel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: CLSCompliant(true)]
+[assembly: ExcludeFromCodeCoverage]
 
 namespace UnitTests
 {
     [TestClass]
     [TestCategory("Production")]
-    [ExcludeFromCodeCoverage]
     public class DebouncerTests
     {
         static TimeSpan TimingUnits(double count) => TimeSpan.FromMilliseconds(50 * count);

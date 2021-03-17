@@ -10,6 +10,7 @@ using Moq;
 using Testable;
 
 [assembly: CLSCompliant(true)]
+[assembly: ExcludeFromCodeCoverage]
 
 namespace TestableUnitTests
 {
@@ -23,7 +24,6 @@ namespace TestableUnitTests
 
     [TestClass]
     [TestCategory("Example")]
-    [ExcludeFromCodeCoverage]
     public class TestableClassTests
     {
         [TestMethod]

@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 using Dorssel.Utilities;
 
 [assembly: CLSCompliant(true)]
+[assembly: ExcludeFromCodeCoverage]
 
 namespace PerformanceTests
 {
-    [ExcludeFromCodeCoverage]
     static class Program
     {
         sealed class BenchmarkTest : IDisposable
