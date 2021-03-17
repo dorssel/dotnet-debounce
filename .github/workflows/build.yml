@@ -24,14 +24,21 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Cache
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
     - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test --configuration Release --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Package
-      run: dotnet pack --configuration Release --no-build
+      run: dotnet pack --configuration Release --no-restore --no-build
     - name: Upload Package Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -44,6 +51,7 @@ jobs:
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1
     - name: Documentation Dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       run: msbuild Documentation -t:restore
     - name: Documentation
       run: msbuild Documentation
