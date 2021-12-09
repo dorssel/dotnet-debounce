@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
     <PackageVersion Include="MSTest.TestAdapter" Version="2.2.3" />
     <PackageVersion Include="MSTest.TestFramework" Version="2.2.3" />
     <PackageVersion Include="Moq" Version="4.16.1" />
-    <PackageVersion Include="coverlet.collector" Version="3.0.3" />
+    <PackageVersion Include="coverlet.collector" Version="3.1.0" />
 
     <!-- documentation -->
     <PackageVersion Include="EWSoftware.SHFB" Version="2020.3.6" />
