@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
     <PackageVersion Include="coverlet.collector" Version="3.1.0" />
 
     <!-- documentation -->
-    <PackageVersion Include="EWSoftware.SHFB" Version="2021.10.23" />
+    <PackageVersion Include="EWSoftware.SHFB" Version="2021.11.7" />
     <PackageVersion Include="EWSoftware.SHFB.NET" Version="5.0.0.2" />
     <PackageVersion Include="docfx.console" Version="2.58.9" />
 
