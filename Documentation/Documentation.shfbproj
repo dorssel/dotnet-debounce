@@ -24,7 +24,7 @@ SPDX-License-Identifier: MIT
     <RootNamespace>Documentation</RootNamespace>
     <Name>Documentation</Name>
     <!-- SHFB properties -->
-    <FrameworkVersion>Cross-platform (.NET Core/.NET Standard)</FrameworkVersion>
+    <FrameworkVersion>.NET Core/.NET Standard/.NET 5.0+</FrameworkVersion>
     <OutputPath>bin\</OutputPath>
     <IntermediateOutputPath>obj\</IntermediateOutputPath>
     <HtmlHelpName>Documentation</HtmlHelpName>
@@ -90,7 +90,7 @@ SPDX-License-Identifier: MIT
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="'$(MSBuildRestoreSessionId)' != ''" />
   <ItemGroup>
     <PackageReference Include="EWSoftware.SHFB" />
-    <PackageReference Include="EWSoftware.SHFB.NETFramework" />
+    <PackageReference Include="EWSoftware.SHFB.NET" />
   </ItemGroup>
   <!-- Import the SHFB build targets during build -->
   <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" Condition="'$(MSBuildRestoreSessionId)' == ''" />
