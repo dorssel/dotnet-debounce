@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
     <TargetFrameworks>netstandard2.0;netstandard1.2</TargetFrameworks>
     <RootNamespace>Dorssel.Utilities</RootNamespace>
     <AssemblyName>Dorssel.Utilities.Debounce</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
     <IsPackable>true</IsPackable>
     <Title>Event Debouncer</Title>
     <Description>Coalesces, debounces, serializes, and throttles incoming concurrent events.</Description>
