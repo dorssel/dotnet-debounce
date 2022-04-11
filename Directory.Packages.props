@@ -19,7 +19,7 @@ SPDX-License-Identifier: MIT
     <!-- documentation -->
     <PackageVersion Include="EWSoftware.SHFB" Version="2022.2.6" />
     <PackageVersion Include="EWSoftware.SHFB.NET" Version="5.0.0.2" />
-    <PackageVersion Include="docfx.console" Version="2.59.1" />
+    <PackageVersion Include="docfx.console" Version="2.59.2" />
 
     <!-- blazor -->
     <PackageVersion Include="BlazorPolyfill.Server" Version="6.0.200" />
