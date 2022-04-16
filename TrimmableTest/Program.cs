@@ -10,24 +10,23 @@ using Dorssel.Utilities;
 [assembly: CLSCompliant(true)]
 [assembly: ExcludeFromCodeCoverage]
 
-namespace TrimmableTest
-{
-    static class Program
-    {
-        static int Main()
-        {
-            using var debouncer = new Debouncer();
+namespace TrimmableTest;
 
-            if (debouncer.GetType().Assembly.GetTypes().Select(t => t.Name).Contains("IDebounce"))
-            {
-                Console.Error.WriteLine("error: Not trimmed. Assembly still contains IDebounce.");
-                return 1;
-            }
-            else
-            {
-                Console.Out.WriteLine("Trimming successful. Assembly no longer contains IDebounce.");
-                return 0;
-            }
+static class Program
+{
+    static int Main()
+    {
+        using var debouncer = new Debouncer();
+
+        if (debouncer.GetType().Assembly.GetTypes().Select(t => t.Name).Contains("IDebounce"))
+        {
+            Console.Error.WriteLine("error: Not trimmed. Assembly still contains IDebounce.");
+            return 1;
+        }
+        else
+        {
+            Console.Out.WriteLine("Trimming successful. Assembly no longer contains IDebounce.");
+            return 0;
         }
     }
 }

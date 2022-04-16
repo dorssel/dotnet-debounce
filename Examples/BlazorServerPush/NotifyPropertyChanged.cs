@@ -5,29 +5,28 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace BlazorServerPush
+namespace BlazorServerPush;
+
+public class NotifyPropertyChanged : INotifyPropertyChanged
 {
-    public class NotifyPropertyChanged : INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnNotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
-        protected void OnNotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+    {
+        if (!Equals(field, value))
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            field = value;
+            OnNotifyPropertyChanged(propertyName);
+            return true;
         }
-
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+        else
         {
-            if (!Equals(field, value))
-            {
-                field = value;
-                OnNotifyPropertyChanged(propertyName);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

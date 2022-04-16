@@ -8,16 +8,15 @@ using Microsoft.Extensions.Hosting;
 
 [assembly: CLSCompliant(false)]
 
-namespace BlazorServerPush
+namespace BlazorServerPush;
+
+sealed class Program
 {
-    sealed class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(wb => wb.UseStartup<Startup>())
-                .Build()
-                .Run();
-        }
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(wb => wb.UseStartup<Startup>())
+            .Build()
+            .Run();
     }
 }

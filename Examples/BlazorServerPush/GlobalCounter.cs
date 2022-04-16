@@ -5,45 +5,44 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerPush
+namespace BlazorServerPush;
+
+public class GlobalCounter : NotifyPropertyChanged
 {
-    public class GlobalCounter : NotifyPropertyChanged
+    long _Count;
+    public long Count
     {
-        long _Count;
-        public long Count
-        {
-            get { return Interlocked.Read(ref _Count); }
-        }
+        get { return Interlocked.Read(ref _Count); }
+    }
 
-        public void Increment()
-        {
-            Interlocked.Increment(ref _Count);
-            OnNotifyPropertyChanged(nameof(Count));
-        }
+    public void Increment()
+    {
+        Interlocked.Increment(ref _Count);
+        OnNotifyPropertyChanged(nameof(Count));
+    }
 
-        bool _Enabled;
-        public bool Enabled
+    bool _Enabled;
+    public bool Enabled
+    {
+        get { return _Enabled; }
+        set
         {
-            get { return _Enabled; }
-            set
+            if (SetProperty(ref _Enabled, value))
             {
-                if (SetProperty(ref _Enabled, value))
+                var myGeneration = ++Generation;
+                if (value)
                 {
-                    var myGeneration = ++Generation;
-                    if (value)
+                    Task.Run(() =>
                     {
-                        Task.Run(() =>
+                        while (myGeneration == Generation)
                         {
-                            while (myGeneration == Generation)
-                            {
-                                Increment();
-                            }
-                        });
-                    }
+                            Increment();
+                        }
+                    });
                 }
             }
         }
-
-        volatile uint Generation;
     }
+
+    volatile uint Generation;
 }
