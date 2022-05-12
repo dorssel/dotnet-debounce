@@ -8,6 +8,8 @@
 .gitattributes   text
 .gitignore       text
 .editorconfig    text
+.config          text
+.license         text
 
 *.md    text
 *.txt   text
