@@ -2,16 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using Dorssel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Testable;
-
-[assembly: CLSCompliant(true)]
-[assembly: ExcludeFromCodeCoverage]
-
 namespace TestableUnitTests;
 
 class MockDebouncedEventArgs : DebouncedEventArgs

@@ -4,11 +4,7 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Dorssel.Utilities;
-
-[assembly: CLSCompliant(true)]
-[assembly: InternalsVisibleTo("TestableUnitTests")]
 
 namespace Testable;
 

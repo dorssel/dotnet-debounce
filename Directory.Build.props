@@ -9,16 +9,19 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- Use the latest .NET SDK -->
     <TargetFrameworks>net6.0</TargetFrameworks>
+
     <!-- Use the latest C# Language standard -->
     <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <!-- Be very strict -->
-    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
+    <!-- Be very strict -->
+    <WarningLevel>5</WarningLevel>
+    <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
     <!-- Common defaults -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <IsPackable>false</IsPackable>
     <Authors>Frans van Dorsselaer</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

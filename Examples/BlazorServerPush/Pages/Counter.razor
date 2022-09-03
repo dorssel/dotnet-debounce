@@ -39,7 +39,7 @@
         InvokeAsync(() => StateHasChanged()).Wait();
     }
 
-    Debouncer Debouncer = new Debouncer()
+    readonly Debouncer Debouncer = new()
     {
         // 10 ms means that we are snappy for single updates
         DebounceWindow = TimeSpan.FromMilliseconds(10),
@@ -51,7 +51,7 @@
         TimingGranularity = TimeSpan.FromMilliseconds(1),
     };
 
-    bool IsDisposed = false;
+    bool IsDisposed;
 
     public void Dispose()
     {

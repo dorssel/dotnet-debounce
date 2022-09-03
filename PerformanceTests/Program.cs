@@ -4,13 +4,9 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Dorssel.Utilities;
-
-[assembly: CLSCompliant(true)]
-[assembly: ExcludeFromCodeCoverage]
 
 namespace PerformanceTests;
 
@@ -21,7 +17,6 @@ static class Program
         public BenchmarkTest(Debouncer debouncer)
         {
             Debouncer = debouncer;
-            CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             Stopwatch.Start();
         }
 
@@ -34,7 +29,7 @@ static class Program
 
         readonly Debouncer Debouncer;
         readonly Stopwatch Stopwatch = new();
-        readonly CancellationTokenSource CancellationTokenSource;
+        readonly CancellationTokenSource CancellationTokenSource = new(TimeSpan.FromSeconds(1));
 
         public void Trigger1k()
         {
@@ -123,18 +118,18 @@ static class Program
             TriggerTest(MaxTasks, false);
         }
 
-        Console.WriteLine("Single-threaded trigger speed (coaslesced)");
+        Console.WriteLine("Single-threaded trigger speed (coalesced)");
         TriggerTest(1, true);
 
         if (MaxTasks >= 2)
         {
-            Console.WriteLine("Multi-threaded (2) trigger speed (coaslesced)");
+            Console.WriteLine("Multi-threaded (2) trigger speed (coalesced)");
             TriggerTest(2, true);
         }
 
         if (MaxTasks > 2)
         {
-            Console.WriteLine($"Multi-threaded ({MaxTasks}) trigger speed (coaslesced)");
+            Console.WriteLine($"Multi-threaded ({MaxTasks}) trigger speed (coalesced)");
             TriggerTest(MaxTasks, true);
         }
 
