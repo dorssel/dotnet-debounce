@@ -7,6 +7,11 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <None Remove="appsettings.json.license" />
+    <None Remove="appsettings.Development.json.license" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BlazorPolyfill.Server" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" />
   </ItemGroup>
