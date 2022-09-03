@@ -2,11 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Collections.Generic;
-using Dorssel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace UnitTests;
 
 [TestClass]
@@ -35,7 +30,7 @@ public class DebouncedEventArgsTests
         }
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(ValidCounts))]
     public void ConstructorCountValid(long count)
     {
@@ -43,7 +38,7 @@ public class DebouncedEventArgsTests
         Assert.AreEqual(count, debouncedEventArgs.Count);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(InvalidCounts))]
     public void ConstructorCountInvalid(long count)
     {
@@ -57,7 +52,7 @@ public class DebouncedEventArgsTests
         { }
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(ValidCounts))]
     public void ProtectedConstructorBoundsCheckedValid(long count)
     {
@@ -65,14 +60,14 @@ public class DebouncedEventArgsTests
         Assert.AreEqual(count, debouncedEventArgs.Count);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(InvalidCounts))]
     public void ProtectedConstructorBoundsCheckedInvalid(long count)
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(ValidCounts))]
     [DynamicData(nameof(InvalidCounts))]
     public void ProtectedConstructorBoundsUnchecked(long count)

@@ -8,10 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: CLSCompliant(true)]
-[assembly: InternalsVisibleTo("UnitTests")]
-[assembly: InternalsVisibleTo("PerformanceTests")]
-
 namespace Dorssel.Utilities;
 
 /// <summary>
@@ -31,11 +27,11 @@ public sealed class Debouncer : IDebounce
 
     internal struct BenchmarkCounters
     {
-        public ulong TriggersReported;
-        public ulong HandlersCalled;
-        public ulong RescheduleCount;
-        public ulong TimerChanges;
-        public ulong TimerEvents;
+        public long TriggersReported;
+        public long HandlersCalled;
+        public long RescheduleCount;
+        public long TimerChanges;
+        public long TimerEvents;
     }
     BenchmarkCounters _Benchmark;
     internal BenchmarkCounters Benchmark
@@ -50,7 +46,7 @@ public sealed class Debouncer : IDebounce
     }
 
     readonly object LockObject = new();
-    ulong Count;
+    long Count;
     readonly Stopwatch FirstTrigger = new();
     readonly Stopwatch LastTrigger = new();
     readonly Stopwatch LastHandlerStarted = new();
@@ -59,11 +55,23 @@ public sealed class Debouncer : IDebounce
     bool TimerActive;
     bool SendingEvent;
 
+    internal static long AddWithClamp(long left, long right)
+    {
+        Debug.Assert(left >= 0);
+        Debug.Assert(right >= 0);
+
+        return unchecked((long)Math.Min((ulong)left + (ulong)right, long.MaxValue));
+    }
+
     void OnTimer(object state)
     {
         lock (LockObject)
         {
-            ++_Benchmark.TimerEvents;
+            unchecked
+            {
+                ++_Benchmark.TimerEvents;
+            }
+
             if (!IsDisposed)
             {
                 LockedReschedule();
@@ -75,7 +83,10 @@ public sealed class Debouncer : IDebounce
     {
         Debug.Assert(!IsDisposed);
 
-        ++_Benchmark.RescheduleCount;
+        unchecked
+        {
+            ++_Benchmark.RescheduleCount;
+        }
 
         var sinceFirstTrigger = FirstTrigger.Elapsed;
         var sinceLastTrigger = LastTrigger.Elapsed;
@@ -93,7 +104,7 @@ public sealed class Debouncer : IDebounce
             if (sinceLastTrigger >= _TimingGranularity)
             {
                 // Accumulate the coalesced triggers.
-                Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
                 countMinusOne = -1;
                 LastTrigger.Restart();
                 sinceLastTrigger = TimeSpan.Zero;
@@ -126,7 +137,7 @@ public sealed class Debouncer : IDebounce
                 if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
                 {
                     // Sending event now, so accumulate all coalesced triggers.
-                    var count = Count + (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                    var count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
 
                     FirstTrigger.Reset();
                     LastTrigger.Reset();
@@ -140,8 +151,11 @@ public sealed class Debouncer : IDebounce
                         lock (LockObject)
                         {
                             // Handler has finished.
-                            _Benchmark.TriggersReported += count;
-                            ++_Benchmark.HandlersCalled;
+                            unchecked
+                            {
+                                _Benchmark.TriggersReported += count;
+                                ++_Benchmark.HandlersCalled;
+                            }
                             if (IsDisposed)
                             {
                                 return;
@@ -183,7 +197,10 @@ public sealed class Debouncer : IDebounce
         // Now set (or cancel) our timer.
         if (TimerActive || (dueTime != Timeout.InfiniteTimeSpan))
         {
-            ++_Benchmark.TimerChanges;
+            unchecked
+            {
+                ++_Benchmark.TimerChanges;
+            }
             // System.Timer works with milliseconds, where -1 (== 2^32 - 1 == uint.MaxValue) means infinite
             // and 2^32 - 2 (or uint.MaxValue - 1) is the actual maximum.
             if (dueTime > TimeSpan.FromMilliseconds(uint.MaxValue - 1))
@@ -233,7 +250,7 @@ public sealed class Debouncer : IDebounce
         {
             if (!IsDisposed)
             {
-                Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
             }
             var count = Count;
             Count = 0;
@@ -241,7 +258,7 @@ public sealed class Debouncer : IDebounce
             {
                 LockedReschedule();
             }
-            return (long)count;
+            return count;
         }
     }
 
@@ -337,7 +354,7 @@ public sealed class Debouncer : IDebounce
         {
             if (!IsDisposed)
             {
-                Count += (ulong)(Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) + 1);
+                Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) + 1);
                 Timer.Dispose();
                 IsDisposed = true;
             }

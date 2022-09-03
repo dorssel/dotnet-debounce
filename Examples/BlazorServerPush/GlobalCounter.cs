@@ -24,7 +24,7 @@ public class GlobalCounter : NotifyPropertyChanged
     bool _Enabled;
     public bool Enabled
     {
-        get { return _Enabled; }
+        get => _Enabled;
         set
         {
             if (SetProperty(ref _Enabled, value))

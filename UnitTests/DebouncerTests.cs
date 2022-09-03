@@ -2,15 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using Dorssel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-[assembly: CLSCompliant(true)]
-[assembly: ExcludeFromCodeCoverage]
-
 namespace UnitTests;
 
 [TestClass]
@@ -58,7 +49,7 @@ public class DebouncerTests
         debouncer.Trigger();
         Sleep(1);
         debouncer.Dispose();
-        Assert.AreEqual(0UL, wrapper.HandlerCount);
+        Assert.AreEqual(0L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -76,8 +67,8 @@ public class DebouncerTests
         Sleep(1);
         debouncer.Dispose();
         Assert.IsTrue(done.Wait(TimingUnits(2)));
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -93,8 +84,8 @@ public class DebouncerTests
         };
         debouncer.Trigger();
         Assert.IsTrue(done.Wait(TimingUnits(1)));
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
     #endregion
 
@@ -106,7 +97,7 @@ public class DebouncerTests
         Assert.AreEqual(TimeSpan.Zero, debouncer.DebounceWindow);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
     public void DebounceWindowValid(TimeSpan DebounceWindow)
     {
@@ -118,7 +109,7 @@ public class DebouncerTests
         Assert.AreEqual(DebounceWindow, debouncer.DebounceWindow);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
     [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
     public void DebounceWindowInvalid(TimeSpan DebounceWindow)
@@ -160,7 +151,7 @@ public class DebouncerTests
         Assert.AreEqual(Timeout.InfiniteTimeSpan, debouncer.DebounceTimeout);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
     [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
     public void DebounceTimeoutValid(TimeSpan debounceTimeout)
@@ -173,7 +164,7 @@ public class DebouncerTests
         Assert.AreEqual(debounceTimeout, debouncer.DebounceTimeout);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
     public void DebounceTimeoutInvalid(TimeSpan debounceTimeout)
     {
@@ -214,7 +205,7 @@ public class DebouncerTests
         Assert.AreEqual(TimeSpan.Zero, debouncer.EventSpacing);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
     public void EventSpacingValid(TimeSpan eventSpacing)
     {
@@ -226,7 +217,7 @@ public class DebouncerTests
         Assert.AreEqual(eventSpacing, debouncer.EventSpacing);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
     [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
     public void EventSpacingInvalid(TimeSpan eventSpacing)
@@ -268,7 +259,7 @@ public class DebouncerTests
         Assert.AreEqual(TimeSpan.Zero, debouncer.HandlerSpacing);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
     public void HandlerSpacingValid(TimeSpan HandlerSpacing)
     {
@@ -280,7 +271,7 @@ public class DebouncerTests
         Assert.AreEqual(HandlerSpacing, debouncer.HandlerSpacing);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
     [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
     public void HandlerSpacingInvalid(TimeSpan HandlerSpacing)
@@ -322,7 +313,7 @@ public class DebouncerTests
         Assert.AreEqual(TimeSpan.Zero, debouncer.TimingGranularity);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
     public void TimingGranularityValid(TimeSpan timingGranularity)
     {
@@ -335,7 +326,7 @@ public class DebouncerTests
         Assert.AreEqual(timingGranularity, debouncer.TimingGranularity);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
     [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
     public void TimingGranularityInvalid(TimeSpan timingGranularity)
@@ -408,8 +399,8 @@ public class DebouncerTests
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -422,11 +413,11 @@ public class DebouncerTests
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(0UL, wrapper.TriggerCount);
-        Assert.AreEqual(0UL, wrapper.HandlerCount);
+        Assert.AreEqual(0L, wrapper.TriggerCount);
+        Assert.AreEqual(0L, wrapper.HandlerCount);
         Sleep(2);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -443,10 +434,10 @@ public class DebouncerTests
             debouncer.Trigger();
             Sleep(1);
         }
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
         Sleep(2);
-        Assert.AreEqual(6UL, wrapper.TriggerCount);
-        Assert.AreEqual(2UL, wrapper.HandlerCount);
+        Assert.AreEqual(6L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -463,8 +454,8 @@ public class DebouncerTests
             debouncer.Trigger();
         }
         Sleep(4);
-        Assert.AreEqual(10UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(10L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -482,8 +473,8 @@ public class DebouncerTests
         };
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(2UL, wrapper.TriggerCount);
-        Assert.AreEqual(2UL, wrapper.HandlerCount);
+        Assert.AreEqual(2L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -496,15 +487,15 @@ public class DebouncerTests
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
         Sleep(2);
-        Assert.AreEqual(2UL, wrapper.TriggerCount);
-        Assert.AreEqual(2UL, wrapper.HandlerCount);
+        Assert.AreEqual(2L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -517,15 +508,15 @@ public class DebouncerTests
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
         Sleep(2);
-        Assert.AreEqual(2UL, wrapper.TriggerCount);
-        Assert.AreEqual(2UL, wrapper.HandlerCount);
+        Assert.AreEqual(2L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -543,8 +534,8 @@ public class DebouncerTests
         debouncer.Trigger();
         debouncer.Trigger();
         Sleep(5);
-        Assert.AreEqual(3UL, wrapper.TriggerCount);
-        Assert.AreEqual(2UL, wrapper.HandlerCount);
+        Assert.AreEqual(3L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
     }
     #endregion
 
@@ -577,8 +568,8 @@ public class DebouncerTests
         debouncer.Trigger();
         Assert.AreEqual(1L, debouncer.Reset());
         Sleep(2);
-        Assert.AreEqual(0UL, wrapper.TriggerCount);
-        Assert.AreEqual(0UL, wrapper.HandlerCount);
+        Assert.AreEqual(0L, wrapper.TriggerCount);
+        Assert.AreEqual(0L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -597,8 +588,8 @@ public class DebouncerTests
         };
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
     #endregion
 
@@ -613,12 +604,12 @@ public class DebouncerTests
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
         debouncer.Trigger();
         Sleep(1);
-        Assert.AreEqual(0UL, wrapper.HandlerCount);
+        Assert.AreEqual(0L, wrapper.HandlerCount);
         debouncer.TimingGranularity = TimeSpan.Zero;
         debouncer.DebounceWindow = TimeSpan.Zero;
         Sleep(1);
-        Assert.AreEqual(1UL, wrapper.TriggerCount);
-        Assert.AreEqual(1UL, wrapper.HandlerCount);
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
     }
 
     [TestMethod]
@@ -626,10 +617,32 @@ public class DebouncerTests
     {
         using var debouncer = new Debouncer();
         var benchmark = debouncer.Benchmark;
-        Assert.AreEqual(0UL, benchmark.HandlersCalled);
-        Assert.AreEqual(0UL, benchmark.TriggersReported);
-        Assert.AreEqual(0UL, benchmark.RescheduleCount);
-        Assert.AreEqual(0UL, benchmark.TimerChanges);
-        Assert.AreEqual(0UL, benchmark.TimerEvents);
+        Assert.AreEqual(0L, benchmark.HandlersCalled);
+        Assert.AreEqual(0L, benchmark.TriggersReported);
+        Assert.AreEqual(0L, benchmark.RescheduleCount);
+        Assert.AreEqual(0L, benchmark.TimerChanges);
+        Assert.AreEqual(0L, benchmark.TimerEvents);
+    }
+
+    [TestMethod]
+    [DataRow(0, 0, 0)]
+    [DataRow(1, 0, 1)]
+    [DataRow(long.MaxValue - 1, 0, long.MaxValue - 1)]
+    [DataRow(long.MaxValue, 0, long.MaxValue)]
+    [DataRow(0, 1, 1)]
+    [DataRow(1, 1, 2)]
+    [DataRow(long.MaxValue - 1, 1, long.MaxValue)]
+    [DataRow(long.MaxValue, 1, long.MaxValue)]
+    [DataRow(0, long.MaxValue - 1, long.MaxValue - 1)]
+    [DataRow(1, long.MaxValue - 1, long.MaxValue)]
+    [DataRow(long.MaxValue - 1, long.MaxValue - 1, long.MaxValue)]
+    [DataRow(long.MaxValue, long.MaxValue - 1, long.MaxValue)]
+    [DataRow(0, long.MaxValue, long.MaxValue)]
+    [DataRow(1, long.MaxValue, long.MaxValue)]
+    [DataRow(long.MaxValue - 1, long.MaxValue, long.MaxValue)]
+    [DataRow(long.MaxValue, long.MaxValue, long.MaxValue)]
+    public void AddWithClamp(long left, long right, long expected)
+    {
+        Assert.AreEqual(expected, Debouncer.AddWithClamp(left, right));
     }
 }

@@ -2,11 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Threading;
-using Dorssel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace UnitTests;
 
 sealed class VerifyingHandlerWrapper : IDisposable
@@ -19,8 +14,8 @@ sealed class VerifyingHandlerWrapper : IDisposable
 
     public event EventHandler<DebouncedEventArgs>? Debounced;
 
-    public ulong HandlerCount { get; private set; }
-    public ulong TriggerCount { get; private set; }
+    public long HandlerCount { get; private set; }
+    public long TriggerCount { get; private set; }
 
     void OnDebounced(object? sender, DebouncedEventArgs debouncedEventArgs)
     {
@@ -32,7 +27,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         Assert.AreEqual(Interlocked.Increment(ref ReentrancyCount), 1);
 
         ++HandlerCount;
-        TriggerCount += (ulong)debouncedEventArgs.Count;
+        TriggerCount += debouncedEventArgs.Count;
 
         Debounced?.Invoke(this, debouncedEventArgs);
 

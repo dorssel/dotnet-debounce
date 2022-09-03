@@ -27,7 +27,6 @@ public interface IDebounce : IDisposable
     long Reset();
 
     /// <summary>Gets or sets the <see cref="TimeSpan"/> within which new calls to <see cref="Trigger"/> will restart the debounce timer.</summary>
-    /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     TimeSpan DebounceWindow { get; set; }
 
