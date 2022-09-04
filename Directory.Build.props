@@ -19,15 +19,35 @@ SPDX-License-Identifier: MIT
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    
+
     <!-- Common defaults -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SelfContained>false</SelfContained>
     <IsPackable>false</IsPackable>
-    <Authors>Frans van Dorsselaer</Authors>
+    <IsPublishable>false</IsPublishable>
+    <IsTrimmable>true</IsTrimmable>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\strongname.snk</AssemblyOriginatorKeyFile>
+
+    <!-- Assembly metadata -->
+    <Product>dotnet-debounce</Product>
+    <Company>Frans van Dorsselaer</Company>
+    <Copyright>Copyright (C) $([System.DateTime]::UtcNow.ToString("yyyy"))  $(Company)</Copyright>
+
+    <!-- NuGet metadata -->
+    <Title>$(Product)</Title>
+    <Authors>$(Company)</Authors>
+    <Description>Coalesces, debounces, serializes, and throttles incoming concurrent events.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright (C) $([System.DateTime]::UtcNow.ToString("yyyy"))  $(Authors)</Copyright>
-    <PackageProjectUrl>https://github.com/dorssel/TestRepo</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dorssel/TestRepo.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dorssel/dotnet-debounce</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
+
+    <!-- SourceLink -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,11 +10,28 @@ SPDX-License-Identifier: MIT
     <TargetFrameworks>netstandard2.0;netstandard1.2</TargetFrameworks>
     <RootNamespace>Dorssel.Utilities</RootNamespace>
     <AssemblyName>Dorssel.Utilities.Debounce</AssemblyName>
-    <IsTrimmable>true</IsTrimmable>
+
     <IsPackable>true</IsPackable>
-    <Title>Event Debouncer</Title>
-    <Description>Coalesces, debounces, serializes, and throttles incoming concurrent events.</Description>
+    <PackageId>Dorssel.Utilities.Debounce</PackageId>
+    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="false" />
+    <None Include="..\README.md" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>
