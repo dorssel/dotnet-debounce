@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
-//
-// SPDX-License-Identifier: MIT
-
 {
   "version": "1.0",
   "defaultProvider": "unpkg",
@@ -9,18 +5,12 @@
     {
       "library": "bootstrap@5.2.0",
       "destination": "wwwroot/libman/bootstrap/",
-      "files": [
-        "dist/css/bootstrap.min.css",
-        "dist/css/bootstrap.min.css.map"
-      ]
+      "files": ["dist/css/bootstrap.min.css", "dist/css/bootstrap.min.css.map"]
     },
     {
       "library": "open-iconic@1.1.1",
       "destination": "wwwroot/libman/open-iconic/",
-      "files": [
-        "font/css/open-iconic-bootstrap.min.css",
-        "font/fonts/*"
-      ]
+      "files": ["font/css/open-iconic-bootstrap.min.css", "font/fonts/*"]
     }
   ]
 }
