@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project>
   <ItemGroup>
     <!-- all -->
-    <PackageVersion Include="GitVersion.MsBuild" Version="5.11.0" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="5.11.1" />
 
     <!-- Debounce -->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
