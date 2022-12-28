@@ -4,7 +4,7 @@
 
 namespace TestableUnitTests;
 
-class MockDebouncedEventArgs : DebouncedEventArgs
+sealed class MockDebouncedEventArgs : DebouncedEventArgs
 {
     public MockDebouncedEventArgs(long count)
         : base(count, false)
