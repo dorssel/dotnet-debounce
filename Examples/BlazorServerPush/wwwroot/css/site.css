@@ -145,7 +145,7 @@ div#application {
   top: 0.5rem;
 }
 
-@media (max-width: 767.98px) {
+@media (width < 768px) {
   .main .top-row:not(.auth) {
     display: none;
   }
@@ -160,7 +160,7 @@ div#application {
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   div#application {
     flex-direction: row;
   }
