@@ -8,10 +8,10 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <!-- Use the latest .NET SDK -->
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
 
     <!-- Use the latest C# Language standard -->
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
 
     <!-- Be very strict -->
     <WarningLevel>5</WarningLevel>
