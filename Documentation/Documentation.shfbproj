@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <!-- A framework version is required for NuGet restore.  This can be any valid version -->
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <!-- A target framework version is required by Visual Studio.  It can be any version with a targeting pack installed. -->
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>

@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <IsPublishable>true</IsPublishable>
     <PublishTrimmed>true</PublishTrimmed>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
