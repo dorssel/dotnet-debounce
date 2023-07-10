@@ -20,7 +20,7 @@ SPDX-License-Identifier: MIT
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
 
     <!-- documentation -->
-    <PackageVersion Include="EWSoftware.SHFB" Version="2023.3.4" />
+    <PackageVersion Include="EWSoftware.SHFB" Version="2023.7.8" />
     <PackageVersion Include="EWSoftware.SHFB.NET" Version="7.0.0" />
 
     <!-- blazor -->
