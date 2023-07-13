@@ -19,6 +19,8 @@ indent_size = 2
 insert_final_newline = true
 [*.yml]
 indent_size = 2
+[*.csproj]
+indent_size = 2
 ###############################
 # .NET Coding Conventions     #
 ###############################

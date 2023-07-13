@@ -4,35 +4,35 @@
     SPDX-License-Identifier: MIT
 *@
 
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazorServerPush</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+@inject NavigationManager navigationmanager
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-    </ul>
-</div>
+<h1 class="head">BlazorServerPush</h1>
+<ul>
+    <li>
+        <FluentAnchor Href="counter" Appearance=@SetAppearance("Counter")>Counter</FluentAnchor>
+    </li>
+</ul>
 
 @code {
-    private bool collapseNavMenu = true;
+    private string? target;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    protected override void OnInitialized()
     {
-        collapseNavMenu = !collapseNavMenu;
+        navigationmanager.LocationChanged += LocationChanged;
+        base.OnInitialized();
     }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        Uri uri = new Uri(e.Location);
+        if (uri.Segments.Count() > 1)
+            target = uri.Segments[1];
+        else
+            target = "";
+        StateHasChanged();
+    }
+
+    private Appearance SetAppearance(string location) => (string.Equals(location, target, StringComparison.OrdinalIgnoreCase)) ? Appearance.Neutral : Appearance.Stealth;
+
+
 }
