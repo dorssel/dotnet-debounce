@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Fast.Components.FluentUI;
 
 namespace BlazorServerPush;
 
@@ -21,6 +22,10 @@ sealed class Startup
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddBlazorPolyfill();
+        services.AddFluentUIComponents();
+        //When using icons and/or emoji replace the line above with the code below
+        //LibraryConfiguration config = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
+        //builder.Services.AddFluentUIComponents(config);
         services.AddSingleton<GlobalCounter>();
     }
 
