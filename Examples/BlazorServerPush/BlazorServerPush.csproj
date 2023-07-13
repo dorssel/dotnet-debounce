@@ -7,8 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <Content Remove="wwwroot\favicon.ico.license" />
-    <None Include="wwwroot\favicon.ico.license" />
+    <Content Update="wwwroot\favicon.ico.license" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,5 +17,13 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <ProjectReference Include="..\..\Debounce\Debounce.csproj" />
   </ItemGroup>
+
+  <!-- publish -->
+  <PropertyGroup>
+    <IsPublishable>true</IsPublishable>
+    <TargetFramework>net7.0</TargetFramework>
+    <SelfContained>false</SelfContained>
+    <DeleteExistingFiles>true</DeleteExistingFiles>
+  </PropertyGroup>
 
 </Project>
