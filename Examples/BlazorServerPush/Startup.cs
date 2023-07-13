@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Blazor.Polyfill.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +20,6 @@ sealed class Startup
     {
         services.AddRazorPages();
         services.AddServerSideBlazor();
-        services.AddBlazorPolyfill();
         services.AddFluentUIComponents();
         //When using icons and/or emoji replace the line above with the code below
         //LibraryConfiguration config = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
@@ -41,7 +39,6 @@ sealed class Startup
             app.UseExceptionHandler("/Error");
         }
 
-        app.UseBlazorPolyfill();
         app.UseStaticFiles();
 
         app.UseRouting();
