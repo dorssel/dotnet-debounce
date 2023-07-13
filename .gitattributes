@@ -27,6 +27,7 @@
 *.cshtml   text
 *.json     text
 *.css      text
+*.pubxml   text
 *.ico      binary
 
 *.shfbproj   text
