@@ -77,7 +77,7 @@ public class TestableClassTests
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.Raise(m => m.Debounced += null, null, new DebouncedEventArgs(1));
+        debounce.Raise(m => m.Debounced += null, null!, new DebouncedEventArgs(1));
     }
 
     [TestMethod]
@@ -87,7 +87,7 @@ public class TestableClassTests
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.Raise(m => m.Debounced += null, debounce.Object, null);
+        debounce.Raise(m => m.Debounced += null, debounce.Object, null!);
     }
 
     [TestMethod]
