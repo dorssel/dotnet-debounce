@@ -47,27 +47,36 @@ public class TestableClassTests
         debounce.VerifyRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
     }
 
+    [TestMethod]
+    public void DisposeNondisposable()
+    {
+        var debounce = new Mock<IDebounce>();
+
+        using (new TestableClass(debounce.Object)) { }
+    }
 
     [TestMethod]
     public void DisposeDisposes()
     {
         var debounce = new Mock<IDebounce>();
+        var disposable = debounce.As<IDisposable>();
 
         using (new TestableClass(debounce.Object)) { }
 
-        debounce.Verify(m => m.Dispose());
+        disposable.Verify(m => m.Dispose(), Times.Once());
     }
 
     [TestMethod]
     public void DisposeDisposesOnce()
     {
         var debounce = new Mock<IDebounce>();
+        var disposable = debounce.As<IDisposable>();
 
         var testable = new TestableClass(debounce.Object);
         testable.Dispose();
         testable.Dispose();
 
-        debounce.Verify(m => m.Dispose(), Times.Once());
+        disposable.Verify(m => m.Dispose(), Times.Once());
     }
 
     [TestMethod]

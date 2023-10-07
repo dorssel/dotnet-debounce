@@ -9,7 +9,7 @@ namespace Dorssel.Utilities;
 /// <summary>
 /// This interface specifies the public API for the <see cref="Debouncer"/> class.
 /// </summary>
-public interface IDebounce : IDisposable
+public interface IDebounce
 {
     /// <summary>
     /// This event will be sent when <see cref="Trigger"/> has been called one or more times and

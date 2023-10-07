@@ -55,7 +55,7 @@ public sealed class TestableClass : IDisposable
         if (!IsDisposed)
         {
             Debounce.Debounced -= OnDebouncedEvents;
-            Debounce.Dispose();
+            (Debounce as IDisposable)?.Dispose();
             IsDisposed = true;
         }
     }

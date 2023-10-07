@@ -13,7 +13,9 @@ namespace Dorssel.Utilities;
 /// <summary>
 /// This class implements the <see cref="IDebounce"/> interface.
 /// </summary>
-public sealed class Debouncer : IDebounce
+public sealed class Debouncer
+    : IDebounce
+    , IDisposable
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Debouncer"/> class.
