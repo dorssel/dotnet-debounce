@@ -2,9 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace BlazorServerPush;
 
 public class GlobalCounter : NotifyPropertyChanged

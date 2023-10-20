@@ -2,18 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using BlazorServerPush;
+using Microsoft.Fast.Components.FluentUI;
 
-namespace BlazorServerPush;
+var builder = WebApplication.CreateBuilder(args);
 
-sealed class Program
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddFluentUIComponents();
+builder.Services.AddSingleton<GlobalCounter>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(wb => wb.UseStartup<Startup>())
-            .Build()
-            .Run();
-    }
+    app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+}
+app.UseStaticFiles();
+app.UseRouting();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
+app.Run();

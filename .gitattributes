@@ -28,6 +28,6 @@
 *.json     text
 *.css      text
 *.pubxml   text
-*.ico      binary
+*.png      binary
 
 *.shfbproj   text
