@@ -1,0 +1,40 @@
+﻿@*
+    SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+
+    SPDX-License-Identifier: MIT
+*@
+
+@inherits LayoutComponentBase
+
+<PageTitle>BlazorServerPush</PageTitle>
+
+<main>
+    <input type="checkbox" id="menu-toggle" checked=@menuchecked @onclick=HandleChecked />
+    <label for="menu-toggle" class="menu-icon">
+        <FluentIcon Icon="Icons.Regular.Size24.Navigation" />
+    </label>
+    <nav>
+        <NavMenu />
+    </nav>
+    <div class="content">
+        <article>
+            <ErrorBoundary>
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent Context="ex">
+                    <p class="error">@ex.Message</p>
+                </ErrorContent>
+            </ErrorBoundary>
+        </article>
+    </div>
+</main>
+
+@code {
+    bool menuchecked = true;
+
+    void HandleChecked()
+    {
+        menuchecked = !menuchecked;
+    }
+}

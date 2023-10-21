@@ -6,24 +6,23 @@ SPDX-License-Identifier: MIT
 -->
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <ItemGroup>
-    <Content Update="wwwroot\favicon.ico.license" CopyToPublishDirectory="Never" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Debounce\Debounce.csproj" />
-  </ItemGroup>
-
-  <!-- publish -->
   <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- publish -->
     <IsPublishable>true</IsPublishable>
     <TargetFramework>net7.0</TargetFramework>
     <SelfContained>false</SelfContained>
     <DeleteExistingFiles>true</DeleteExistingFiles>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Debounce\Debounce.csproj" />
+  </ItemGroup>
 
 </Project>
