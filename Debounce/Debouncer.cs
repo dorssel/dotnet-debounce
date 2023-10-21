@@ -349,7 +349,11 @@ public sealed class Debouncer
         }
     }
 
+    // NOTE: the additional summary is for docfx, which for some reason does not pick up the inheritdoc.
     /// <inheritdoc/>
+    /// <summary>
+    /// See <see cref="IDisposable.Dispose"/>
+    /// </summary>
     public void Dispose()
     {
         lock (LockObject)

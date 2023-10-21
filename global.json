@@ -3,5 +3,8 @@
     "version": "7.0.203",
     "allowPrerelease": false,
     "rollForward": "latestFeature"
+  },
+  "msbuild-sdks": {
+    "Microsoft.Build.NoTargets": "3.7.0"
   }
 }

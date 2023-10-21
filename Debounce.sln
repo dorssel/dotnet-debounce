@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testable", "Examples\Testab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServerPush", "Examples\BlazorServerPush\BlazorServerPush.csproj", "{C8153F1E-38A2-4056-960C-2AD4DF270A77}"
 EndProject
-Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Documentation", "Documentation\Documentation.shfbproj", "{0891FF51-8E52-4CF5-B904-E74F5E26A155}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Documentation", "Documentation\Documentation.csproj", "{AFE742DE-B2D9-4569-8ED6-C04CED0874FF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{664F6F11-7F80-43E9-A806-96C66DAFD207} = {664F6F11-7F80-43E9-A806-96C66DAFD207}
 	EndProjectSection
@@ -68,8 +68,9 @@ Global
 		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8153F1E-38A2-4056-960C-2AD4DF270A77}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0891FF51-8E52-4CF5-B904-E74F5E26A155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0891FF51-8E52-4CF5-B904-E74F5E26A155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFE742DE-B2D9-4569-8ED6-C04CED0874FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFE742DE-B2D9-4569-8ED6-C04CED0874FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFE742DE-B2D9-4569-8ED6-C04CED0874FF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{03546736-234E-4398-B715-046F92BCB256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03546736-234E-4398-B715-046F92BCB256}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03546736-234E-4398-B715-046F92BCB256}.Release|Any CPU.ActiveCfg = Release|Any CPU
