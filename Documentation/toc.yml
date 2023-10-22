@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2023 Frans van Dorsselaer
+#
+# SPDX-License-Identifier: MIT
+
+---
+- name: Api Documentation
+  href: api/
+  homepage: api/index.md

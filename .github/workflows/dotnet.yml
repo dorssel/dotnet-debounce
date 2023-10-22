@@ -17,7 +17,7 @@ permissions: read-all
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -35,7 +35,10 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
 
       - name: Install dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore
+          dotnet restore Documentation
+          dotnet tool restore
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
@@ -58,17 +61,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Documentation Dependencies
-        run: msbuild Documentation -t:restore
-
-      - name: Documentation
-        run: msbuild Documentation
-
       - name: Upload Documentation Artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
-          path: Documentation/bin
+          path: Documentation/_site

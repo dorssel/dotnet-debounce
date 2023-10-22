@@ -1,0 +1,22 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["bin/Release/netstandard2.0/**/*.dll"],
+          "src": "../Debounce"
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["toc.yml", "*.md", "api/**.yml", "api/index.md"]
+      }
+    ],
+    "template": ["default", "modern"],
+    "output": "_site"
+  }
+}

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2023 Frans van Dorsselaer
+
+SPDX-License-Identifier: MIT
+-->
+<Project Sdk="Microsoft.Build.NoTargets">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="api/**/*.yml;api/.manifest" />
+    <None Remove="_site/**/*.*" />
+  </ItemGroup>
+  
+  <Target Name="docfx" BeforeTargets="AfterBuild">
+    <Exec Command="dotnet docfx" />
+  </Target>
+
+</Project>
