@@ -12,9 +12,9 @@ SPDX-License-Identifier: MIT
     <AssemblyName>Dorssel.Utilities.Debounce</AssemblyName>
 
     <IsPackable>true</IsPackable>
-    <PackageId>Dorssel.Utilities.Debounce</PackageId>
-    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Dorssel.Utilities.Debounce</PackageId>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
