@@ -478,15 +478,13 @@ code {
   aside {
     grid-area: 1 / 2 / 2 / 3;
     padding: 1.5em 0.75em 1em;
-    margin-inline-start: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)); /* hinge width */
-    margin-inline-end: calc(100% - env(viewport-segment-left 1 0));
+    margin-inline: calc(calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0))) calc(100% - env(viewport-segment-left 1 0));
   }
 
   article {
     grid-area: 2 / 2 / 3 / 3;
     padding-top: 0;
-    margin-inline-start: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)); /* hinge width */
-    margin-inline-end: calc(100% - env(viewport-segment-left 1 0));
+    margin-inline-start: calc(calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0))) calc(100% - env(viewport-segment-left 1 0));
   }
 }
 

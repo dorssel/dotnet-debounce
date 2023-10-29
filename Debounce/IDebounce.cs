@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-
 namespace Dorssel.Utilities;
 
 /// <summary>

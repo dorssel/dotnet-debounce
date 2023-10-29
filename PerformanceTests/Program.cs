@@ -2,10 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Dorssel.Utilities;
 
 namespace PerformanceTests;
