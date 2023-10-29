@@ -7,9 +7,7 @@ SPDX-License-Identifier: MIT
 <Project>
 
   <PropertyGroup>
-    <!-- Convenience -->
-    <ImplicitUsings>enable</ImplicitUsings>
-    <!-- Be strict when testing -->
+    <!-- Be strict when testing, even in Release (at the cost of performance) -->
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
 

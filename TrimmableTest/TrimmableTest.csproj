@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPublishable>true</IsPublishable>
+    <TargetFramework>net7.0</TargetFramework>
     <PublishTrimmed>true</PublishTrimmed>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
   </PropertyGroup>

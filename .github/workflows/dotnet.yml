@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           dotnet restore
-          dotnet restore Documentation
+          dotnet restore Documentation --no-dependencies
           dotnet tool restore
 
       - name: Build
@@ -49,6 +49,13 @@ jobs:
       - name: Package
         run: dotnet pack --configuration Release --no-build
 
+      - name: Trimmable Test
+        run: |
+          # NOTE: This has to rebuild Debounce as well, due to how '--use-current-runtime' works.
+          # Make sure to run this test *after* building packaging, in order to not mix up the builds.
+          dotnet publish TrimmableTest --use-current-runtime --configuration Release -p:PublishProfile=FolderProfile
+          ./TrimmableTest/bin/Release/publish/TrimmableTest
+
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -56,13 +63,13 @@ jobs:
           path: |
             **/*.nupkg
 
-      - name: Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
       - name: Upload Documentation Artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
           path: Documentation/_site
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

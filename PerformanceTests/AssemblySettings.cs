@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: CLSCompliant(true)]
