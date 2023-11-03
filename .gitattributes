@@ -13,11 +13,11 @@
 
 *.md    text
 *.txt   text
-*LICENSE   text
 
 *.yml   text
 
 *.sln   text
+*.snk   binary
 
 *.csproj   text
 *.cs       text eol=crlf
@@ -30,4 +30,6 @@
 *.pubxml   text
 *.png      binary
 
-*.shfbproj   text
+# These are part of the nuget package
+LICENSE.txt   text eol=crlf
+README.md     text eol=crlf
