@@ -3,20 +3,39 @@
     {
       "src": [
         {
-          "files": ["bin/Release/netstandard2.0/**/*.dll"],
+          "files": ["*.csproj"],
           "src": "../Debounce"
         }
       ],
-      "dest": "api"
+      "dest": "api",
+      "outputFormat": "apiPage"
     }
   ],
   "build": {
     "content": [
       {
-        "files": ["toc.yml", "*.md", "api/**.yml", "api/index.md"]
+        "files": ["**/*.{md,yml}"],
+        "exclude": ["_site/**", "obj/**"]
       }
     ],
-    "template": ["default", "modern"],
-    "output": "_site"
+    "postProcessors": ["ExtractSearchIndex"],
+     "globalMetadata": {
+      "_appTitle": "Debounce",
+      "_appName": "Debounce",
+      "_lang": "en-US",
+      "pdf": true
+    },
+    "markdownEngineProperties": {
+      "alerts": {
+        "TODO": "alert alert-secondary"
+      }
+    },
+    "sitemap": {
+      "baseUrl": "https://dorssel.github.io/dotnet-debounce-documentation",
+      "priority": 0.5,
+      "changefreq": "daily"
+    },
+    "output": "_site",
+    "template": ["default", "modern"]
   }
 }
