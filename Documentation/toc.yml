@@ -3,6 +3,5 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- name: Api Documentation
+- name: API
   href: api/
-  homepage: api/index.md
