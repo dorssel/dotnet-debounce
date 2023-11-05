@@ -9,17 +9,27 @@ SPDX-License-Identifier: MIT
 > [!NOTE]
 > Information the user should notice even if skimming.
 
+<!-- new blockquote -->
+
 > [!TIP]
 > Optional information to help a user be more successful.
+
+<!-- new blockquote -->
 
 > [!IMPORTANT]
 > Essential information required for user success.
 
+<!-- new blockquote -->
+
 > [!CAUTION]
 > Negative potential consequences of an action.
 
+<!-- new blockquote -->
+
 > [!WARNING]
 > Dangerous certain consequences of an action.
+
+<!-- new blockquote -->
 
 > [!TODO]
 > This needs to be done.
