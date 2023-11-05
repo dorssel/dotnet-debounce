@@ -19,7 +19,7 @@
       }
     ],
     "postProcessors": ["ExtractSearchIndex"],
-     "globalMetadata": {
+    "globalMetadata": {
       "_appTitle": "Debounce",
       "_appName": "Debounce",
       "_lang": "en-US",
@@ -36,6 +36,6 @@
       "changefreq": "daily"
     },
     "output": "_site",
-    "template": ["default", "modern"]
+    "template": ["default", "modern", "template"]
   }
 }
