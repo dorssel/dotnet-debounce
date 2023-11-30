@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlazorServerPush;
 
-public class NotifyPropertyChanged : INotifyPropertyChanged
+abstract class NotifyPropertyChanged : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 

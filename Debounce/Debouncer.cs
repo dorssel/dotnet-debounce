@@ -62,7 +62,7 @@ public sealed class Debouncer
         return unchecked((long)Math.Min((ulong)left + (ulong)right, long.MaxValue));
     }
 
-    void OnTimer(object state)
+    void OnTimer(object? state)
     {
         lock (LockObject)
         {

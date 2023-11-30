@@ -8,15 +8,15 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <!-- publish -->
+    <IsTrimmable>false</IsTrimmable>
     <IsPublishable>true</IsPublishable>
-    <TargetFramework>net7.0</TargetFramework>
     <SelfContained>false</SelfContained>
     <DeleteExistingFiles>true</DeleteExistingFiles>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
   </ItemGroup>
 
   <ItemGroup>

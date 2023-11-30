@@ -8,10 +8,10 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <!-- Use the latest .NET SDK -->
-    <TargetFrameworks>net7.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
 
     <!-- Use the latest C# Language standard -->
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
@@ -28,7 +28,7 @@ SPDX-License-Identifier: MIT
     <SelfContained>false</SelfContained>
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
-    <IsTrimmable>true</IsTrimmable>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\strongname.snk</AssemblyOriginatorKeyFile>
 
     <!-- Assembly metadata -->
@@ -56,7 +56,6 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild">
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 

@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 using BlazorServerPush;
-using Microsoft.Fast.Components.FluentUI;
+using BlazorServerPush.Components;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 builder.Services.AddFluentUIComponents();
 builder.Services.AddSingleton<GlobalCounter>();
 
@@ -23,8 +24,9 @@ else
     app.UseExceptionHandler("/Error");
 }
 app.UseStaticFiles();
-app.UseRouting();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

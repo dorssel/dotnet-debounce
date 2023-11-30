@@ -4,7 +4,9 @@
 
 namespace BlazorServerPush;
 
-public class GlobalCounter : NotifyPropertyChanged
+#pragma warning disable CA1812 // Instantiated by DI
+sealed class GlobalCounter : NotifyPropertyChanged
+#pragma warning restore CA1812
 {
     long _Count;
     public long Count

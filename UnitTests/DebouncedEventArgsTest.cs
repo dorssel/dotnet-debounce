@@ -45,11 +45,8 @@ public class DebouncedEventArgsTests
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
     }
 
-    sealed class DerivedDebouncedEventArgs : DebouncedEventArgs
+    sealed class DerivedDebouncedEventArgs(long count, bool boundsCheck) : DebouncedEventArgs(count, boundsCheck)
     {
-        public DerivedDebouncedEventArgs(long count, bool boundsCheck)
-            : base(count, boundsCheck)
-        { }
     }
 
     [TestMethod]
