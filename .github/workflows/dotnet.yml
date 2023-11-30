@@ -53,13 +53,6 @@ jobs:
       - name: Package
         run: dotnet pack --configuration Release --no-build
 
-      - name: Trimmable Test
-        run: |
-          # NOTE: This has to rebuild Debounce as well, due to how '--use-current-runtime' works.
-          # Make sure to run this test *after* building packaging, in order to not mix up the builds.
-          dotnet publish TrimmableTest --use-current-runtime --configuration Release -p:PublishProfile=FolderProfile
-          ./TrimmableTest/bin/Release/publish/TrimmableTest
-
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()

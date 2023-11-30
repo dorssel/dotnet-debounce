@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+@*
+    SPDX-FileCopyrightText: 2023 Frans van Dorsselaer
+
+    SPDX-License-Identifier: MIT
+*@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="_content/Microsoft.FluentUI.AspNetCore.Components/css/reboot.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="BlazorServerPush.styles.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <HeadOutlet @rendermode="@InteractiveServer"  />
+</head>
+
+<body>
+    <Routes @rendermode="@InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

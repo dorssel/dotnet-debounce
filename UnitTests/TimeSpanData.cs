@@ -11,8 +11,8 @@ static class TimeSpanData
     /// </summary>
     public static readonly TimeSpan ArbitraryNonDefault = TimeSpan.FromSeconds(Math.PI);
 
-    static readonly TimeSpan[] _NonNegative = new TimeSpan[]
-    {
+    static readonly TimeSpan[] _NonNegative =
+    [
         TimeSpan.MaxValue,
         TimeSpan.FromDays(1),
         TimeSpan.FromHours(1),
@@ -21,10 +21,10 @@ static class TimeSpanData
         TimeSpan.FromMilliseconds(1),
         TimeSpan.FromTicks(1),
         TimeSpan.Zero
-    };
+    ];
 
-    static readonly TimeSpan[] _Negative = new TimeSpan[]
-    {
+    static readonly TimeSpan[] _Negative =
+    [
         TimeSpan.FromTicks(-1),
         // NOTE: FromMilliseconds(-1) == Timeout.InfiniteTimeSpan, a  magic value
         TimeSpan.FromMilliseconds(-2),
@@ -33,7 +33,7 @@ static class TimeSpanData
         TimeSpan.FromHours(-1),
         TimeSpan.FromDays(-1),
         TimeSpan.MinValue
-    };
+    ];
 
     public static IEnumerable<object[]> NonNegative
     {
@@ -47,6 +47,6 @@ static class TimeSpanData
 
     public static IEnumerable<object[]> Infinite
     {
-        get => new object[][] { new object[] { Timeout.InfiniteTimeSpan } };
+        get => new object[][] { [Timeout.InfiniteTimeSpan] };
     }
 }
