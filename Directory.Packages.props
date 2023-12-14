@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
     <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <!-- blazor -->
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.2.0" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.2.0" />
   </ItemGroup>
 </Project>
