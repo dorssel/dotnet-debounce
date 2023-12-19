@@ -61,7 +61,7 @@ jobs:
             **/TestResults/*.trx
 
       - name: Upload Package Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nuget-package
           path: |
@@ -70,7 +70,7 @@ jobs:
             retention-days: 14
 
       - name: Upload Documentation Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: Documentation/_site
