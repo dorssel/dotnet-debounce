@@ -26,4 +26,4 @@ updates:
           - 'MSTest.*'
       fluentui:
         patterns:
-          - 'Microsoft.Fast.Components.FluentUI*'
+          - 'Microsoft.FluentUI.AspNetCore.Components*'
