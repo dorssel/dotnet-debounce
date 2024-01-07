@@ -7,7 +7,7 @@ export default {
     iconLinks: [
         {
             icon: 'github',
-            href: 'https://github.com/dorssel/TestRepo',
+            href: 'https://github.com/dorssel/dotnet-debounce',
             title: 'GitHub'
         }
     ]
