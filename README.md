@@ -6,9 +6,12 @@ SPDX-License-Identifier: MIT
 
 # .NET event debouncer
 
-[![Build](https://github.com/dorssel/dotnet-debounce/actions/workflows/dotnet.yml/badge.svg)](https://github.com/dorssel/dotnet-debounce/actions/workflows/dotnet.yml)
-[![Lint](https://github.com/dorssel/dotnet-debounce/actions/workflows/lint.yml/badge.svg)](https://github.com/dorssel/dotnet-debounce/actions/workflows/lint.yml)
+[![Build](https://github.com/dorssel/dotnet-debounce/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/dorssel/dotnet-debounce/actions?query=workflow%3ABuild+branch%3Amaster)
+[![CodeQL](https://github.com/dorssel/dotnet-debounce/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/dorssel/dotnet-debounce/actions?query=workflow%3ACodeQL+branch%3Amaster)
+[![Lint](https://github.com/dorssel/dotnet-debounce/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/dorssel/dotnet-debounce/actions?query=workflow%3ALint+branch%3Amaster)
+[![REUSE status](https://api.reuse.software/badge/github.com/dorssel/dotnet-debounce)](https://api.reuse.software/info/github.com/dorssel/dotnet-debounce)
 [![codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
+[![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
 This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
 Common uses are:
