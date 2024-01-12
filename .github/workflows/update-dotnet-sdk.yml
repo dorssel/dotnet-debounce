@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2024 Frans van Dorsselaer
+#
+# SPDX-License-Identifier: MIT
+
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: UpdateSDK
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '4 6 * * *'
+
+permissions: read-all
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: dorssel/workflows/.github/workflows/update-dotnet-sdk.yml@main
