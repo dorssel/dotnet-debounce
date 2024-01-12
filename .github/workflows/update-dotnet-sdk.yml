@@ -15,12 +15,5 @@ on:
 permissions: read-all
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      pull-requests: write
-
-    steps:
-      - uses: dorssel/workflows/.github/workflows/update-dotnet-sdk.yml@main
+  UpdateSDK:
+    uses: dorssel/workflows/.github/workflows/update-dotnet-sdk.yml@main
