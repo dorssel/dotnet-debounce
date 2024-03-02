@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/yamllint.json
+
 extends: default
 
 rules:
