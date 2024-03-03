@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/markdown-lint-check.json",
   "retryOn429": true,
   "retryCount": 5,
   "aliveStatusCodes": [200, 203],

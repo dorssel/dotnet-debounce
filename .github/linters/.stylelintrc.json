@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/stylelintrc.json",
   "extends": "stylelint-config-standard",
   "rules": {
     "selector-pseudo-element-no-unknown": [
