@@ -13,13 +13,19 @@ SPDX-License-Identifier: MIT
 [![codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
 [![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
-This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
+This library exposes a two objects:
+
+1. An event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
 Common uses are:
 
 - Throttling how often the event handler is called.
 - Coalescing/debounce multiple events into one; the final event includes to total number of events received.
 - Serializing the event handler, such that it is not called re-entrant even if events are fired from multiple concurrent sources.
 - Spacing event handler calls, to give the CPU / disk / network some breathing room if events are arriving continuously.
+
+2. An event bufferer, which does the same as the debouncer but keeps track of all original events that have been triggered. The final
+event contains all the events received. This could be useful when the original events are required for later processing. The event 
+bufferer is not as performant as the debouncer because of additional memory allocations and locking.
 
 ## Examples
 
@@ -48,6 +54,12 @@ push. You could configure the debounce window and spacing to 100 ms, and the tim
 are sporadic, then they will be pushed after the initial timeout window of 100 ms for "snappiness". Finally, the debouncer will wait at least 100 ms
 (the spacer value) after the return of the previous handler, such that the network IO in the handler itself is given a bit
 of rest every time.
+
+### batch processing of data
+
+You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time, 
+processing them in batches. Use the `Bufferer` to buffer these events and send out a full list of events to process in batch.
+Multiple event types are also supported as long as they have a common base class.
 
 ## Performance
 
