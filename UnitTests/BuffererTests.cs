@@ -13,7 +13,7 @@ public sealed class BuffererTests : IDisposable
     static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
 
     Bufferer<MockEvent> debouncer;
-    List<IList<MockEvent>> bufferEventsCaptured = new List<IList<MockEvent>>();
+    List<IReadOnlyList<MockEvent>> bufferEventsCaptured = new List<IReadOnlyList<MockEvent>>();
 
     sealed record MockEvent(int Id)
     {

@@ -15,7 +15,7 @@ public class BufferedEventArgs<TEvent> : EventArgs
     /// <param name="events">The original events accumulated since the previous buffered event was sent.
     /// <para>Must be greater than 0.</para>
     /// </param>
-    public BufferedEventArgs(IList<TEvent> events)
+    public BufferedEventArgs(IReadOnlyList<TEvent> events)
     {
         Events = events;
     }
@@ -23,5 +23,5 @@ public class BufferedEventArgs<TEvent> : EventArgs
     /// <summary>
     /// Original events accumulated in this buffered event.
     /// </summary>
-    public IList<TEvent> Events { get; }
+    public IReadOnlyList<TEvent> Events { get; }
 }
