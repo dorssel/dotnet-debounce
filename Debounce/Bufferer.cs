@@ -114,6 +114,6 @@ public sealed class Bufferer<TEvent> : IDisposable, IBufferEvents<TEvent>
     /// <inheritdoc/>
     public void Dispose()
     {
-        (debouncer as IDisposable)?.Dispose();
+        ((IDisposable)debouncer).Dispose();
     }
 }
