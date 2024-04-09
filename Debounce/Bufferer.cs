@@ -8,6 +8,9 @@ namespace Dorssel.Utilities;
 /// A <see cref="Debouncer"/> that buffers events of type <typeparamref name="TEvent"/> that were triggered, aggregates them and sends aggregated events.
 /// </summary>
 /// <typeparam name="TEvent">Events to buffer</typeparam>
+/// <remarks>
+/// This is not as performant as the <see cref="Debouncer"/> due to allocations.
+/// </remarks>
 public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
 {
     IDebounce debouncer;
