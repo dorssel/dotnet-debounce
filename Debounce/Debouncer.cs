@@ -8,10 +8,10 @@ using System.Runtime.CompilerServices;
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// This class implements the <see cref="IDebounce"/> interface.
+/// This class implements the <see cref="IDebounceEvents"/> interface.
 /// </summary>
 public sealed class Debouncer
-    : IDebounce
+    : IDebounceEvents
     , IDisposable
 {
     /// <summary>

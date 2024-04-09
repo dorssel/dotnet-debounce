@@ -15,7 +15,7 @@ public class TestableClassTests
     [TestMethod]
     public void ConstructorHappyFlow()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
         debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>());
 
         using var _ = new TestableClass(debounce.Object);
@@ -35,7 +35,7 @@ public class TestableClassTests
     [TestMethod]
     public void DisposeUnregisters()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
         debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>());
 
         using (new TestableClass(debounce.Object)) { }
@@ -46,7 +46,7 @@ public class TestableClassTests
     [TestMethod]
     public void DisposeNondisposable()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using (new TestableClass(debounce.Object)) { }
     }
@@ -54,7 +54,7 @@ public class TestableClassTests
     [TestMethod]
     public void DisposeDisposes()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
         var disposable = debounce.As<IDisposable>();
 
         using (new TestableClass(debounce.Object)) { }
@@ -65,7 +65,7 @@ public class TestableClassTests
     [TestMethod]
     public void DisposeDisposesOnce()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
         var disposable = debounce.As<IDisposable>();
 
         var testable = new TestableClass(debounce.Object);
@@ -78,7 +78,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerAcceptsNullSender()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 
@@ -88,7 +88,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerAcceptsNullEventArgs()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 
@@ -98,7 +98,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerZeroCount()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 
@@ -108,7 +108,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerNegativeCount()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 
@@ -118,7 +118,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerMaxCount()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 
@@ -128,7 +128,7 @@ public class TestableClassTests
     [TestMethod]
     public void HandlerHappyFlow()
     {
-        var debounce = new Mock<IDebounce>();
+        var debounce = new Mock<IDebounceEvents>();
 
         using var _ = new TestableClass(debounce.Object);
 

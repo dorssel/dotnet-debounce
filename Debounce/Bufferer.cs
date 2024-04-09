@@ -11,9 +11,9 @@ namespace Dorssel.Utilities;
 /// <remarks>
 /// This is not as performant as the <see cref="Debouncer"/> due to allocations.
 /// </remarks>
-public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
+public sealed class Bufferer<TEvent> : IDisposable, IBufferEvents<TEvent>
 {
-    IDebounce debouncer;
+    IDebounceEvents debouncer;
     List<TEvent> eventList = new();
     object eventListLock = new();
 
@@ -25,11 +25,11 @@ public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
     /// <summary>
-    /// Create Bufferer with a specific <see cref="IDebounce"/> instance.
+    /// Create Bufferer with a specific <see cref="IDebounceEvents"/> instance.
     /// </summary>
     /// <param name="debouncer"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public Bufferer(IDebounce debouncer)
+    public Bufferer(IDebounceEvents debouncer)
     {
         this.debouncer = debouncer ?? throw new ArgumentNullException(nameof(debouncer));
         debouncer.Debounced += Debouncer_Debounced;
