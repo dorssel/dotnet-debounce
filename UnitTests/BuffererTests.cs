@@ -12,22 +12,18 @@ public sealed class BuffererTests : IDisposable
 
     static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
 
-    Bufferer<MockEvent> debouncer;
-    List<IReadOnlyList<MockEvent>> bufferEventsCaptured = new List<IReadOnlyList<MockEvent>>();
-
-    sealed record MockEvent(int Id)
-    {
-    }
+    Bufferer<int> debouncer;
+    List<IReadOnlyList<int>> buffersCaptured = new();
 
     public BuffererTests()
     {
-        debouncer = new Bufferer<MockEvent>();
+        debouncer = new Bufferer<int>();
         debouncer.Buffered += Debouncer_Buffered;
     }
 
-    private void Debouncer_Buffered(object? sender, BufferedEventArgs<MockEvent> e)
+    private void Debouncer_Buffered(object? sender, BufferedEventArgs<int> e)
     {
-        bufferEventsCaptured.Add(e.Events);
+        buffersCaptured.Add(e.Buffer);
     }
 
     [TestCleanup]
@@ -56,29 +52,29 @@ public sealed class BuffererTests : IDisposable
     [TestMethod]
     public void TriggerWithoutHandler()
     {
-        debouncer.Trigger(new MockEvent(1));
+        debouncer.Trigger(1);
         Sleep(1);
     }
 
     [TestMethod]
     public void TriggerSingle()
     {
-        debouncer.Trigger(new MockEvent(1));
+        debouncer.Trigger(1);
         Sleep(1);
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured[0].SequenceEqual([new MockEvent(1)]));
+        Assert.AreEqual(1, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured[0].SequenceEqual([1]));
     }
 
     [TestMethod]
     public void TriggerSingleDelay()
     {
         debouncer.DebounceWindow = TimingUnits(2);
-        debouncer.Trigger(new MockEvent(1));
+        debouncer.Trigger(1);
         Sleep(1);
-        Assert.AreEqual(0, bufferEventsCaptured.Count);
+        Assert.AreEqual(0, buffersCaptured.Count);
         Sleep(2);
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured[0].SequenceEqual([new MockEvent(1)]));
+        Assert.AreEqual(1, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured[0].SequenceEqual([1]));
     }
 
     [TestMethod]
@@ -89,15 +85,15 @@ public sealed class BuffererTests : IDisposable
 
         for (var i = 0; i < 6; ++i)
         {
-            debouncer.Trigger(new MockEvent(i));
+            debouncer.Trigger(i);
             Sleep(1);
         }
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured.Last().SequenceEqual([new MockEvent(0), new MockEvent(1), new MockEvent(2), new MockEvent(3)]), $"Was: [{string.Join(",",bufferEventsCaptured.Last())}]");
+        Assert.AreEqual(1, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured.Last().SequenceEqual([0, 1, 2, 3]), $"Was: [{string.Join(",",buffersCaptured.Last())}]");
 
         Sleep(2);
-        Assert.AreEqual(2, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured.Last().SequenceEqual([new MockEvent(4), new MockEvent(5)]), $"Was: [{string.Join(",", bufferEventsCaptured.Last())}]");
+        Assert.AreEqual(2, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured.Last().SequenceEqual([4, 5]), $"Was: [{string.Join(",", buffersCaptured.Last())}]");
     }
 
     [TestMethod]
@@ -105,16 +101,16 @@ public sealed class BuffererTests : IDisposable
     {
         debouncer.DebounceWindow = TimingUnits(1);
         debouncer.TimingGranularity = TimingUnits(1);
-        List<MockEvent> expectedEvents = new();
+        List<int> expectedEvents = new();
         for (var i = 0; i < 10; ++i)
         {
-            debouncer.Trigger(new MockEvent(i));
-            expectedEvents.Add(new MockEvent(i));
+            debouncer.Trigger(i);
+            expectedEvents.Add(i);
         }
         Sleep(4);
 
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured.Last().SequenceEqual(expectedEvents), $"Was: [{string.Join(",", bufferEventsCaptured.Last())}]");
+        Assert.AreEqual(1, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured.Last().SequenceEqual(expectedEvents), $"Was: [{string.Join(",", buffersCaptured.Last())}]");
     }
 
     [TestMethod]
@@ -122,16 +118,16 @@ public sealed class BuffererTests : IDisposable
     {
         debouncer.HandlerSpacing = TimingUnits(3);
 
-        debouncer.Trigger(new MockEvent(1));
+        debouncer.Trigger(1);
         Sleep(1);
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured.Last().SequenceEqual([new MockEvent(1)]));
-        debouncer.Trigger(new MockEvent(2));
+        Assert.AreEqual(1, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured.Last().SequenceEqual([1]));
+        debouncer.Trigger(2);
         Sleep(1);
-        Assert.AreEqual(1, bufferEventsCaptured.Count);
+        Assert.AreEqual(1, buffersCaptured.Count);
         Sleep(2);
-        Assert.AreEqual(2, bufferEventsCaptured.Count);
-        Assert.IsTrue(bufferEventsCaptured.Last().SequenceEqual([new MockEvent(2)]));
+        Assert.AreEqual(2, buffersCaptured.Count);
+        Assert.IsTrue(buffersCaptured.Last().SequenceEqual([2]));
     }
     #endregion
 
@@ -154,7 +150,7 @@ public sealed class BuffererTests : IDisposable
     {
         debouncer.DebounceWindow = TimingUnits(1);
 
-        debouncer.Trigger(new MockEvent(1));
+        debouncer.Trigger(1);
         Assert.AreEqual(1L, debouncer.Reset());
         Sleep(2);
         Assert.AreEqual(0L, debouncer.Reset());

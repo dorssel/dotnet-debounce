@@ -5,23 +5,23 @@
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// Provides data for the <see cref="IBufferer{TEvent}.Buffered"/> event.
+/// Event arguments for the <see cref="IBufferer{TData}.Buffered"/> event.
 /// </summary>
-public class BufferedEventArgs<TEvent> : EventArgs
+public class BufferedEventArgs<TData> : EventArgs
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="BufferedEventArgs{TEvent}"/> class.
+    /// Initializes a new instance of the <see cref="BufferedEventArgs{TData}"/> class.
     /// </summary>
-    /// <param name="events">The original events accumulated since the previous buffered event was sent.
-    /// <para>Must be greater than 0.</para>
+    /// <param name="bufferedData">
+    /// The original data accumulated since the previous buffered event was sent.
     /// </param>
-    public BufferedEventArgs(IReadOnlyList<TEvent> events)
+    public BufferedEventArgs(IReadOnlyList<TData> bufferedData)
     {
-        Events = events;
+        Buffer = bufferedData;
     }
 
     /// <summary>
-    /// Original events accumulated in this buffered event.
+    /// List of data accumulated in this buffered event.
     /// </summary>
-    public IReadOnlyList<TEvent> Events { get; }
+    public IReadOnlyList<TData> Buffer { get; }
 }

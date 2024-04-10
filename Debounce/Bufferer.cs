@@ -2,19 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Collections.ObjectModel;
+
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// A <see cref="Debouncer"/> that buffers events of type <typeparamref name="TEvent"/> that were triggered, aggregates them and sends aggregated events.
+/// A <see cref="Debouncer"/> that buffers data and sends events with the accumulated data.
 /// </summary>
-/// <typeparam name="TEvent">Events to buffer</typeparam>
+/// <typeparam name="TData">Data to buffer per trigger</typeparam>
 /// <remarks>
 /// This is not as performant as the <see cref="Debouncer"/> due to allocations.
 /// </remarks>
-public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
+public sealed class Bufferer<TData> : IDisposable, IBufferer<TData>
 {
     IDebouncer debouncer;
-    List<TEvent> eventList = new();
+    List<TData> eventList = new();
     object eventListLock = new();
 
     /// <summary>
@@ -27,8 +29,8 @@ public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
     /// <summary>
     /// Create Bufferer with a specific <see cref="IDebouncer"/> instance.
     /// </summary>
-    /// <param name="debouncer"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="debouncer">The debouncer instance to use</param>
+    /// <exception cref="ArgumentNullException">If debouncer is null</exception>
     public Bufferer(IDebouncer debouncer)
     {
         this.debouncer = debouncer ?? throw new ArgumentNullException(nameof(debouncer));
@@ -40,22 +42,22 @@ public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
     /// </summary>
     private void Debouncer_Debounced(object sender, DebouncedEventArgs e)
     {
-        List<TEvent> debouncedEvents;
+        IReadOnlyList<TData> debouncedEvents;
         lock (eventListLock)
         {
-            debouncedEvents = eventList;
+            debouncedEvents = new ReadOnlyCollection<TData>(eventList);
             eventList = new();
         }
 
-        Buffered?.Invoke(this, new BufferedEventArgs<TEvent>(debouncedEvents));
+        Buffered?.Invoke(this, new BufferedEventArgs<TData>(debouncedEvents));
     }
 
     /// <inheritdoc/>
-    public void Trigger(TEvent evt)
+    public void Trigger(TData data)
     {
         lock (eventListLock)
         {
-            eventList.Add(evt);
+            eventList.Add(data);
         }
         debouncer.Trigger();
     }
@@ -109,7 +111,7 @@ public sealed class Bufferer<TEvent> : IDisposable, IBufferer<TEvent>
     }
 
     /// <inheritdoc/>
-    public event EventHandler<BufferedEventArgs<TEvent>>? Buffered;
+    public event EventHandler<BufferedEventArgs<TData>>? Buffered;
 
     /// <inheritdoc/>
     public void Dispose()

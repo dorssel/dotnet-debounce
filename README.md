@@ -58,8 +58,9 @@ of rest every time.
 ### batch processing of data
 
 You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time, 
-processing them in batches. Use the `Bufferer` to buffer these events and send out a full list of events to process in batch.
-Multiple event types are also supported as long as they have a common base class.
+processing them in batches. Use the `Bufferer` to buffer the data of the events and send out buffered events with a list of data to process in batch.
+Multiple data types are also supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
+However, there are no restrictions on what to use as a data type to buffer.
 
 ## Performance
 
