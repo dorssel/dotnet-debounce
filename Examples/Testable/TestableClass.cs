@@ -9,7 +9,7 @@ namespace Testable;
 
 public sealed class TestableClass : IDisposable
 {
-    public TestableClass(IDebounceEvents debounce)
+    public TestableClass(IDebouncer debounce)
     {
         Debounce = debounce ?? throw new ArgumentNullException(nameof(debounce));
         Debounce.Debounced += OnDebouncedEvents;
@@ -44,7 +44,7 @@ public sealed class TestableClass : IDisposable
         }
     }
 
-    readonly IDebounceEvents Debounce;
+    readonly IDebouncer Debounce;
 
     #region IDisposable Support
     bool IsDisposed;

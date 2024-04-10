@@ -6,7 +6,7 @@ namespace UnitTests;
 
 sealed class VerifyingHandlerWrapper : IDisposable
 {
-    public VerifyingHandlerWrapper(IDebounceEvents debouncer)
+    public VerifyingHandlerWrapper(IDebouncer debouncer)
     {
         Debouncer = debouncer;
         Debouncer.Debounced += OnDebounced;
@@ -35,7 +35,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         Assert.AreEqual(Interlocked.Decrement(ref ReentrancyCount), 0);
     }
 
-    readonly IDebounceEvents Debouncer;
+    readonly IDebouncer Debouncer;
     int ReentrancyCount;
 
     #region IDisposable Support

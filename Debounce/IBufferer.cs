@@ -7,7 +7,7 @@ namespace Dorssel.Utilities;
 /// <summary>
 /// This interface specifies the public API for the <see cref="Bufferer{TEvent}"/> class.
 /// </summary>
-public interface IBufferEvents<TEvent> : IDebounceSettings
+public interface IBufferer<TEvent> : IDebounceSettings
 {
     /// <summary>
     /// This event will be sent when <see cref="Trigger"/> has been called one or more times and
