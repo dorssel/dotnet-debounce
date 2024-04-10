@@ -5,7 +5,7 @@
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// Provides data for the <see cref="IDebouncer.Debounced"/> event.
+/// Provides data for the <see cref="Debouncer.Debounced"/> event.
 /// </summary>
 public class DebouncedEventArgs : EventArgs
 {

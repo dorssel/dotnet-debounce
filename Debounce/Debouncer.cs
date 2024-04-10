@@ -216,6 +216,9 @@ public sealed class Debouncer
     public event EventHandler<DebouncedEventArgs>? Debounced;
 
     /// <inheritdoc/>
+    public void Trigger(Void data) => Trigger();
+
+    /// <inheritdoc/>
     public void Trigger()
     {
         var newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);

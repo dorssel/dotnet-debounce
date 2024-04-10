@@ -13,7 +13,7 @@ namespace Dorssel.Utilities;
 /// <remarks>
 /// This is not as performant as the <see cref="Debouncer"/> due to allocations.
 /// </remarks>
-public sealed class Bufferer<TData> : IDisposable, IBufferer<TData>
+public sealed class Bufferer<TData> : IDisposable, IDebouncer<TData, BufferedEventArgs<TData>>
 {
     IDebouncer debouncer;
     List<TData> eventList = new();
@@ -49,15 +49,18 @@ public sealed class Bufferer<TData> : IDisposable, IBufferer<TData>
             eventList = new();
         }
 
-        Buffered?.Invoke(this, new BufferedEventArgs<TData>(debouncedEvents));
+        Debounced?.Invoke(this, new BufferedEventArgs<TData>(debouncedEvents));
     }
 
     /// <inheritdoc/>
-    public void Trigger(TData data)
+    public void Trigger(TData? data)
     {
         lock (eventListLock)
         {
-            eventList.Add(data);
+            if (data is not null)
+            {
+                eventList.Add(data);
+            }
         }
         debouncer.Trigger();
     }
@@ -111,7 +114,7 @@ public sealed class Bufferer<TData> : IDisposable, IBufferer<TData>
     }
 
     /// <inheritdoc/>
-    public event EventHandler<BufferedEventArgs<TData>>? Buffered;
+    public event EventHandler<BufferedEventArgs<TData>>? Debounced;
 
     /// <inheritdoc/>
     public void Dispose()

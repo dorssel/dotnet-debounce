@@ -5,7 +5,7 @@
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// Event arguments for the <see cref="IBufferer{TData}.Buffered"/> event.
+/// Event arguments for the <see cref="Bufferer{TData}"/> event.
 /// </summary>
 public class BufferedEventArgs<TData> : EventArgs
 {

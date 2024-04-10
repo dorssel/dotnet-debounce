@@ -18,7 +18,7 @@ public sealed class BuffererTests : IDisposable
     public BuffererTests()
     {
         debouncer = new Bufferer<int>();
-        debouncer.Buffered += Debouncer_Buffered;
+        debouncer.Debounced += Debouncer_Buffered;
     }
 
     private void Debouncer_Buffered(object? sender, BufferedEventArgs<int> e)
@@ -29,7 +29,7 @@ public sealed class BuffererTests : IDisposable
     [TestCleanup]
     public void Dispose()
     {
-        debouncer.Buffered -= Debouncer_Buffered;
+        debouncer.Debounced -= Debouncer_Buffered;
         debouncer.Dispose();
     }
 
