@@ -55,9 +55,9 @@ public sealed class Bufferer<TData> : IDisposable, IDebouncer<TData, BufferedEve
     /// <inheritdoc/>
     public void Trigger(TData? data)
     {
-        lock (eventListLock)
+        if (data is not null) 
         {
-            if (data is not null)
+            lock (eventListLock)
             {
                 eventList.Add(data);
             }
