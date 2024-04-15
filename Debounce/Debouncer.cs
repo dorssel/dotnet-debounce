@@ -2,24 +2,49 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// This class implements the <see cref="IDebouncer"/> interface.
+/// Object which debounces events, i.e., accumulating multiple incoming events into one.
 /// </summary>
-public sealed class Debouncer
-    : IDebouncer
-    , IDisposable
+public sealed class Debouncer : Debouncer<Void>, IDebouncer
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Debouncer"/> class.
     /// </summary>
     public Debouncer()
+        : base(false)
+    {
+    }
+}
+
+/// <summary>
+/// Object which debounces events, i.e., accumulating multiple incoming events into one with the possibility of 
+/// keeping track of the incoming trigger data.
+/// </summary>
+public class Debouncer<TData> : IDebouncer<TData>
+    , IDisposable
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class with buffering enabled.
+    /// </summary>
+    public Debouncer()
+        : this(true)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class with enableBuffering option.
+    /// </summary>
+    /// <param name="enableBuffering">Whether to buffer trigger data or not</param>
+    protected Debouncer(bool enableBuffering)
     {
         Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        EnableBuffering = enableBuffering;
     }
 
     long InterlockedCountMinusOne = -1;
@@ -53,6 +78,9 @@ public sealed class Debouncer
     readonly Timer Timer;
     bool TimerActive;
     bool SendingEvent;
+    bool EnableBuffering;
+    List<TData> TriggerData = new();
+    object TriggerDataLock = new();
 
     internal static long AddWithClamp(long left, long right)
     {
@@ -137,6 +165,15 @@ public sealed class Debouncer
                 {
                     // Sending event now, so accumulate all coalesced triggers.
                     var count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
+                    IReadOnlyList<TData> triggerData = [];
+                    if (EnableBuffering)
+                    {
+                        lock (TriggerDataLock)
+                        {
+                            triggerData = new ReadOnlyCollection<TData>(TriggerData);
+                            TriggerData = new();
+                        }
+                    }
 
                     FirstTrigger.Reset();
                     LastTrigger.Reset();
@@ -146,7 +183,7 @@ public sealed class Debouncer
                     // Must call handler asynchronously and outside the lock.
                     Task.Run(() =>
                     {
-                        Debounced?.Invoke(this, new DebouncedEventArgs((long)count));
+                        Debounced?.Invoke(this, new DebouncedEventArgs<TData>((long)count, triggerData));
                         lock (LockObject)
                         {
                             // Handler has finished.
@@ -213,14 +250,18 @@ public sealed class Debouncer
 
     #region IDebounce Support
     /// <inheritdoc/>
-    public event EventHandler<DebouncedEventArgs>? Debounced;
+    public event EventHandler<DebouncedEventArgs<TData>>? Debounced;
 
     /// <inheritdoc/>
-    public void Trigger(Void data) => Trigger();
-
-    /// <inheritdoc/>
-    public void Trigger()
+    public void Trigger(TData data = default!)
     {
+        if (EnableBuffering)
+        {
+            lock (TriggerDataLock)
+            {
+                TriggerData.Add(data);
+            }
+        }
         var newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);
         if (newCountMinusOne > 0)
         {
@@ -250,6 +291,10 @@ public sealed class Debouncer
     {
         lock (LockObject)
         {
+            lock (TriggerDataLock)
+            {
+                TriggerData = new();
+            }
             if (!IsDisposed)
             {
                 Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
@@ -356,13 +401,26 @@ public sealed class Debouncer
     /// </summary>
     public void Dispose()
     {
-        lock (LockObject)
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Perform object cleanup.
+    /// </summary>
+    /// <param name="disposing">Indicates whether the method call comes from a Dispose method (true) or from a finalizer (false)</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            if (!IsDisposed)
+            lock (LockObject)
             {
-                Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) + 1);
-                Timer.Dispose();
-                IsDisposed = true;
+                if (!IsDisposed)
+                {
+                    Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue) + 1);
+                    Timer.Dispose();
+                    IsDisposed = true;
+                }
             }
         }
     }

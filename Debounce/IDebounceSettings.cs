@@ -5,7 +5,7 @@
 namespace Dorssel.Utilities;
 
 /// <summary>
-/// Debounce settings for <see cref="Debouncer"/> and <see cref="Bufferer{TEvent}"/>.
+/// Settings for <see cref="Debouncer{TData}"/> and <see cref="Debouncer"/>.
 /// </summary>
 public interface IDebounceSettings
 {

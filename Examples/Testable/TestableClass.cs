@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using Dorssel.Utilities;
+using Void = Dorssel.Utilities.Void;
 
 namespace Testable;
 
@@ -15,7 +16,7 @@ public sealed class TestableClass : IDisposable
         Debounce.Debounced += OnDebouncedEvents;
     }
 
-    void OnDebouncedEvents(object? sender, DebouncedEventArgs debouncedEventArgs)
+    void OnDebouncedEvents(object? sender, DebouncedEventArgs<Void> debouncedEventArgs)
     {
         if (sender == null)
         {

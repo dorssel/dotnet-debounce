@@ -2,9 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Void = Dorssel.Utilities.Void;
+
 namespace TestableUnitTests;
 
-sealed class MockDebouncedEventArgs(long count) : DebouncedEventArgs(count, false)
+sealed class MockDebouncedEventArgs(long count) : DebouncedEventArgs<Void>(count, false, [])
 {
 }
 
@@ -16,11 +18,11 @@ public class TestableClassTests
     public void ConstructorHappyFlow()
     {
         var debounce = new Mock<IDebouncer>();
-        debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>());
+        debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs<Void>>>());
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.VerifyAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
+        debounce.VerifyAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs<Void>>>(), Times.Once());
     }
 
     [TestMethod]
@@ -36,11 +38,11 @@ public class TestableClassTests
     public void DisposeUnregisters()
     {
         var debounce = new Mock<IDebouncer>();
-        debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>());
+        debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs<Void>>>());
 
         using (new TestableClass(debounce.Object)) { }
 
-        debounce.VerifyRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
+        debounce.VerifyRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs<Void>>>(), Times.Once());
     }
 
     [TestMethod]
@@ -82,7 +84,7 @@ public class TestableClassTests
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.Raise(m => m.Debounced += null, null!, new DebouncedEventArgs(1));
+        debounce.Raise(m => m.Debounced += null, null!, new DebouncedEventArgs<Void>(1, []));
     }
 
     [TestMethod]
@@ -122,7 +124,7 @@ public class TestableClassTests
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs(long.MaxValue));
+        debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs<Void>(long.MaxValue, []));
     }
 
     [TestMethod]
@@ -132,6 +134,6 @@ public class TestableClassTests
 
         using var _ = new TestableClass(debounce.Object);
 
-        debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs(1));
+        debounce.Raise(m => m.Debounced += null, debounce.Object, new DebouncedEventArgs<Void>(1, []));
     }
 }
