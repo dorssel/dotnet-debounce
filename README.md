@@ -13,19 +13,14 @@ SPDX-License-Identifier: MIT
 [![codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
 [![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
-This library exposes a two objects:
-
-1. An event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
+This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
+It is also able to buffer attached event data for later usage at a performance cost.
 Common uses are:
 
 - Throttling how often the event handler is called.
 - Coalescing/debounce multiple events into one; the final event includes to total number of events received.
 - Serializing the event handler, such that it is not called re-entrant even if events are fired from multiple concurrent sources.
 - Spacing event handler calls, to give the CPU / disk / network some breathing room if events are arriving continuously.
-
-2. An event bufferer, which does the same as the debouncer but keeps track of all original events that have been triggered. The final
-event contains all the events received. This could be useful when the original events are required for later processing. The event 
-bufferer is not as performant as the debouncer because of additional memory allocations and locking.
 
 ## Examples
 
@@ -58,16 +53,18 @@ of rest every time.
 ### batch processing of data
 
 You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time, 
-processing them in batches. Use the `Bufferer` to buffer the data of the events and send out buffered events with a list of data to process in batch.
-Multiple data types are also supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
-However, there are no restrictions on what to use as a data type to buffer.
+processing them in batches. By using the generic version of the Debouncer, it is possible to trigger events with data attached.
+Retrieve the list of original triggered data by accessing the `TriggerData` property of the `DebouncedEventArgs`.
+Multiple data types are supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
 
 ## Performance
 
 The library was written with performance in mind. The `Trigger` function (to indicate that a source event has arrived) can easily handle
-tens of millions of calls per second, coming in from mutliple threads.
+tens of millions of calls per second, coming in from multiple threads.
 
 Once configured, the debouncer works without object allocation while debouncing.
+
+When triggering the debouncer with data attached, it comes with a significant performance cost because of memory allocations and locking.
 
 ## Versatility
 
