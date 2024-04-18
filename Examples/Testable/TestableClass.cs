@@ -4,18 +4,19 @@
 
 using System.Diagnostics;
 using Dorssel.Utilities;
+using Void = Dorssel.Utilities.Void;
 
 namespace Testable;
 
 public sealed class TestableClass : IDisposable
 {
-    public TestableClass(IDebounce debounce)
+    public TestableClass(IDebouncer debounce)
     {
         Debounce = debounce ?? throw new ArgumentNullException(nameof(debounce));
         Debounce.Debounced += OnDebouncedEvents;
     }
 
-    void OnDebouncedEvents(object? sender, DebouncedEventArgs debouncedEventArgs)
+    void OnDebouncedEvents(object? sender, DebouncedEventArgs<Void> debouncedEventArgs)
     {
         if (sender == null)
         {
@@ -44,7 +45,7 @@ public sealed class TestableClass : IDisposable
         }
     }
 
-    readonly IDebounce Debounce;
+    readonly IDebouncer Debounce;
 
     #region IDisposable Support
     bool IsDisposed;

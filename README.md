@@ -14,6 +14,7 @@ SPDX-License-Identifier: MIT
 [![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
 This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
+It is also able to buffer attached event data for later usage at a performance cost.
 Common uses are:
 
 - Throttling how often the event handler is called.
@@ -49,12 +50,21 @@ are sporadic, then they will be pushed after the initial timeout window of 100 m
 (the spacer value) after the return of the previous handler, such that the network IO in the handler itself is given a bit
 of rest every time.
 
+### batch processing of data
+
+You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time, 
+processing them in batches. By using the generic version of the Debouncer, it is possible to trigger events with data attached.
+Retrieve the list of original triggered data by accessing the `TriggerData` property of the `DebouncedEventArgs`.
+Multiple data types are supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
+
 ## Performance
 
 The library was written with performance in mind. The `Trigger` function (to indicate that a source event has arrived) can easily handle
-tens of millions of calls per second, coming in from mutliple threads.
+tens of millions of calls per second, coming in from multiple threads.
 
 Once configured, the debouncer works without object allocation while debouncing.
+
+When triggering the debouncer with data attached, it comes with a significant performance cost because of memory allocations and locking.
 
 ## Versatility
 

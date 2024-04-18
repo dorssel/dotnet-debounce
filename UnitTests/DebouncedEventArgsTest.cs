@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Void = Dorssel.Utilities.Void;
+
 namespace UnitTests;
 
 [TestClass]
@@ -34,7 +36,7 @@ public class DebouncedEventArgsTests
     [DynamicData(nameof(ValidCounts))]
     public void ConstructorCountValid(long count)
     {
-        var debouncedEventArgs = new DebouncedEventArgs(count);
+        var debouncedEventArgs = new DebouncedEventArgs<Void>(count, []);
         Assert.AreEqual(count, debouncedEventArgs.Count);
     }
 
@@ -42,10 +44,10 @@ public class DebouncedEventArgsTests
     [DynamicData(nameof(InvalidCounts))]
     public void ConstructorCountInvalid(long count)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs<Void>(count, []));
     }
 
-    sealed class DerivedDebouncedEventArgs(long count, bool boundsCheck) : DebouncedEventArgs(count, boundsCheck)
+    sealed class DerivedDebouncedEventArgs(long count, bool boundsCheck) : DebouncedEventArgs<Void>(count, boundsCheck, [])
     {
     }
 

@@ -5,19 +5,33 @@
 namespace Dorssel.Utilities;
 
 /// <summary>
+/// Void data type for <see cref="IDebouncer"/>.
+/// </summary>
+public struct Void { }
+
+/// <summary>
 /// This interface specifies the public API for the <see cref="Debouncer"/> class.
 /// </summary>
-public interface IDebounce
+public interface IDebouncer : IDebouncer<Void>
+{
+}
+
+/// <summary>
+/// Interface for debouncers accumulating triggers and debouncing.
+/// </summary>
+/// <typeparam name="TData">Data to accumulate when triggering</typeparam>
+public interface IDebouncer<TData>
 {
     /// <summary>
     /// This event will be sent when <see cref="Trigger"/> has been called one or more times and
     /// the debounce timer times out.
     /// </summary>
-    public event EventHandler<DebouncedEventArgs> Debounced;
+    public event EventHandler<DebouncedEventArgs<TData>> Debounced;
 
     /// <summary>Accumulates one more trigger.</summary>
+    /// <param name="data">Data that accompanies the trigger, or null if no data.</param>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-    public void Trigger();
+    public void Trigger(TData data = default!);
 
     /// <summary>Resets the accumulated trigger count to 0 and cancels any ongoing debouncing.</summary>
     /// <remarks>This method may be called even after <see cref="IDisposable.Dispose"/> has been called.</remarks>
@@ -44,3 +58,4 @@ public interface IDebounce
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     public TimeSpan TimingGranularity { get; set; }
 }
+
