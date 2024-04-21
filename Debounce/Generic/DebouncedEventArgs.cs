@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Dorssel.Utilities;
+namespace Dorssel.Utilities.Generic;
 
 /// <summary>
 /// Provides data for the <see cref="Debouncer{TData}.Debounced"/> event.

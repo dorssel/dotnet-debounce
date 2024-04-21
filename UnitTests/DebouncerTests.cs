@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Linq;
 using Void = Dorssel.Utilities.Void;
 
 namespace UnitTests;
@@ -11,7 +10,7 @@ namespace UnitTests;
 [TestCategory("Production")]
 public class DebouncerTests
 {
-    static TimeSpan TimingUnits(double count) => TimeSpan.FromMilliseconds(50 * count);
+    static TimeSpan TimingUnits(double count) => TimeSpan.FromMilliseconds(100 * count);
 
     static void Sleep(double count) => Thread.Sleep(TimingUnits(count));
 

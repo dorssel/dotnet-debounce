@@ -22,12 +22,12 @@ sealed class VerifyingHandlerWrapper<TData> : IDisposable
     /// </summary>
     public IReadOnlyList<TData> LastTriggerData { get; private set; } = [];
 
-    private List<TData> triggerData = [];
+    readonly List<TData> _TriggerData = [];
     /// <summary>
     /// Concatenation of all TriggerData from all Debounced calls.
     /// </summary>
-    public IReadOnlyList<TData> TriggerData { get => triggerData; }
-    
+    public IReadOnlyList<TData> TriggerData { get => _TriggerData; }
+
     void OnDebounced(object? sender, DebouncedEventArgs<TData> debouncedEventArgs)
     {
         // sender *must* be the original debouncer object
@@ -40,7 +40,7 @@ sealed class VerifyingHandlerWrapper<TData> : IDisposable
         ++HandlerCount;
         TriggerCount += debouncedEventArgs.Count;
         LastTriggerData = debouncedEventArgs.TriggerData;
-        triggerData.AddRange(debouncedEventArgs.TriggerData);
+        _TriggerData.AddRange(debouncedEventArgs.TriggerData);
 
         Debounced?.Invoke(this, debouncedEventArgs);
 
