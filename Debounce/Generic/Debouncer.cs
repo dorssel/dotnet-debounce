@@ -378,9 +378,9 @@ public class Debouncer<TData> : IDebouncer<TData>
         set => SetField(ref _TimingGranularity, value, false);
     }
 
-    long _DebounceAfterTriggerCount = long.MaxValue;
+    int _DebounceAfterTriggerCount = int.MaxValue;
     /// <inheritdoc/>
-    public long DebounceAfterTriggerCount
+    public int DebounceAfterTriggerCount
     {
         get
         {

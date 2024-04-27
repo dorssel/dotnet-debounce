@@ -212,13 +212,13 @@ public class DebouncerTests
     public void DebounceAfterTriggerCountDefault()
     {
         using var debouncer = new Debouncer();
-        Assert.AreEqual(long.MaxValue, debouncer.DebounceAfterTriggerCount);
+        Assert.AreEqual(int.MaxValue, debouncer.DebounceAfterTriggerCount);
     }
 
     [TestMethod]
     [DataRow(2)]
-    [DataRow(long.MaxValue - 1)]
-    public void DebounceAfterTriggerCountValid(long debounceAfterTriggerCount)
+    [DataRow(int.MaxValue - 1)]
+    public void DebounceAfterTriggerCountValid(int debounceAfterTriggerCount)
     {
         using var debouncer = new Debouncer
         {
@@ -229,10 +229,10 @@ public class DebouncerTests
     }
 
     [TestMethod]
-    [DataRow(long.MinValue)]
+    [DataRow(int.MinValue)]
     [DataRow(-1)]
     [DataRow(0)]
-    public void DebounceAfterTriggerCountInvalid(long debounceAfterTriggerCount)
+    public void DebounceAfterTriggerCountInvalid(int debounceAfterTriggerCount)
     {
         using var debouncer = new Debouncer()
         {

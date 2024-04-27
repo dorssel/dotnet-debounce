@@ -51,6 +51,6 @@ public interface IDebouncer<TData>
     /// </summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The value is less than 1.</exception>
-    public long DebounceAfterTriggerCount { get; set; }
+    public int DebounceAfterTriggerCount { get; set; }
 }
 
