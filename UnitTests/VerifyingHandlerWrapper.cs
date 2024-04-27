@@ -1,6 +1,8 @@
 ﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 //
 // SPDX-License-Identifier: MIT
+//
+// SPDX-FileContributor: Alain van den Berg
 
 namespace UnitTests;
 
