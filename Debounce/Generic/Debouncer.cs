@@ -105,6 +105,7 @@ public class Debouncer<TData> : IDebouncer<TData>
 
         var sinceFirstTrigger = FirstTrigger.Elapsed;
         var sinceLastTrigger = LastTrigger.Elapsed;
+        var triggerCountExceeded = false;
 
         var countMinusOne = Interlocked.Read(ref InterlockedCountMinusOne);
         if (countMinusOne >= 0)
@@ -123,6 +124,14 @@ public class Debouncer<TData> : IDebouncer<TData>
                 countMinusOne = -1;
                 LastTrigger.Restart();
                 sinceLastTrigger = TimeSpan.Zero;
+                if (Count >= DebounceAfterTriggerCount)
+                {
+                    triggerCountExceeded = true;
+                }
+            }
+            else if (countMinusOne + 1 >= DebounceAfterTriggerCount)
+            {
+                triggerCountExceeded = true;
             }
         }
         else if (Count == 0)
@@ -149,8 +158,9 @@ public class Debouncer<TData> : IDebouncer<TData>
             if ((sinceLastHandlerStarted >= _EventSpacing) && (sinceLastHandlerFinished >= _HandlerSpacing))
             {
                 // We are not within any backoff interval, so we may send an event if needed.
-                if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout))
-                {
+                if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout)
+                    || triggerCountExceeded)
+                { 
                     // Sending event now, so accumulate all coalesced triggers.
                     var count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
                     IReadOnlyList<TData> triggerData = [];
@@ -251,12 +261,12 @@ public class Debouncer<TData> : IDebouncer<TData>
             }
         }
         var newCountMinusOne = Interlocked.Increment(ref InterlockedCountMinusOne);
-        if (newCountMinusOne > 0)
+        if (newCountMinusOne > 0 && newCountMinusOne + 1 < DebounceAfterTriggerCount)
         {
             // fast-path
             return;
         }
-        else if (newCountMinusOne == 0)
+        else if (newCountMinusOne == 0 || newCountMinusOne + 1 >= DebounceAfterTriggerCount)
         {
             // not-so-fast-path: This is not likely under stress.
             // The first trigger *must* Reschedule().
@@ -368,6 +378,36 @@ public class Debouncer<TData> : IDebouncer<TData>
     {
         get => GetField(ref _TimingGranularity);
         set => SetField(ref _TimingGranularity, value, false);
+    }
+
+    int _DebounceAfterTriggerCount = int.MaxValue;
+    /// <inheritdoc/>
+    public int DebounceAfterTriggerCount
+    {
+        get
+        {
+            lock (LockObject)
+            {
+                return _DebounceAfterTriggerCount;
+            }
+        }
+        set
+        {
+            lock (LockObject)
+            {
+                ThrowIfDisposed();
+                if (_DebounceAfterTriggerCount == value)
+                {
+                    return;
+                }
+                if (value < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(DebounceAfterTriggerCount), $"{nameof(DebounceAfterTriggerCount)} must not be negative or zero.");
+                }
+                _DebounceAfterTriggerCount = value;
+                LockedReschedule();
+            }
+        }
     }
     #endregion
 

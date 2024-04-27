@@ -47,5 +47,12 @@ public interface IDebouncer<TData>
     /// <summary>Gets or sets the <see cref="TimeSpan"/> within which multiple calls to <see cref="Trigger"/> will be coalesced without rescheduling the timer.</summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     public TimeSpan TimingGranularity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the minimum number of calls to <see cref="Trigger"/> after which a new Debounced event will fire.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The value is less than 1.</exception>
+    public int DebounceAfterTriggerCount { get; set; }
 }
 

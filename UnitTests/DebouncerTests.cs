@@ -209,6 +209,62 @@ public class DebouncerTests
     }
     #endregion
 
+    #region DebounceAfterTriggerCount
+    [TestMethod]
+    public void DebounceAfterTriggerCountDefault()
+    {
+        using var debouncer = new Debouncer();
+        Assert.AreEqual(int.MaxValue, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    [DataRow(2)]
+    [DataRow(int.MaxValue - 1)]
+    public void DebounceAfterTriggerCountValid(int debounceAfterTriggerCount)
+    {
+        using var debouncer = new Debouncer
+        {
+            DebounceAfterTriggerCount = 5
+        };
+        debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount;
+        Assert.AreEqual(debounceAfterTriggerCount, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    [DataRow(int.MinValue)]
+    [DataRow(-1)]
+    [DataRow(0)]
+    public void DebounceAfterTriggerCountInvalid(int debounceAfterTriggerCount)
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceAfterTriggerCount = 1
+        };
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount);
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    public void DebounceAfterTriggerCountUnchanged()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceAfterTriggerCount = 1
+        };
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+        debouncer.DebounceAfterTriggerCount = 1;
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    public void DebounceAfterTriggerCountAfterDispose()
+    {
+        var debouncer = new Debouncer();
+        debouncer.Dispose();
+        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceAfterTriggerCount = 1);
+    }
+    #endregion
+
     #region EventSpacing
     [TestMethod]
     public void EventSpacingDefault()
@@ -746,6 +802,77 @@ public class DebouncerTests
         Assert.AreEqual(2L, wrapper.HandlerCount);
         Assert.IsTrue(wrapper.TriggerData.SequenceEqual([1, 2, 3]), $"Was: [{string.Join(",", wrapper.TriggerData)}]");
         Assert.IsTrue(wrapper.LastTriggerData.SequenceEqual([2, 3]), $"Was: [{string.Join(",", wrapper.LastTriggerData)}]");
+    }
+
+    [TestMethod]
+    public void TriggersWithTriggerCount()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceWindow = TimingUnits(2),
+            DebounceAfterTriggerCount = 4
+        };
+        using var wrapper = new VerifyingHandlerWrapper<Void>(debouncer);
+        for (var i = 0; i < 6; ++i)
+        {
+            debouncer.Trigger();
+            Sleep(1);
+        }
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+        Assert.AreEqual(4L, wrapper.TriggerCount);
+        Sleep(2);
+        Assert.AreEqual(6L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
+        Assert.AreEqual(0, wrapper.TriggerData.Count);
+        Assert.AreEqual(0, wrapper.LastTriggerData.Count);
+    }
+
+    [TestMethod]
+    public void TriggersWithTimeoutAndTriggerCountAndTimeoutWins()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceWindow = TimingUnits(2),
+            DebounceTimeout = TimingUnits(4),
+            DebounceAfterTriggerCount = 5
+        };
+        using var wrapper = new VerifyingHandlerWrapper<Void>(debouncer);
+        for (var i = 0; i < 6; ++i)
+        {
+            debouncer.Trigger();
+            Sleep(1);
+        }
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+        Assert.AreEqual(4L, wrapper.TriggerCount);
+        Sleep(2);
+        Assert.AreEqual(6L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
+        Assert.AreEqual(0, wrapper.TriggerData.Count);
+        Assert.AreEqual(0, wrapper.LastTriggerData.Count);
+    }
+
+    [TestMethod]
+    public void TriggersWithTimeoutTriggerCountAndTriggerCountWins()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceWindow = TimingUnits(2),
+            DebounceTimeout = TimingUnits(5),
+            DebounceAfterTriggerCount = 4
+        };
+        using var wrapper = new VerifyingHandlerWrapper<Void>(debouncer);
+        for (var i = 0; i < 6; ++i)
+        {
+            debouncer.Trigger();
+            Sleep(1);
+        }
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+        Assert.AreEqual(4L, wrapper.TriggerCount);
+        Sleep(2);
+        Assert.AreEqual(6L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
+        Assert.AreEqual(0, wrapper.TriggerData.Count);
+        Assert.AreEqual(0, wrapper.LastTriggerData.Count);
     }
     #endregion
 
