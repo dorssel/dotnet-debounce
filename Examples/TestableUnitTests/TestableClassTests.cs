@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Dorssel.Utilities.Generic;
 using Void = Dorssel.Utilities.Void;
 
 namespace TestableUnitTests;

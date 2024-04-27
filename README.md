@@ -52,7 +52,7 @@ of rest every time.
 
 ### batch processing of data
 
-You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time, 
+You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time,
 processing them in batches. By using the generic version of the Debouncer, it is possible to trigger events with data attached.
 Retrieve the list of original triggered data by accessing the `TriggerData` property of the `DebouncedEventArgs`.
 Multiple data types are supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
