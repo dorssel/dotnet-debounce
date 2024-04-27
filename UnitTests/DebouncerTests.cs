@@ -207,6 +207,62 @@ public class DebouncerTests
     }
     #endregion
 
+    #region DebounceAfterTriggerCount
+    [TestMethod]
+    public void DebounceAfterTriggerCountDefault()
+    {
+        using var debouncer = new Debouncer();
+        Assert.AreEqual(long.MaxValue, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    [DataRow(2)]
+    [DataRow(long.MaxValue - 1)]
+    public void DebounceAfterTriggerCountValid(long debounceAfterTriggerCount)
+    {
+        using var debouncer = new Debouncer
+        {
+            DebounceAfterTriggerCount = 5
+        };
+        debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount;
+        Assert.AreEqual(debounceAfterTriggerCount, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    [DataRow(long.MinValue)]
+    [DataRow(-1)]
+    [DataRow(0)]
+    public void DebounceAfterTriggerCountInvalid(long debounceAfterTriggerCount)
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceAfterTriggerCount = 1
+        };
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount);
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    public void DebounceAfterTriggerCountUnchanged()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceAfterTriggerCount = 1
+        };
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+        debouncer.DebounceAfterTriggerCount = 1;
+        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
+    }
+
+    [TestMethod]
+    public void DebounceAfterTriggerCountAfterDispose()
+    {
+        var debouncer = new Debouncer();
+        debouncer.Dispose();
+        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceAfterTriggerCount = 1);
+    }
+    #endregion
+
     #region EventSpacing
     [TestMethod]
     public void EventSpacingDefault()
