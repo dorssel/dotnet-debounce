@@ -832,21 +832,21 @@ public class DebouncerTests
     {
         using var debouncer = new Debouncer()
         {
-            DebounceWindow = TimingUnits(2),
-            DebounceTimeout = TimingUnits(4),
-            DebounceAfterTriggerCount = 5
+            DebounceWindow = TimingUnits(3),
+            DebounceTimeout = TimingUnits(5),
+            DebounceAfterTriggerCount = 4
         };
         using var wrapper = new VerifyingHandlerWrapper<Void>(debouncer);
-        for (var i = 0; i < 6; ++i)
+        for (var i = 0; i < 5; ++i)
         {
             debouncer.Trigger();
-            Sleep(1);
+            Sleep(2);
         }
         Assert.AreEqual(1L, wrapper.HandlerCount);
-        Assert.AreEqual(4L, wrapper.TriggerCount);
-        Sleep(2);
-        Assert.AreEqual(6L, wrapper.TriggerCount);
+        Assert.AreEqual(3L, wrapper.TriggerCount);
+        Sleep(4);
         Assert.AreEqual(2L, wrapper.HandlerCount);
+        Assert.AreEqual(5L, wrapper.TriggerCount);
         Assert.AreEqual(0, wrapper.TriggerData.Count);
         Assert.AreEqual(0, wrapper.LastTriggerData.Count);
     }
@@ -856,21 +856,21 @@ public class DebouncerTests
     {
         using var debouncer = new Debouncer()
         {
-            DebounceWindow = TimingUnits(2),
+            DebounceWindow = TimingUnits(3),
             DebounceTimeout = TimingUnits(5),
-            DebounceAfterTriggerCount = 4
+            DebounceAfterTriggerCount = 2
         };
         using var wrapper = new VerifyingHandlerWrapper<Void>(debouncer);
-        for (var i = 0; i < 6; ++i)
+        for (var i = 0; i < 5; ++i)
         {
             debouncer.Trigger();
-            Sleep(1);
+            Sleep(2);
         }
-        Assert.AreEqual(1L, wrapper.HandlerCount);
-        Assert.AreEqual(4L, wrapper.TriggerCount);
-        Sleep(2);
-        Assert.AreEqual(6L, wrapper.TriggerCount);
         Assert.AreEqual(2L, wrapper.HandlerCount);
+        Assert.AreEqual(4L, wrapper.TriggerCount);
+        Sleep(4);
+        Assert.AreEqual(3L, wrapper.HandlerCount);
+        Assert.AreEqual(5L, wrapper.TriggerCount);
         Assert.AreEqual(0, wrapper.TriggerData.Count);
         Assert.AreEqual(0, wrapper.LastTriggerData.Count);
     }
