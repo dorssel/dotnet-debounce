@@ -8,3 +8,4 @@ obj/
 TestResults/
 *.user
 Examples/BlazorServerPush/wwwroot/libman/
+*.lutconfig
