@@ -6,3 +6,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: CLSCompliant(false)]
 [assembly: ExcludeFromCodeCoverage]
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]

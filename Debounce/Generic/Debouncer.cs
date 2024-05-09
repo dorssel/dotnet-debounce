@@ -160,7 +160,7 @@ public class Debouncer<TData> : IDebouncer<TData>
                 // We are not within any backoff interval, so we may send an event if needed.
                 if ((sinceLastTrigger >= _DebounceWindow) || ((_DebounceTimeout != Timeout.InfiniteTimeSpan) && sinceFirstTrigger >= _DebounceTimeout)
                     || triggerCountExceeded)
-                { 
+                {
                     // Sending event now, so accumulate all coalesced triggers.
                     var count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
                     IReadOnlyList<TData> triggerData = [];
