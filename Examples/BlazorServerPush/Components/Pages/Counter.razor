@@ -37,7 +37,7 @@
         Debouncer.Trigger();
     }
 
-    void OnDebounced(object? sender, DebouncedEventArgs<Dorssel.Utilities.Void> ev)
+    void OnDebounced(object? sender, DebouncedEventArgs ev)
     {
         // now it is time to render the new state
         InvokeAsync(() => StateHasChanged()).Wait();

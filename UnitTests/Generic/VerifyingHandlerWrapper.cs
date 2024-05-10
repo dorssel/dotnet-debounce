@@ -1,23 +1,36 @@
 ﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 //
 // SPDX-License-Identifier: MIT
+//
+// SPDX-FileContributor: Alain van den Berg
 
-namespace UnitTests;
+namespace UnitTests.Generic;
 
-sealed class VerifyingHandlerWrapper : IDisposable
+sealed class VerifyingHandlerWrapper<TData> : IDisposable
 {
-    public VerifyingHandlerWrapper(IDebouncer debouncer)
+    public VerifyingHandlerWrapper(IDebouncer<TData> debouncer)
     {
         Debouncer = debouncer;
         Debouncer.Debounced += OnDebounced;
     }
 
-    public event EventHandler<DebouncedEventArgs>? Debounced;
+    public event EventHandler<DebouncedEventArgs<TData>>? Debounced;
 
     public long HandlerCount { get; private set; }
     public long TriggerCount { get; private set; }
 
-    void OnDebounced(object? sender, DebouncedEventArgs debouncedEventArgs)
+    /// <summary>
+    /// TriggerData of the last Debounced call.
+    /// </summary>
+    public IReadOnlyList<TData> LastTriggerData { get; private set; } = [];
+
+    readonly List<TData> _TriggerData = [];
+    /// <summary>
+    /// Concatenation of all TriggerData from all Debounced calls.
+    /// </summary>
+    public IReadOnlyList<TData> TriggerData { get => _TriggerData; }
+
+    void OnDebounced(object? sender, DebouncedEventArgs<TData> debouncedEventArgs)
     {
         // sender *must* be the original debouncer object
         Assert.AreSame(Debouncer, sender);
@@ -28,6 +41,8 @@ sealed class VerifyingHandlerWrapper : IDisposable
 
         ++HandlerCount;
         TriggerCount += debouncedEventArgs.Count;
+        LastTriggerData = debouncedEventArgs.TriggerData;
+        _TriggerData.AddRange(debouncedEventArgs.TriggerData);
 
         Debounced?.Invoke(this, debouncedEventArgs);
 
@@ -35,7 +50,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         Assert.AreEqual(Interlocked.Decrement(ref ReentrancyCount), 0);
     }
 
-    readonly IDebouncer Debouncer;
+    readonly IDebouncer<TData> Debouncer;
     int ReentrancyCount;
 
     #region IDisposable Support

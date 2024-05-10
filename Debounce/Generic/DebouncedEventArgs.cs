@@ -7,60 +7,57 @@
 namespace Dorssel.Utilities.Generic;
 
 /// <summary>
-/// Provides data for the <see cref="Debouncer{TData}.Debounced"/> event.
+/// Provides data for the <see cref="IDebouncerBase{TEventArgs}.Debounced"/> event.
 /// </summary>
-public class DebouncedEventArgs<TData> : EventArgs
+public class DebouncedEventArgs<TData> : DebouncedEventArgs
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DebouncedEventArgs{TData}"/> class.
     /// </summary>
-    /// <param name="count">The number of triggers accumulated since the previous event was sent.
-    /// <para>Must be greater than 0.</para>
-    /// </param>
+    /// <param name="count"></param>
     /// <param name="triggerData">
-    /// Accumulated data from each individual trigger, or empty when buffering is disabled in the <see cref="Debouncer{TData}"/>
+    /// Accumulated data from each individual trigger. Must not be empty."/>
     /// </param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is not greater than 0.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="triggerData"/> is an empty list.</exception>
     public DebouncedEventArgs(long count, IReadOnlyList<TData> triggerData)
-        : this(count, true, triggerData)
+        : this(count, triggerData, true)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DebouncedEventArgs{TData}"/> class.
     /// </summary>
-    /// <param name="count">The number of triggers accumulated since the previous event was sent.
-    /// <para>Must be greater than 0 if <paramref name="boundsCheck"/> is <c>true</c>.</para>
-    /// </param>
-    /// <param name="boundsCheck">If <c>true</c>, <paramref name="count"/> is checked to be within its valid range.</param>
+    /// <param name="count"></param>
     /// <param name="triggerData">
-    /// Accumulated data from each individual trigger, or empty when buffering is disabled in the <see cref="Debouncer{TData}"/>
+    /// Accumulated data from each individual trigger. Must not be empty if <paramref name="boundsCheck"/> is <c>true</c>.
     /// </param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="boundsCheck"/> is <c>true</c> and <paramref name="count"/> is not greater than 0.</exception>
-    protected DebouncedEventArgs(long count, bool boundsCheck, IReadOnlyList<TData> triggerData)
+    /// <param name="boundsCheck">If <c>true</c>, <paramref name="triggerData"/> is checked to be non-empty.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="boundsCheck"/> is <see langword="true" /> and <paramref name="triggerData"/> is an empty list.</exception>
+    protected DebouncedEventArgs(long count, IReadOnlyList<TData> triggerData, bool boundsCheck)
+        : base(count, boundsCheck)
     {
+        if (triggerData is null)
+        {
+            throw new ArgumentNullException(nameof(triggerData));
+        }
+
         if (boundsCheck)
         {
-            if (count <= 0)
+            if (triggerData.Count > count)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), $"{nameof(count)} must be greater than 0");
+                throw new ArgumentOutOfRangeException(nameof(triggerData), $"{nameof(triggerData)} must not contain more than Count items");
             }
         }
 
-        Count = count;
         TriggerData = triggerData;
     }
 
     /// <summary>
-    /// The number of triggers accumulated since the previous event was sent.
-    /// </summary>
-    /// <remarks>
-    /// <para>The value will always greater than 0.</para>
-    /// </remarks>
-    public long Count { get; }
-
-    /// <summary>
     /// List of data accumulated in this buffered event.
+    /// <para>
+    /// Note that the trigger data is shared with all event listeners and that besides the list itself (which is read only),
+    /// the data within the list should probably also not be altered.
+    /// </para>
     /// </summary>
     public IReadOnlyList<TData> TriggerData { get; }
 }
