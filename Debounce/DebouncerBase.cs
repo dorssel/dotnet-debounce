@@ -21,7 +21,7 @@ public abstract class DebouncerBase<TEventArgs>
     }
 
     /// <summary>
-    /// 
+    /// This event will be sent when <see cref="Trigger"/> has been called one or more times and the debounce timer times out.
     /// </summary>
     public event EventHandler<TEventArgs>? Debounced;
 
@@ -47,9 +47,6 @@ public abstract class DebouncerBase<TEventArgs>
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     private protected object LockObject { get; } = new();
 
     long Count;
@@ -61,6 +58,9 @@ public abstract class DebouncerBase<TEventArgs>
     bool TimerActive;
     private protected bool SendingEvent;
 
+    /// <summary>
+    /// Adds two non-negative values without overflowing. When an overflow would occur, the result is clamped to <see cref="long.MaxValue"/>.
+    /// </summary>
     internal static long AddWithClamp(long left, long right)
     {
         Debug.Assert(left >= 0);

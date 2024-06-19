@@ -22,12 +22,13 @@ public interface IDebouncer<TData> : IDebouncerBase<DebouncedEventArgs<TData>>
 
     /// <summary>Accumulates one more trigger.</summary>
     /// <param name="data">Data that accompanies the trigger.</param>
-    /// <exception cref="InvalidOperationException">More than <see cref="DataLimit"/> calls to <see cref="Trigger(TData)"/> while an event handler is currently being invoked.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// More than <see cref="DataLimit"/> calls to <see cref="Trigger(TData)"/> while an event handler is currently being invoked.
+    /// </exception>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     public void Trigger(TData data);
 
-    /// <summary>Resets the accumulated trigger count to 0 and cancels any ongoing debouncing.</summary>
-    /// <remarks>This method may be called even after <see cref="IDisposable.Dispose"/> has been called.</remarks>
-    /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
+    /// <inheritdoc cref="IDebouncerBase{TEventArgs}.Reset"/>
+    /// <param name="data">Accumulated data from each call to <see cref="IDebouncer{TData}.Trigger(TData)"/> since the last event handler was called.</param>
     public long Reset(out IReadOnlyList<TData> data);
 }

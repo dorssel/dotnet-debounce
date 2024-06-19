@@ -29,8 +29,10 @@ public class DebouncedEventArgs : EventArgs
     /// <param name="count">The number of triggers accumulated since the previous event was sent.
     /// <para>Must be greater than 0 if <paramref name="boundsCheck"/> is <c>true</c>.</para>
     /// </param>
-    /// <param name="boundsCheck">If <c>true</c>, <paramref name="count"/> is checked to be within its valid range.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="boundsCheck"/> is <c>true</c> and <paramref name="count"/> is not greater than 0.</exception>
+    /// <param name="boundsCheck">If <c>false</c>, the parameters are not checked to be within their valid range.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><inheritdoc cref="DebouncedEventArgs(long)" path="/exception" />
+    /// <para>This exception is not thrown if <paramref name="boundsCheck"/> is <see langword="false"/>.</para>
+    /// </exception>
     protected DebouncedEventArgs(long count, bool boundsCheck)
     {
         if (boundsCheck)
