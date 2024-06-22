@@ -6,4 +6,3 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/GitTools/GitVersion/main/schemas/6.0/GitVersion.configuration.json
 
 assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{env:GITHUB_RUN_NUMBER ?? 0}'
-next-version: 1.0.0
