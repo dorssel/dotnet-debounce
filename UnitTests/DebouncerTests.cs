@@ -1,10 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 //
 // SPDX-License-Identifier: MIT
-//
-// SPDX-FileContributor: Alain van den Berg
-
-using Void = Dorssel.Utilities.Void;
 
 namespace UnitTests;
 
@@ -18,14 +14,6 @@ public class DebouncerTests
     {
 #pragma warning disable CA2000 // Dispose objects before losing scope
         _ = new Debouncer();
-#pragma warning restore CA2000 // Dispose objects before losing scope
-    }
-
-    [TestMethod]
-    public void ConstructorDefaultGeneric()
-    {
-#pragma warning disable CA2000 // Dispose objects before losing scope
-        _ = new Debouncer<int>();
 #pragma warning restore CA2000 // Dispose objects before losing scope
     }
     #endregion
@@ -152,62 +140,6 @@ public class DebouncerTests
         var debouncer = new Debouncer();
         debouncer.Dispose();
         Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceTimeout = TimeSpan.Zero);
-    }
-    #endregion
-
-    #region DebounceAfterTriggerCount
-    [TestMethod]
-    public void DebounceAfterTriggerCountDefault()
-    {
-        using var debouncer = new Debouncer();
-        Assert.AreEqual(int.MaxValue, debouncer.DebounceAfterTriggerCount);
-    }
-
-    [TestMethod]
-    [DataRow(2)]
-    [DataRow(int.MaxValue - 1)]
-    public void DebounceAfterTriggerCountValid(int debounceAfterTriggerCount)
-    {
-        using var debouncer = new Debouncer
-        {
-            DebounceAfterTriggerCount = 5
-        };
-        debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount;
-        Assert.AreEqual(debounceAfterTriggerCount, debouncer.DebounceAfterTriggerCount);
-    }
-
-    [TestMethod]
-    [DataRow(int.MinValue)]
-    [DataRow(-1)]
-    [DataRow(0)]
-    public void DebounceAfterTriggerCountInvalid(int debounceAfterTriggerCount)
-    {
-        using var debouncer = new Debouncer()
-        {
-            DebounceAfterTriggerCount = 1
-        };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceAfterTriggerCount = debounceAfterTriggerCount);
-        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
-    }
-
-    [TestMethod]
-    public void DebounceAfterTriggerCountUnchanged()
-    {
-        using var debouncer = new Debouncer()
-        {
-            DebounceAfterTriggerCount = 1
-        };
-        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
-        debouncer.DebounceAfterTriggerCount = 1;
-        Assert.AreEqual(1, debouncer.DebounceAfterTriggerCount);
-    }
-
-    [TestMethod]
-    public void DebounceAfterTriggerCountAfterDispose()
-    {
-        var debouncer = new Debouncer();
-        debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceAfterTriggerCount = 1);
     }
     #endregion
 
@@ -380,7 +312,7 @@ public class DebouncerTests
     [TestMethod]
     public void EventHandlerAcceptsDebouncedEventArgs()
     {
-        static void Handler(object? sender, DebouncedEventArgs<Void> debouncedEventArgs) { }
+        static void Handler(object? sender, DebouncedEventArgs debouncedEventArgs) { }
 
         using var debouncer = new Debouncer();
         debouncer.Debounced += Handler;
@@ -433,27 +365,5 @@ public class DebouncerTests
         Assert.AreEqual(0L, benchmark.RescheduleCount);
         Assert.AreEqual(0L, benchmark.TimerChanges);
         Assert.AreEqual(0L, benchmark.TimerEvents);
-    }
-
-    [TestMethod]
-    [DataRow(0, 0, 0)]
-    [DataRow(1, 0, 1)]
-    [DataRow(long.MaxValue - 1, 0, long.MaxValue - 1)]
-    [DataRow(long.MaxValue, 0, long.MaxValue)]
-    [DataRow(0, 1, 1)]
-    [DataRow(1, 1, 2)]
-    [DataRow(long.MaxValue - 1, 1, long.MaxValue)]
-    [DataRow(long.MaxValue, 1, long.MaxValue)]
-    [DataRow(0, long.MaxValue - 1, long.MaxValue - 1)]
-    [DataRow(1, long.MaxValue - 1, long.MaxValue)]
-    [DataRow(long.MaxValue - 1, long.MaxValue - 1, long.MaxValue)]
-    [DataRow(long.MaxValue, long.MaxValue - 1, long.MaxValue)]
-    [DataRow(0, long.MaxValue, long.MaxValue)]
-    [DataRow(1, long.MaxValue, long.MaxValue)]
-    [DataRow(long.MaxValue - 1, long.MaxValue, long.MaxValue)]
-    [DataRow(long.MaxValue, long.MaxValue, long.MaxValue)]
-    public void AddWithClamp(long left, long right, long expected)
-    {
-        Assert.AreEqual(expected, Debouncer.AddWithClamp(left, right));
     }
 }

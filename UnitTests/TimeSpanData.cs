@@ -26,7 +26,7 @@ static class TimeSpanData
     static readonly TimeSpan[] _Negative =
     [
         TimeSpan.FromTicks(-1),
-        // NOTE: FromMilliseconds(-1) == Timeout.InfiniteTimeSpan, a  magic value
+        // NOTE: FromMilliseconds(-1) == Timeout.InfiniteTimeSpan, a magic value
         TimeSpan.FromMilliseconds(-2),
         TimeSpan.FromSeconds(-1),
         TimeSpan.FromMinutes(-1),
@@ -47,6 +47,6 @@ static class TimeSpanData
 
     public static IEnumerable<object[]> Infinite
     {
-        get => new object[][] { [Timeout.InfiniteTimeSpan] };
+        get => [[Timeout.InfiniteTimeSpan]];
     }
 }

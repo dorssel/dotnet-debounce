@@ -4,8 +4,6 @@
 
 using System.Diagnostics;
 using Dorssel.Utilities;
-using Dorssel.Utilities.Generic;
-using Void = Dorssel.Utilities.Void;
 
 namespace PerformanceTests;
 
@@ -135,7 +133,7 @@ static class Program
         {
             Console.WriteLine("Handler speed");
             using var debouncer = new Debouncer();
-            void handler(object? s, DebouncedEventArgs<Void> e)
+            void handler(object? s, DebouncedEventArgs e)
             {
                 // each handler triggers the next
                 debouncer.Trigger();
@@ -157,7 +155,7 @@ static class Program
                 DebounceWindow = TimeSpan.FromTicks(1),
                 TimingGranularity = TimeSpan.FromTicks(1)
             };
-            void handler(object? s, DebouncedEventArgs<Void> e)
+            void handler(object? s, DebouncedEventArgs e)
             {
                 // each handler triggers the next
                 debouncer.Trigger();

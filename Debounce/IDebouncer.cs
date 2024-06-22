@@ -11,6 +11,6 @@ namespace Dorssel.Utilities;
 /// <summary>
 /// This interface specifies the public API for the non-buffering <see cref="Debouncer"/> class.
 /// </summary>
-public interface IDebouncer : IDebouncer<Void>
+public interface IDebouncer : IDebouncerBase<DebouncedEventArgs>
 {
 }
