@@ -30,4 +30,5 @@ XML_XMLLINT_FILE_EXTENSIONS:
   - .props
   - .pubxml
 # Exclude verbatim copies of external sources that are not under our control.
-FILTER_REGEX_EXCLUDE: LICENSES/
+# Also exclude auto-generated files.
+FILTER_REGEX_EXCLUDE: LICENSES/|dotnet-tools.json
