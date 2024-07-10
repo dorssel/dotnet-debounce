@@ -18,7 +18,7 @@ public class DebouncedEventArgs<TData> : DebouncedEventArgs
     /// Both <see cref="IDebouncerBase{TEventArgs}.Trigger"/> and <see cref="IDebouncer{TData}.Trigger(TData)"/> add to the count.
     /// </param>
     /// <param name="triggerData">
-    /// Accumulated data from each call to <see cref="IDebouncer{TData}.Trigger(TData)"/>."/>
+    /// Accumulated data from each call to <see cref="IDebouncer{TData}.Trigger(TData)"/>.
     /// </param>
     /// <exception cref="ArgumentOutOfRangeException"><inheritdoc cref="DebouncedEventArgs(long)"/>
     /// Thrown when <paramref name="triggerData"/> has more than <paramref name="count"/> items.
