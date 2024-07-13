@@ -19,7 +19,7 @@ public interface IDebouncerBase<TEventArgs> where TEventArgs : DebouncedEventArg
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     public TimeSpan DebounceWindow { get; set; }
 
-    /// <summary>Gets or sets the <see cref="TimeSpan"/> since the first <see cref="Trigger"/> after the which a new <see cref="Debounced"/> event will fire.</summary>
+    /// <summary>Gets or sets the maximum <see cref="TimeSpan"/> since the first <see cref="Trigger"/> after which a new <see cref="Debounced"/> event will fire.</summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     public TimeSpan DebounceTimeout { get; set; }
 

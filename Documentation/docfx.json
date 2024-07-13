@@ -7,8 +7,7 @@
           "src": "../Debounce"
         }
       ],
-      "dest": "api",
-      "outputFormat": "apiPage"
+      "dest": "api"
     }
   ],
   "build": {
