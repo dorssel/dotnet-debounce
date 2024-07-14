@@ -10,6 +10,7 @@
 .editorconfig    text
 .config          text
 .license         text
+.nojekyll        text
 
 *.md    text
 *.txt   text
