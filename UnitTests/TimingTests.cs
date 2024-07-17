@@ -61,7 +61,7 @@ public class TimingTests
             if (waitFor < TimingUnitMarginOfError)
             {
                 // Too much drift.
-                Assert.Fail("Timing outside margin of error; consider increasing the TimingUnit.");
+                Assert.Fail($"Timing outside margin of error; consider increasing the TimingUnit. (waitFor = {waitFor.Milliseconds} ms)");
             }
             await Task.Delay(waitFor);
         }
