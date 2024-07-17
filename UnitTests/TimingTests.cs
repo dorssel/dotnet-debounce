@@ -24,8 +24,9 @@ public class TimingTests
 {
     /// <summary>
     /// The maximum time slice of thread scheduling is 10 ms, both for Linux and for Windows.
+    /// Using twice that value should normally work, unless the CPU is really busy.
     /// </summary>
-    static readonly TimeSpan TimingUnitMarginOfError = TimeSpan.FromMilliseconds(10);
+    static readonly TimeSpan TimingUnitMarginOfError = TimeSpan.FromMilliseconds(20);
 
     /// <summary>
     /// A single timing unit should be short enough so tests run fast, and long enough
