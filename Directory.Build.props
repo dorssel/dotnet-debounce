@@ -59,4 +59,10 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="GitVersion.MsBuild" PrivateAssets="all" />
   </ItemGroup>
 
+  <Target Name="SetPackageVersion" AfterTargets="GetVersion">
+    <PropertyGroup>
+      <PackageVersion>$(GitVersion_MajorMinorPatch)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+  
 </Project>
