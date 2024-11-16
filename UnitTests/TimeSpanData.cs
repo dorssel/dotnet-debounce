@@ -35,18 +35,9 @@ static class TimeSpanData
         TimeSpan.MinValue
     ];
 
-    public static IEnumerable<object[]> NonNegative
-    {
-        get => from value in _NonNegative select new object[] { value };
-    }
+    public static IEnumerable<object[]> NonNegative => from value in _NonNegative select new object[] { value };
 
-    public static IEnumerable<object[]> Negative
-    {
-        get => from value in _Negative select new object[] { value };
-    }
+    public static IEnumerable<object[]> Negative => from value in _Negative select new object[] { value };
 
-    public static IEnumerable<object[]> Infinite
-    {
-        get => [[Timeout.InfiniteTimeSpan]];
-    }
+    public static IEnumerable<object[]> Infinite => [[Timeout.InfiniteTimeSpan]];
 }

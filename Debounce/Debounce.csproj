@@ -8,6 +8,10 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard1.2</TargetFrameworks>
+    <!--
+    See https://learn.microsoft.com/nl-nl/dotnet/core/compatibility/sdk/9.0/netstandard-warning
+    -->
+    <CheckNotRecommendedTargetFramework>false</CheckNotRecommendedTargetFramework>
     <RootNamespace>Dorssel.Utilities</RootNamespace>
     <AssemblyName>Dorssel.Utilities.Debounce</AssemblyName>
 

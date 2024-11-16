@@ -20,7 +20,7 @@ namespace UnitTests;
 /// </summary>
 [TestClass]
 [TestCategory("Production")]
-public class TimingTests
+sealed class TimingTests
 {
     /// <summary>
     /// The maximum time slice of thread scheduling is 10 ms, both for Linux and for Windows.
@@ -34,7 +34,10 @@ public class TimingTests
     /// </summary>
     static readonly TimeSpan TimingUnit = 5 * TimingUnitMarginOfError;
 
-    static void Sleep(double count) => Thread.Sleep(count * TimingUnit);
+    static void Sleep(double count)
+    {
+        Thread.Sleep(count * TimingUnit);
+    }
 
     /// <summary>
     /// Run a sequence of actions. After each action we wait until the next <see cref="TimingUnit" /> interval.
@@ -57,7 +60,7 @@ public class TimingTests
             action.Invoke();
             ++step;
             // Correct for drift in long sequences.
-            var waitFor = start + step * TimingUnit - DateTime.UtcNow;
+            var waitFor = start + (step * TimingUnit) - DateTime.UtcNow;
             if (waitFor < TimingUnitMarginOfError)
             {
                 // Too much drift.
@@ -92,7 +95,7 @@ public class TimingTests
         ]);
         // Verify that the handler was indeed *not* called, even though there was a trigger and the debounce window ran out.
         Assert.AreEqual(0L, wrapper.HandlerCount);
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.Trigger());
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
     }
 
     /// <summary>
@@ -128,7 +131,7 @@ public class TimingTests
         Assert.IsTrue(done.IsSet);
         Assert.AreEqual(1L, wrapper.TriggerCount);
         Assert.AreEqual(1L, wrapper.HandlerCount);
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.Trigger());
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
     }
 
     /// <summary>
@@ -154,7 +157,7 @@ public class TimingTests
         Assert.IsTrue(done.IsSet);
         Assert.AreEqual(1L, wrapper.TriggerCount);
         Assert.AreEqual(1L, wrapper.HandlerCount);
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.Trigger());
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
     }
     #endregion
 

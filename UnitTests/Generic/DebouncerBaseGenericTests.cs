@@ -6,7 +6,7 @@ namespace UnitTests.Generic;
 
 [TestClass]
 [TestCategory("Production")]
-public class DebouncerBaseGenericTests
+sealed class DebouncerBaseGenericTests
 {
     [TestMethod]
     [DataRow(0, 0, 0)]

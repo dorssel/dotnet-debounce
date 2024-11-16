@@ -8,7 +8,7 @@ namespace UnitTests.Generic;
 
 [TestClass]
 [TestCategory("Production")]
-public class DebouncerGenericTests
+sealed class DebouncerGenericTests
 {
     #region Constructor
     [TestMethod]
@@ -53,7 +53,7 @@ public class DebouncerGenericTests
         {
             DataLimit = 1
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
         {
             debouncer.DataLimit = dataLimit;
         });
@@ -77,7 +77,7 @@ public class DebouncerGenericTests
     {
         var debouncer = new Debouncer<int>();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() =>
+        _ = Assert.ThrowsException<ObjectDisposedException>(() =>
         {
             debouncer.DataLimit = 1;
         });
@@ -108,7 +108,7 @@ public class DebouncerGenericTests
     {
         using var debouncer = new Debouncer<int>();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() =>
+        _ = Assert.ThrowsException<ObjectDisposedException>(() =>
         {
             debouncer.Trigger(1);
         });

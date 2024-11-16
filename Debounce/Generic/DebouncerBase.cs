@@ -104,7 +104,7 @@ public abstract class DebouncerBase<TEventArgs>
         SendingEvent = true;
         LastHandlerStarted.Restart();
         // Must call handler asynchronously and outside the lock.
-        Task.Run(() =>
+        _ = Task.Run(() =>
         {
             Debounced?.Invoke(this, eventArgs);
             lock (LockObject)
@@ -181,7 +181,7 @@ public abstract class DebouncerBase<TEventArgs>
             if (sinceLastHandlerStarted >= _EventSpacing && sinceLastHandlerFinished >= _HandlerSpacing)
             {
                 // We are not within any backoff interval, so we may send an event if needed.
-                if (sinceLastTrigger >= _DebounceWindow || _DebounceTimeout != Timeout.InfiniteTimeSpan && sinceFirstTrigger >= _DebounceTimeout)
+                if (sinceLastTrigger >= _DebounceWindow || (_DebounceTimeout != Timeout.InfiniteTimeSpan && sinceFirstTrigger >= _DebounceTimeout))
                 {
                     // Sending event now, so accumulate all coalesced triggers.
                     LockedSendEvent();
@@ -227,7 +227,7 @@ public abstract class DebouncerBase<TEventArgs>
             {
                 dueTime = TimeSpan.FromMilliseconds(uint.MaxValue - 1);
             }
-            Timer.Change(dueTime, Timeout.InfiniteTimeSpan);
+            _ = Timer.Change(dueTime, Timeout.InfiniteTimeSpan);
         }
         TimerActive = dueTime != Timeout.InfiniteTimeSpan;
     }
@@ -254,7 +254,7 @@ public abstract class DebouncerBase<TEventArgs>
         else
         {
             // We were already disposed.
-            Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue);
+            _ = Interlocked.Exchange(ref InterlockedCountMinusOne, long.MinValue);
             throw new ObjectDisposedException(GetType().FullName);
         }
     }

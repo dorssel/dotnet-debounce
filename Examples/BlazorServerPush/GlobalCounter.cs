@@ -9,14 +9,11 @@ sealed class GlobalCounter : NotifyPropertyChanged
 #pragma warning restore CA1812
 {
     long _Count;
-    public long Count
-    {
-        get { return Interlocked.Read(ref _Count); }
-    }
+    public long Count => Interlocked.Read(ref _Count);
 
     public void Increment()
     {
-        Interlocked.Increment(ref _Count);
+        _ = Interlocked.Increment(ref _Count);
         OnNotifyPropertyChanged(nameof(Count));
     }
 
@@ -31,7 +28,7 @@ sealed class GlobalCounter : NotifyPropertyChanged
                 var myGeneration = ++Generation;
                 if (value)
                 {
-                    Task.Run(() =>
+                    _ = Task.Run(() =>
                     {
                         while (myGeneration == Generation)
                         {

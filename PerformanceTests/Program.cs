@@ -17,11 +17,11 @@ static class Program
             Stopwatch.Start();
         }
 
-        public bool IsFinished { get => CancellationTokenSource.IsCancellationRequested; }
+        public bool IsFinished => CancellationTokenSource.IsCancellationRequested;
 
         public void WaitUntilFinished()
         {
-            CancellationTokenSource.Token.WaitHandle.WaitOne();
+            _ = CancellationTokenSource.Token.WaitHandle.WaitOne();
         }
 
         readonly Debouncer Debouncer;

@@ -10,15 +10,15 @@ sealed class MockDebouncedEventArgs(long count) : DebouncedEventArgs(count, fals
 
 [TestClass]
 [TestCategory("Example")]
-public class TestableClassTests
+sealed class TestableClassTests
 {
     [TestMethod]
     public void ConstructorHappyFlow()
     {
         var debounce = new Mock<IDebouncer>();
-        debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>());
+        _ = debounce.SetupAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>());
 
-        using var _ = new TestableClass(debounce.Object);
+        using (new TestableClass(debounce.Object)) { }
 
         debounce.VerifyAdd(m => m.Debounced += It.IsAny<EventHandler<DebouncedEventArgs>>(), Times.Once());
     }
@@ -26,9 +26,9 @@ public class TestableClassTests
     [TestMethod]
     public void ConstructorThrowsOnNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() =>
+        _ = Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            using var _ = new TestableClass(null!);
+            _ = new TestableClass(null!);
         });
     }
 
@@ -36,7 +36,7 @@ public class TestableClassTests
     public void DisposeUnregisters()
     {
         var debounce = new Mock<IDebouncer>();
-        debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>());
+        _ = debounce.SetupRemove(m => m.Debounced -= It.IsAny<EventHandler<DebouncedEventArgs>>());
 
         using (new TestableClass(debounce.Object)) { }
 

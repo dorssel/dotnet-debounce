@@ -6,7 +6,7 @@ namespace UnitTests;
 
 [TestClass]
 [TestCategory("Production")]
-public class DebouncedEventArgsTests
+sealed class DebouncedEventArgsTests
 {
     public static IEnumerable<object[]> ValidCounts
     {
@@ -42,7 +42,7 @@ public class DebouncedEventArgsTests
     [DynamicData(nameof(InvalidCounts))]
     public void ConstructorCountInvalid(long count)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
     }
 
     sealed class DerivedDebouncedEventArgs(long count, bool boundsCheck) : DebouncedEventArgs(count, boundsCheck)
@@ -61,7 +61,7 @@ public class DebouncedEventArgsTests
     [DynamicData(nameof(InvalidCounts))]
     public void ProtectedConstructorBoundsCheckedInvalid(long count)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
     }
 
     [TestMethod]
