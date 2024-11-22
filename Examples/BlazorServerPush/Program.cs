@@ -15,14 +15,8 @@ builder.Services.AddSingleton<GlobalCounter>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler("/Error");
-}
+_ = app.Environment.IsDevelopment() ? app.UseDeveloperExceptionPage() : app.UseExceptionHandler("/Error");
+
 app.UseStaticFiles();
 app.UseAntiforgery();
 

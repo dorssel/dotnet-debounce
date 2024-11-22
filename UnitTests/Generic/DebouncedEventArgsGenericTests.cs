@@ -10,7 +10,7 @@ namespace UnitTests.Generic;
 
 [TestClass]
 [TestCategory("Production")]
-public class DebouncedEventArgsGenericTests
+sealed class DebouncedEventArgsGenericTests
 {
     sealed class MockEnumerator(MockReadOnlyList List) : IEnumerator<int>
     {
@@ -40,23 +40,19 @@ public class DebouncedEventArgsGenericTests
 
     sealed class MockReadOnlyList(int _Count) : IReadOnlyList<int>
     {
-        public int this[int index]
-        {
-            get
-            {
-                if (index < 0 || index >= Count)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(index));
-                }
-                return index;
-            }
-        }
+        public int this[int index] => index < 0 || index >= Count ? throw new ArgumentOutOfRangeException(nameof(index)) : index;
 
         public int Count => _Count;
 
-        IEnumerator IEnumerable.GetEnumerator() => new MockEnumerator(this);
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new MockEnumerator(this);
+        }
 
-        public IEnumerator<int> GetEnumerator() => new MockEnumerator(this);
+        public IEnumerator<int> GetEnumerator()
+        {
+            return new MockEnumerator(this);
+        }
     }
 
     public static IEnumerable<object[]> ValidCounts
@@ -104,7 +100,7 @@ public class DebouncedEventArgsGenericTests
     [DynamicData(nameof(InvalidCounts))]
     public void ConstructorCountInvalid(long count, IReadOnlyList<int> triggerData)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
         {
             _ = new DebouncedEventArgs<int>(count, triggerData);
         });
@@ -113,7 +109,7 @@ public class DebouncedEventArgsGenericTests
     [TestMethod]
     public void ConstructorNullThrows()
     {
-        Assert.ThrowsException<ArgumentNullException>(() =>
+        _ = Assert.ThrowsException<ArgumentNullException>(() =>
         {
             _ = new DebouncedEventArgs<int>(1, null!);
         });
@@ -137,7 +133,7 @@ public class DebouncedEventArgsGenericTests
     [DynamicData(nameof(InvalidCounts))]
     public void ProtectedConstructorBoundsCheckedInvalid(long count, IReadOnlyList<int> triggerData)
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
         {
             _ = new DerivedDebouncedEventArgs<int>(count, triggerData, true);
         });

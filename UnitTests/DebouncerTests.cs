@@ -6,7 +6,7 @@ namespace UnitTests;
 
 [TestClass]
 [TestCategory("Production")]
-public class DebouncerTests
+sealed class DebouncerTests
 {
     #region Constructor
     [TestMethod]
@@ -64,7 +64,7 @@ public class DebouncerTests
         {
             DebounceWindow = TimeSpan.FromMilliseconds(1)
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceWindow = DebounceWindow);
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceWindow = DebounceWindow);
         Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceWindow);
     }
 
@@ -85,7 +85,7 @@ public class DebouncerTests
     {
         var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceWindow = TimeSpan.Zero);
+        _ = Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceWindow = TimeSpan.Zero);
     }
     #endregion
 
@@ -118,7 +118,7 @@ public class DebouncerTests
         {
             DebounceTimeout = TimeSpan.FromMilliseconds(1)
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceTimeout = debounceTimeout);
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.DebounceTimeout = debounceTimeout);
         Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.DebounceTimeout);
     }
 
@@ -139,7 +139,7 @@ public class DebouncerTests
     {
         var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceTimeout = TimeSpan.Zero);
+        _ = Assert.ThrowsException<ObjectDisposedException>(() => debouncer.DebounceTimeout = TimeSpan.Zero);
     }
     #endregion
 
@@ -172,7 +172,7 @@ public class DebouncerTests
         {
             EventSpacing = TimeSpan.FromMilliseconds(1)
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.EventSpacing = eventSpacing);
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.EventSpacing = eventSpacing);
         Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.EventSpacing);
     }
 
@@ -193,7 +193,7 @@ public class DebouncerTests
     {
         var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.EventSpacing = TimeSpan.Zero);
+        _ = Assert.ThrowsException<ObjectDisposedException>(() => debouncer.EventSpacing = TimeSpan.Zero);
     }
     #endregion
 
@@ -226,7 +226,7 @@ public class DebouncerTests
         {
             HandlerSpacing = TimeSpan.FromMilliseconds(1)
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.HandlerSpacing = HandlerSpacing);
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.HandlerSpacing = HandlerSpacing);
         Assert.AreEqual(TimeSpan.FromMilliseconds(1), debouncer.HandlerSpacing);
     }
 
@@ -247,7 +247,7 @@ public class DebouncerTests
     {
         var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.HandlerSpacing = TimeSpan.Zero);
+        _ = Assert.ThrowsException<ObjectDisposedException>(() => debouncer.HandlerSpacing = TimeSpan.Zero);
     }
     #endregion
 
@@ -282,7 +282,7 @@ public class DebouncerTests
             DebounceWindow = TimeSpan.MaxValue,
             TimingGranularity = TimeSpan.FromMilliseconds(2)
         };
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.TimingGranularity = timingGranularity);
+        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => debouncer.TimingGranularity = timingGranularity);
         Assert.AreEqual(TimeSpan.FromMilliseconds(2), debouncer.TimingGranularity);
     }
 
@@ -304,7 +304,7 @@ public class DebouncerTests
     {
         var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.TimingGranularity = TimeSpan.Zero);
+        _ = Assert.ThrowsException<ObjectDisposedException>(() => debouncer.TimingGranularity = TimeSpan.Zero);
     }
     #endregion
 
@@ -332,7 +332,7 @@ public class DebouncerTests
     {
         using var debouncer = new Debouncer();
         debouncer.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => debouncer.Trigger());
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
     }
     #endregion
 

@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- Be strict when testing, even in Release (at the cost of performance) -->
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,15 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="MSTest.TestAdapter" />
     <PackageReference Include="MSTest.TestFramework" />
     <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- We use internal test classes. -->
+    <AssemblyAttribute Include="Microsoft.VisualStudio.TestTools.UnitTesting.DiscoverInternalsAttribute" />
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.SuppressMessageAttribute">
+      <_Parameter1>Performance</_Parameter1>
+      <_Parameter2>CA1812:Internal class is never instantiated</_Parameter2>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

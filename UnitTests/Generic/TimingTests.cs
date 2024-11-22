@@ -20,7 +20,7 @@ namespace UnitTests.Generic;
 /// </summary>
 [TestClass]
 [TestCategory("Production")]
-public class TimingGenericTests
+sealed class TimingGenericTests
 {
     /// <summary>
     /// The maximum time slice of thread scheduling is 10 ms, both for Linux and for Windows.
@@ -33,7 +33,10 @@ public class TimingGenericTests
     /// </summary>
     static readonly TimeSpan TimingUnit = 5 * TimingUnitMarginOfError;
 
-    static void Sleep(double count) => Thread.Sleep(count * TimingUnit);
+    static void Sleep(double count)
+    {
+        Thread.Sleep(count * TimingUnit);
+    }
 
     /// <summary>
     /// Run a sequence of actions. After each action we wait until the next <see cref="TimingUnit" /> interval.
@@ -56,7 +59,7 @@ public class TimingGenericTests
             action.Invoke();
             ++step;
             // Correct for drift in long sequences.
-            var waitFor = start + step * TimingUnit - DateTime.UtcNow;
+            var waitFor = start + (step * TimingUnit) - DateTime.UtcNow;
             if (waitFor < TimingUnitMarginOfError)
             {
                 // Too much drift.
@@ -74,7 +77,10 @@ public class TimingGenericTests
     /// <summary>
     /// A helper <see cref="Action"/> that triggers the given debouncer with the given data.
     /// </summary>
-    static Action Trigger(Debouncer<int> debouncer, int data) => () => { debouncer.Trigger(data); };
+    static Action Trigger(Debouncer<int> debouncer, int data)
+    {
+        return () => { debouncer.Trigger(data); };
+    }
 
     #region Trigger
     [TestMethod]
@@ -237,7 +243,7 @@ public class TimingGenericTests
             Trigger(debouncer, 2),
             // T == 2, two thirds into the handler, the trigger throws
             () => {
-                Assert.ThrowsException<InvalidOperationException>(() =>
+                _ = Assert.ThrowsException<InvalidOperationException>(() =>
                 {
                     debouncer.Trigger(3);
                 });

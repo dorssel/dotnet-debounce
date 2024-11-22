@@ -19,7 +19,10 @@ public sealed class Debouncer : DebouncerBase<DebouncedEventArgs>, IDebouncer
     {
     }
 
-    private protected override DebouncedEventArgs LockedCreateEventArgs(long count) => new(count);
+    private protected override DebouncedEventArgs LockedCreateEventArgs(long count)
+    {
+        return new(count);
+    }
 
     private protected override void LockedReset() { }
 }
