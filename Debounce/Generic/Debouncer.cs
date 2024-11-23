@@ -18,7 +18,17 @@ public sealed class Debouncer<TData> : DebouncerBase<DebouncedEventArgs<TData>>,
     /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class.
     /// </summary>
     public Debouncer()
-        : base()
+        : base(TimeProvider.System)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class using the specified <see cref="TimeProvider"/>.
+    /// </summary>
+    /// <remarks>This constructor is intended for unit testing.</remarks>
+    /// <param name="timeProvider">The <see cref="TimeProvider"/> to use.</param>
+    public Debouncer(TimeProvider timeProvider)
+        : base(timeProvider)
     {
     }
 
@@ -26,7 +36,10 @@ public sealed class Debouncer<TData> : DebouncerBase<DebouncedEventArgs<TData>>,
     List<TData> TriggerData = [];
 
     /// <inheritdoc/>
-    private protected override DebouncedEventArgs<TData> LockedCreateEventArgs(long count) => new(count, LockedExchangeTriggerData());
+    private protected override DebouncedEventArgs<TData> LockedCreateEventArgs(long count)
+    {
+        return new(count, LockedExchangeTriggerData());
+    }
 
     #region IDebouncer<TData> Support
 
@@ -114,7 +127,10 @@ public sealed class Debouncer<TData> : DebouncerBase<DebouncedEventArgs<TData>>,
         }
     }
 
-    private protected override void LockedReset() => _ = LockedExchangeTriggerData();
+    private protected override void LockedReset()
+    {
+        _ = LockedExchangeTriggerData();
+    }
 
     #endregion
 }

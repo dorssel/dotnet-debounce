@@ -4,6 +4,8 @@
 //
 // SPDX-FileContributor: Alain van den Berg
 
+using Microsoft.Extensions.Time.Testing;
+
 namespace UnitTests.Generic;
 
 /// <summary>
@@ -82,34 +84,46 @@ sealed class TimingGenericTests
         return () => { debouncer.Trigger(data); };
     }
 
+#if false
+    static void WaitForHandlers()
+    {
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+    }
+#endif
+
     #region Trigger
     [TestMethod]
-    public async Task TriggersWithDataLimit()
+    public void TriggersWithDataLimit()
     {
-        using var debouncer = new Debouncer<int>()
+        var timeProvider = new FakeTimeProvider();
+        using var debouncer = new Debouncer<int>(timeProvider)
         {
             DebounceWindow = 2 * TimingUnit,
             DataLimit = 4
         };
         using var wrapper = new VerifyingHandlerWrapper<int>(debouncer);
-        await TimedSequence([
-            // T == 0, the trigger starts the DebounceWindow
-            Trigger(debouncer, 1),
-            // T == 1, the trigger resets the DebounceWindow
-            Trigger(debouncer, 2),
-            // T == 2, the trigger resets the DebounceWindow
-            Trigger(debouncer, 3),
-            // T == 3, the trigger resets the DebounceWindow, but count maximum has been reached => handler invoked
-            Trigger(debouncer, 4),
-            // T == 5, the trigger starts the DebounceWindow
-            Trigger(debouncer, 5),
-            // T == 6
-            Skip,
-            // T == 7, DebounceWindow runs out => handler invoked
-            Skip,
-            // T == 8
-        ]);
-        // Verify
+
+        // T == 0, the trigger starts the DebounceWindow
+        debouncer.Trigger(1);
+        timeProvider.Advance(TimingUnit);
+        // T == 1, the trigger resets the DebounceWindow
+        debouncer.Trigger(2);
+        timeProvider.Advance(TimingUnit);
+        // T == 2, the trigger resets the DebounceWindow
+        debouncer.Trigger(3);
+        timeProvider.Advance(TimingUnit);
+        // T == 3, the trigger resets the DebounceWindow, but count maximum has been reached => handler invoked
+        debouncer.Trigger(4);
+        timeProvider.Advance(TimingUnit);
+        debouncer.CurrentEventHandlersTask.Wait();
+        // T == 4, the trigger resets the DebounceWindow
+        debouncer.Trigger(5);
+        timeProvider.Advance(TimingUnit);
+        // T == 5
+        timeProvider.Advance(TimingUnit);
+        // T == 6, DebounceWindow runs out => handler invoked
+        debouncer.CurrentEventHandlersTask.Wait();
+
         Assert.AreEqual(5L, wrapper.TriggerCount);
         Assert.AreEqual(2L, wrapper.HandlerCount);
         CollectionAssert.That.AreEqual([1, 2, 3, 4, 5], wrapper.TriggerData);

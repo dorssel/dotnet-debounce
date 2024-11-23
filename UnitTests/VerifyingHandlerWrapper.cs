@@ -24,7 +24,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         // *must* have a positive trigger count since last handler called
         Assert.IsTrue(debouncedEventArgs.Count > 0);
         // *never* should be called reentrant (i.e. always serialize handlers)
-        Assert.AreEqual(Interlocked.Increment(ref ReentrancyCount), 1);
+        Assert.AreEqual(1, Interlocked.Increment(ref ReentrancyCount));
 
         ++HandlerCount;
         TriggerCount += debouncedEventArgs.Count;
@@ -32,7 +32,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         Debounced?.Invoke(this, debouncedEventArgs);
 
         // *never* should be called reentrant (i.e. always serialize handlers)
-        Assert.AreEqual(Interlocked.Decrement(ref ReentrancyCount), 0);
+        Assert.AreEqual(0, Interlocked.Decrement(ref ReentrancyCount));
     }
 
     readonly IDebouncer Debouncer;

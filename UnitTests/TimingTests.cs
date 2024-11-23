@@ -4,6 +4,8 @@
 //
 // SPDX-FileContributor: Alain van den Berg
 
+using Microsoft.Extensions.Time.Testing;
+
 namespace UnitTests;
 
 /// <summary>
@@ -77,22 +79,25 @@ sealed class TimingTests
 
     #region Dispose
     [TestMethod]
-    public async Task DisposeDuringTimer()
+    public void DisposeDuringTimer()
     {
-        using var debouncer = new Debouncer()
+        var timeProvider = new FakeTimeProvider();
+        using var debouncer = new Debouncer(timeProvider)
         {
             DebounceWindow = 2 * TimingUnit
         };
         using var wrapper = new VerifyingHandlerWrapper(debouncer);
-        await TimedSequence([
-            // T == 0, the trigger starts the DebounceWindow
-            debouncer.Trigger,
-            // T == 1, Dispose in the middle of the DebounceWindow
-            debouncer.Dispose,
-            // T == 2, DebounceWindow would run out, but the object is disposed already
-            Skip,
-            // T == 3
-        ]);
+
+        // T == 0, the trigger starts the DebounceWindow
+        debouncer.Trigger();
+        timeProvider.Advance(TimingUnit);
+        // T == 1, Dispose in the middle of the DebounceWindow
+        debouncer.Dispose();
+        timeProvider.Advance(TimingUnit);
+        // T == 2, DebounceWindow would run out, but the object is disposed already
+        timeProvider.Advance(TimingUnit);
+        // T == 3
+
         // Verify that the handler was indeed *not* called, even though there was a trigger and the debounce window ran out.
         Assert.AreEqual(0L, wrapper.HandlerCount);
         _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
