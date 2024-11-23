@@ -43,4 +43,7 @@ public interface IDebouncerBase<TEventArgs> where TEventArgs : DebouncedEventArg
     /// <remarks>This method may be called even after <see cref="IDisposable.Dispose"/> has been called.</remarks>
     /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
     public long Reset();
+
+    /// <summary>Gets a waitable <see cref="Task"/> running any current event handlers.</summary>
+    public Task CurrentEventHandlersTask { get; }
 }

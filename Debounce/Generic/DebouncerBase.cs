@@ -15,15 +15,18 @@ public abstract class DebouncerBase<TEventArgs>
     , IDisposable
     where TEventArgs : DebouncedEventArgs
 {
-    private protected DebouncerBase()
+    private protected DebouncerBase(TimeProvider timeProvider)
     {
-        Timer = new Timer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        TimeProvider = timeProvider;
+        Timer = TimeProvider.CreateTimer(OnTimer, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>
     /// This event will be sent when <see cref="Trigger"/> has been called one or more times and the debounce timer times out.
     /// </summary>
     public event EventHandler<TEventArgs>? Debounced;
+
+    readonly TimeProvider TimeProvider;
 
     long InterlockedCountMinusOne = -1;
 
@@ -50,11 +53,11 @@ public abstract class DebouncerBase<TEventArgs>
     private protected object LockObject { get; } = new();
 
     long Count;
-    readonly Stopwatch FirstTrigger = new();
-    readonly Stopwatch LastTrigger = new();
-    readonly Stopwatch LastHandlerStarted = new();
-    readonly Stopwatch LastHandlerFinished = new();
-    readonly Timer Timer;
+    long FirstTriggerTimestamp;
+    long LastTriggerTimestamp;
+    long LastHandlerStartedTimestamp;
+    long LastHandlerFinishedTimestamp;
+    readonly ITimer Timer;
     bool TimerActive;
     private protected bool SendingEvent;
 
@@ -98,18 +101,19 @@ public abstract class DebouncerBase<TEventArgs>
         var count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
         var eventArgs = LockedCreateEventArgs(count);
 
-        FirstTrigger.Reset();
-        LastTrigger.Reset();
+        FirstTriggerTimestamp = 0;
+        LastTriggerTimestamp = 0;
         Count = 0;
         SendingEvent = true;
-        LastHandlerStarted.Restart();
+        LastHandlerStartedTimestamp = TimeProvider.GetTimestamp();
         // Must call handler asynchronously and outside the lock.
-        _ = Task.Run(() =>
+        CurrentEventHandlersTask = Task.Run(() =>
         {
             Debounced?.Invoke(this, eventArgs);
             lock (LockObject)
             {
                 // Handler has finished.
+                CurrentEventHandlersTask = Task.CompletedTask;
                 unchecked
                 {
                     _Benchmark.TriggersReported += count;
@@ -119,7 +123,7 @@ public abstract class DebouncerBase<TEventArgs>
                 {
                     return;
                 }
-                LastHandlerFinished.Restart();
+                LastHandlerFinishedTimestamp = TimeProvider.GetTimestamp();
                 SendingEvent = false;
                 LockedReschedule();
             }
@@ -135,25 +139,27 @@ public abstract class DebouncerBase<TEventArgs>
             ++_Benchmark.RescheduleCount;
         }
 
-        var sinceFirstTrigger = FirstTrigger.Elapsed;
-        var sinceLastTrigger = LastTrigger.Elapsed;
+        var nowTimestamp = TimeProvider.GetTimestamp();
+
+        var sinceFirstTrigger = FirstTriggerTimestamp == 0 ? TimeSpan.Zero : TimeProvider.GetElapsedTime(FirstTriggerTimestamp, nowTimestamp);
+        var sinceLastTrigger = LastTriggerTimestamp == 0 ? TimeSpan.Zero : TimeProvider.GetElapsedTime(LastTriggerTimestamp, nowTimestamp);
 
         var countMinusOne = Interlocked.Read(ref InterlockedCountMinusOne);
         if (countMinusOne >= 0)
         {
             // There are triggers that we have not yet processed.
-            if (!FirstTrigger.IsRunning)
+            if (FirstTriggerTimestamp == 0)
             {
                 // Start coalescing triggers.
-                FirstTrigger.Start();
-                LastTrigger.Start();
+                FirstTriggerTimestamp = nowTimestamp;
+                LastTriggerTimestamp = nowTimestamp;
             }
             if (sinceLastTrigger >= _TimingGranularity)
             {
                 // Accumulate the coalesced triggers.
                 Count = AddWithClamp(Count, Interlocked.Exchange(ref InterlockedCountMinusOne, -1) + 1);
                 countMinusOne = -1;
-                LastTrigger.Restart();
+                LastTriggerTimestamp = nowTimestamp;
                 sinceLastTrigger = TimeSpan.Zero;
             }
         }
@@ -176,8 +182,10 @@ public abstract class DebouncerBase<TEventArgs>
         else
         {
             // We are not currently sending an event, so check to see if we need to send one now.
-            var sinceLastHandlerStarted = LastHandlerStarted.IsRunning ? LastHandlerStarted.Elapsed : TimeSpan.MaxValue;
-            var sinceLastHandlerFinished = LastHandlerFinished.IsRunning ? LastHandlerFinished.Elapsed : TimeSpan.MaxValue;
+            var sinceLastHandlerStarted = LastHandlerStartedTimestamp == 0 ? TimeSpan.MaxValue
+                : TimeProvider.GetElapsedTime(LastHandlerStartedTimestamp, nowTimestamp);
+            var sinceLastHandlerFinished = LastHandlerFinishedTimestamp == 0 ? TimeSpan.MaxValue
+                : TimeProvider.GetElapsedTime(LastHandlerFinishedTimestamp, nowTimestamp);
             if (sinceLastHandlerStarted >= _EventSpacing && sinceLastHandlerFinished >= _HandlerSpacing)
             {
                 // We are not within any backoff interval, so we may send an event if needed.
@@ -360,7 +368,10 @@ public abstract class DebouncerBase<TEventArgs>
         set => SetField(ref _TimingGranularity, value, false);
     }
 
-    #endregion
+    /// <inheritdoc/>
+    public Task CurrentEventHandlersTask { get; private set; } = Task.CompletedTask;
+
+    #endregion IDebouncerBase
 
     #region IDisposable Support
 

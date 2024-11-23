@@ -48,10 +48,12 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx
+        run: |
+          dotnet test --configuration Release --no-build \
+            -p:TestingPlatformCommandLineArguments="--report-trx --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml"
 
       - name: Package
-        run: dotnet pack --configuration Release --no-build
+        run: dotnet pack --configuration Release --no-build Debounce
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2

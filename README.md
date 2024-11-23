@@ -68,23 +68,20 @@ When triggering the debouncer with data attached, it comes with a significant pe
 
 ## Versatility
 
-The library has two targets:
-
-- `netstandard2.0` (which works on all modern .NET versions)
-- `netstandard1.2` (for backward compatibility with older .NET Framework and PowerShell versions).
-
-The library is compiled for `AnyCPU`.
-
-The library has no dependencies.
-
-The library uses strong name signing to allow being consumed by other strongly named assemblies.
+The library targets `netstandard2.0` and is compiled for `AnyCPU`.
 
 The public API uses the interface design patern, which allows 100% code coverage testing with mocking (even for edge cases that will
 never occur in real life).
 
-The binaries are signed with Authenticode.
+## NuGet package
 
-The `nuget` package ships with SourceLink and IntelliSense documentation.
+The released [NuGet package](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
+and the .NET assemblies contained therein have the following properties:
+
+- [Strong Naming](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/strong-naming)
+- [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink)
+- [IntelliSense](https://learn.microsoft.com/en-us/visualstudio/ide/using-intellisense)
+- [Authenticode](https://learn.microsoft.com/en-us/windows/win32/seccrypto/time-stamping-authenticode-signatures#a-brief-introduction-to-authenticode)
 
 ## Code Examples
 

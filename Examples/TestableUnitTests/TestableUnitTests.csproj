@@ -4,10 +4,14 @@ SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 
 SPDX-License-Identifier: MIT
 -->
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk">
 
   <Import Project="..\..\UnitTest.Build.props" />
 
+  <PropertyGroup>
+    <TargetFramework>$(MainTargetFramework)</TargetFramework>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Moq" />
   </ItemGroup>

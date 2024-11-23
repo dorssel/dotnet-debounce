@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <TargetFramework>$(MainTargetFramework)</TargetFramework>
     <!-- publish -->
     <IsTrimmable>false</IsTrimmable>
     <IsPublishable>true</IsPublishable>

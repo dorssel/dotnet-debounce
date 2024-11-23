@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <!-- Use the latest .NET SDK -->
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <MainTargetFramework>net9.0</MainTargetFramework>
 
     <!-- Use the latest C# Language standard -->
     <LangVersion>13.0</LangVersion>

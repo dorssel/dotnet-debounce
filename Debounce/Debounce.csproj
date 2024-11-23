@@ -7,11 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.2</TargetFrameworks>
-    <!--
-    See https://learn.microsoft.com/nl-nl/dotnet/core/compatibility/sdk/9.0/netstandard-warning
-    -->
-    <CheckNotRecommendedTargetFramework>false</CheckNotRecommendedTargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <RootNamespace>Dorssel.Utilities</RootNamespace>
     <AssemblyName>Dorssel.Utilities.Debounce</AssemblyName>
 
@@ -26,8 +22,8 @@ SPDX-License-Identifier: MIT
     <None Include="..\README.md" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" />
   </ItemGroup>
 
 </Project>

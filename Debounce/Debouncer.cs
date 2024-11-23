@@ -12,10 +12,20 @@ namespace Dorssel.Utilities;
 public sealed class Debouncer : DebouncerBase<DebouncedEventArgs>, IDebouncer
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Debouncer"/> class.
+    /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class.
     /// </summary>
     public Debouncer()
-        : base()
+        : base(TimeProvider.System)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Debouncer{TData}"/> class using the specified <see cref="TimeProvider"/>.
+    /// </summary>
+    /// <remarks>This constructor is intended for unit testing.</remarks>
+    /// <param name="timeProvider">The <see cref="TimeProvider"/> to use.</param>
+    public Debouncer(TimeProvider timeProvider)
+        : base(timeProvider)
     {
     }
 

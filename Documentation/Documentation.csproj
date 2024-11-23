@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.Build.NoTargets">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
