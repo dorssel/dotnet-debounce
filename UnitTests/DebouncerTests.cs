@@ -33,6 +33,60 @@ sealed class DebouncerTests
         debouncer.Dispose();
         debouncer.Dispose();
     }
+
+    /// <summary>
+    /// Verify that Dispose() can be called safely while a handler is running.
+    /// </summary>
+    [TestMethod]
+    public async Task DisposeDuringHandler()
+    {
+        using var debouncer = new Debouncer();
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+        using var started = new SemaphoreSlim(0);
+        using var finish = new SemaphoreSlim(0);
+        wrapper.Debounced += (s, e) =>
+        {
+            _ = started.Release();
+            finish.Wait();
+        };
+
+        // the trigger immediately causes a handler invocation
+        debouncer.Trigger();
+        await started.WaitAsync();
+        // in the middle of the handler
+        debouncer.Dispose();
+        _ = finish.Release();
+        // handler exits
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
+    }
+
+    /// <summary>
+    /// Verify that Dispose() can be called safely from within a handler.
+    /// </summary>
+    [TestMethod]
+    public async Task DisposeFromHandler()
+    {
+        using var debouncer = new Debouncer();
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+        wrapper.Debounced += (s, e) =>
+        {
+            debouncer.Dispose();
+        };
+
+        // the trigger immediately causes a handler invocation
+        debouncer.Trigger();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
+    }
     #endregion
 
     #region DebounceWindow
@@ -334,6 +388,48 @@ sealed class DebouncerTests
         debouncer.Dispose();
         _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
     }
+
+    [TestMethod]
+    public async Task TriggerSingle()
+    {
+        using var debouncer = new Debouncer();
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+
+        // the trigger immediately causes a handler invocation
+        debouncer.Trigger();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+    }
+
+    [TestMethod]
+    public async Task TriggerFromHandler()
+    {
+        using var debouncer = new Debouncer();
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+        var first = true;
+
+        wrapper.Debounced += (s, e) =>
+        {
+            if (first)
+            {
+                debouncer.Trigger();
+                first = false;
+            }
+        };
+
+        // the trigger immediately causes a handler invocation
+        debouncer.Trigger();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+        // the handler triggered, which immediately causes another handler invocation
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(2L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
+    }
     #endregion
 
     #region Reset
@@ -353,7 +449,61 @@ sealed class DebouncerTests
         debouncer.Dispose();
         Assert.AreEqual(0L, debouncer.Reset());
     }
+
+    [TestMethod]
+    public async Task ResetFromHandler()
+    {
+        using var debouncer = new Debouncer();
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+
+        wrapper.Debounced += (s, e) =>
+        {
+            if (wrapper.HandlerCount == 1)
+            {
+                // Trigger again, but Reset before we return from the first handler
+                debouncer.Trigger();
+                Assert.AreEqual(1L, debouncer.Reset());
+            }
+        };
+
+        // the trigger immediately causes a handler invocation
+        debouncer.Trigger();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+        // there should never be a second handler invocation
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+    }
     #endregion
+
+    [TestMethod]
+    public async Task TimingMaximum()
+    {
+        using var debouncer = new Debouncer()
+        {
+            DebounceWindow = TimeSpan.MaxValue,
+            TimingGranularity = TimeSpan.MaxValue,
+        };
+        using var wrapper = new VerifyingHandlerWrapper(debouncer);
+
+        // trigger starts maximum DebounceWindow
+        debouncer.Trigger();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        Assert.AreEqual(0L, wrapper.TriggerCount);
+        Assert.AreEqual(0L, wrapper.HandlerCount);
+
+        // reset DebounceWindow and TimingGranularity to 0, causing immediate handler invocation
+        debouncer.TimingGranularity = TimeSpan.Zero;
+        debouncer.DebounceWindow = TimeSpan.Zero;
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(1L, wrapper.TriggerCount);
+        Assert.AreEqual(1L, wrapper.HandlerCount);
+    }
 
     [TestMethod]
     public void BenchmarkDefaults()

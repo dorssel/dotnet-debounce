@@ -113,6 +113,47 @@ sealed class DebouncerGenericTests
             debouncer.Trigger(1);
         });
     }
+
+    [TestMethod]
+    public async Task TriggerBeyondDataLimitThrows()
+    {
+        using var debouncer = new Debouncer<int>
+        {
+            DataLimit = 1,
+        };
+        using var wrapper = new VerifyingHandlerWrapper<int>(debouncer);
+        using var handlerStarted = new SemaphoreSlim(0);
+        using var handlerMayFinish = new SemaphoreSlim(0);
+        wrapper.Debounced += (s, e) =>
+        {
+            _ = handlerStarted.Release();
+            handlerMayFinish.Wait();
+        };
+
+        // T == 0, the first trigger immediately causes a handler invocation
+        debouncer.Trigger(1);
+        await handlerStarted.WaitAsync();
+        // the trigger gets buffered
+        debouncer.Trigger(2);
+
+        // the trigger throws
+        _ = Assert.ThrowsException<InvalidOperationException>(() =>
+        {
+            debouncer.Trigger(3);
+        });
+
+        // the first handler is released, the second handler is immediately invoked
+        _ = handlerMayFinish.Release();
+        await handlerStarted.WaitAsync();
+        _ = handlerMayFinish.Release();
+        await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
+
+        // Verify
+        Assert.AreEqual(2L, wrapper.TriggerCount);
+        Assert.AreEqual(2L, wrapper.HandlerCount);
+        CollectionAssert.That.AreEqual([1, 2], wrapper.TriggerData);
+        CollectionAssert.That.AreEqual([2], wrapper.LastTriggerData);
+    }
     #endregion
 
     #region Reset
