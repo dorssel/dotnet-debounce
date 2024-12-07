@@ -34,3 +34,5 @@ XML_XMLLINT_FILE_EXTENSIONS:
 # Exclude verbatim copies of external sources that are not under our control.
 # Also exclude auto-generated files.
 FILTER_REGEX_EXCLUDE: LICENSES/|global.json|dotnet-tools.json
+# Exclude additional binary files not already excluded by default.
+EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (\.snk$)

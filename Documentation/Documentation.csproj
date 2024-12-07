@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
     <None Remove="api/**/*.yml;api/.manifest" />
     <None Remove="_site/**/*.*" />
   </ItemGroup>
-  
+
   <Target Name="docfx" BeforeTargets="AfterBuild">
     <Exec Command="dotnet docfx" />
   </Target>

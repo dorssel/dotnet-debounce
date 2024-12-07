@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 
@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
     <TargetFramework>$(MainTargetFramework)</TargetFramework>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\Debounce\Debounce.csproj" />
   </ItemGroup>
