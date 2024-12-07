@@ -6,17 +6,20 @@
 
 @page "/counter"
 
+<PageTitle>Counter</PageTitle>
+
 @inject GlobalCounter GlobalCounter
 
 @implements IDisposable
 
 @using System.ComponentModel
 @using Dorssel.Utilities
-@using Dorssel.Utilities.Generic
 
 <h2>Counter</h2>
 
-<p>Current count: @GlobalCounter.Count</p>
+<div role="status" style="padding-bottom: 1em;">
+    Current count: <FluentBadge Appearance="Appearance.Neutral">@GlobalCounter.Count</FluentBadge>
+</div>
 
 <FluentStack Orientation="Orientation.Vertical">
     <FluentSwitch @bind-Value=GlobalCounter.Enabled Label="Stress" />

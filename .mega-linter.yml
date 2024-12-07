@@ -30,6 +30,7 @@ XML_XMLLINT_FILE_EXTENSIONS:
   - .csproj
   - .props
   - .pubxml
+  - .targets
 # Exclude verbatim copies of external sources that are not under our control.
 # Also exclude auto-generated files.
-FILTER_REGEX_EXCLUDE: LICENSES/|dotnet-tools.json
+FILTER_REGEX_EXCLUDE: LICENSES/|global.json|dotnet-tools.json
