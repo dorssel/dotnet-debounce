@@ -15,20 +15,22 @@
 *.md    text
 *.txt   text
 
-*.yml   text
+*.json   text
+*.yml    text
 
 *.sln   text
 *.snk   binary
 
-*.csproj   text
-*.cs       text eol=crlf
-*.props    text
+*.csproj    text
+*.cs        text eol=crlf
+*.props     text
+*.targets   text
 
 *.razor    text
 *.cshtml   text
-*.json     text
 *.css      text
 *.pubxml   text
+*.ico      binary
 *.png      binary
 
 # These are part of the nuget package

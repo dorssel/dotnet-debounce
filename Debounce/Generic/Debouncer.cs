@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 namespace Dorssel.Utilities.Generic;
 
 /// <summary>
-/// Object which debounces events, i.e., accumulating multiple incoming events into one with the possibility of 
+/// Object which debounces events, i.e., accumulating multiple incoming events into one with the possibility of
 /// keeping track of the incoming trigger data.
 /// </summary>
 public sealed class Debouncer<TData> : DebouncerBase<DebouncedEventArgs<TData>>, IDebouncer<TData>

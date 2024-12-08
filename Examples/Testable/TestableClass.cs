@@ -35,7 +35,7 @@ public sealed class TestableClass : IDisposable
         }
         else if (debouncedEventArgs.Count == long.MaxValue)
         {
-            // It would take ages to reach this Count value for real DebouncedEventArgs, but we can mock it! 
+            // It would take ages to reach this Count value for real DebouncedEventArgs, but we can mock it!
             Debug.WriteLine("Corner case galore.");
         }
         else
