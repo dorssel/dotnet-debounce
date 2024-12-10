@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project>
   <ItemGroup>
     <!-- all -->
-    <PackageVersion Include="GitVersion.MsBuild" Version="6.0.5" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="6.1.0" />
     <!-- Debounce -->
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="9.0.0" />
     <!-- unit tests -->
