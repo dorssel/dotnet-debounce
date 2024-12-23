@@ -7,6 +7,9 @@ SPDX-License-Identifier: MIT
 <Project>
 
   <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != 'true'">false</ContinuousIntegrationBuild>
+
     <!-- Use the latest .NET SDK -->
     <MainTargetFramework>net9.0</MainTargetFramework>
 
@@ -26,14 +29,12 @@ SPDX-License-Identifier: MIT
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <SelfContained>false</SelfContained>
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\strongname.snk</AssemblyOriginatorKeyFile>
-    <!--
-    See: https://github.com/dotnet/roslyn/issues/41640
-    -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- Assembly metadata -->
@@ -46,21 +47,25 @@ SPDX-License-Identifier: MIT
     <Authors>$(Company)</Authors>
     <Description>Coalesces, debounces, serializes, and throttles incoming concurrent events.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/dorssel/dotnet-debounce</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
-
-    <!-- SourceLink -->
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" PrivateAssets="all" />
+    <PackageReference Include="Dorssel.GitVersion.MsBuild" PrivateAssets="all" />
   </ItemGroup>
+
+  <Target Name="SetCopyright" AfterTargets="GetVersion">
+    <PropertyGroup>
+      <!-- For deterministic builds, use the commit year as the copyright year. -->
+      <CopyrightYear Condition="$(ContinuousIntegrationBuild)">$([System.DateTime]::Parse($(GitVersion_CommitDate)).ToString("yyyy"))</CopyrightYear>
+      <CopyrightYear Condition="!$(ContinuousIntegrationBuild)">$([System.DateTime]::UtcNow.ToString("yyyy"))</CopyrightYear>
+      <Copyright>Copyright (C) $(CopyrightYear)  $(Company)</Copyright>
+    </PropertyGroup>
+  </Target>
 
   <Target Name="SetPackageVersion" AfterTargets="GetVersion">
     <PropertyGroup>
