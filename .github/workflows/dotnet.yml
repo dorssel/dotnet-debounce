@@ -40,9 +40,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          dotnet tool restore
           dotnet restore
           dotnet restore Documentation --no-dependencies
-          dotnet tool restore
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
