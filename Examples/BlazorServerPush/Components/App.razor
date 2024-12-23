@@ -10,8 +10,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="BlazorServerPush.styles.css" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["BlazorServerPush.styles.css"]" />
+    <ImportMap />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <HeadOutlet @rendermode="@InteractiveServer"  />
 </head>
