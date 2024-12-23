@@ -55,13 +55,6 @@ jobs:
       - name: Package
         run: dotnet pack --configuration Release --no-build Debounce
 
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            **/TestResults/*.trx
-
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -78,7 +71,21 @@ jobs:
           path: Documentation/_site
           retention-days: 3
 
-      - name: Codecov
+      - name: Convert test results
+        if: ${{ !cancelled() }}
+        run: |
+          find . -name "*.trx" -exec dotnet tool run trx2junit --output TestResults/JUnit {} +
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          fail_ci_if_error: true
+          files: TestResults/JUnit/*.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
