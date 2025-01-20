@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project>
   <ItemGroup>
     <!-- all -->
-    <PackageVersion Include="Dorssel.GitVersion.MsBuild" Version="1.1.0" />
+    <PackageVersion Include="Dorssel.GitVersion.MsBuild" Version="1.1.1" />
     <!-- Debounce -->
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="9.0.1" />
     <!-- unit tests -->
