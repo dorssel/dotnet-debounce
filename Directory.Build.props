@@ -46,6 +46,8 @@ SPDX-License-Identifier: MIT
     <Title>$(Product)</Title>
     <Authors>$(Company)</Authors>
     <Description>Coalesces, debounces, serializes, and throttles incoming concurrent events.</Description>
+    <PackageProjectUrl>https://dorssel.github.io/dotnet-debounce/</PackageProjectUrl>
+    <PackageTags>debounce throttle coalesce rate-limit</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
