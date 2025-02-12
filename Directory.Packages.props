@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.1.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <!-- blazor -->
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.3" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.4" />
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.3" />
   </ItemGroup>
 </Project>
