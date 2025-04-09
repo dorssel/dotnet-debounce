@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
   "metadata": [
     {
       "src": [
@@ -7,6 +8,7 @@
           "src": "../Debounce"
         }
       ],
+      "noRestore": true,
       "dest": "api"
     }
   ],
