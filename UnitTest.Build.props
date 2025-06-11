@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
 
@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <!-- Updates to transitive MSTest.Sdk dependencies -->
-    <MicrosoftNETTestSdkVersion>17.12.0</MicrosoftNETTestSdkVersion>
+    <MicrosoftNETTestSdkVersion>17.14.1</MicrosoftNETTestSdkVersion>
   </PropertyGroup>
 
   <ItemGroup>
