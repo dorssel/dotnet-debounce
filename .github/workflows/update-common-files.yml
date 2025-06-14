@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2025 Frans van Dorsselaer
+#
+# SPDX-License-Identifier: MIT
+
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Update Common Files
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '24 4 * * *'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  update:
+    uses: dorssel/workflows/.github/workflows/update-common-files.yml@main
