@@ -12,10 +12,11 @@ on:
   schedule:
     - cron: '24 4 * * *'
 
-permissions:
-  contents: read
-  pull-requests: write
+permissions: {}
 
 jobs:
   update:
     uses: dorssel/workflows/.github/workflows/update-common-files.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
