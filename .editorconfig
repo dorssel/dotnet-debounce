@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Frans van Dorsselaer
+# SPDX-FileCopyrightText: 2020 Frans van Dorsselaer
 #
 # SPDX-License-Identifier: MIT
 
@@ -162,6 +162,11 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_readonly_field = true:suggestion
 dotnet_style_require_accessibility_modifiers = omit_if_default:suggestion
+spelling_checkable_types = strings,identifiers,comments
+spelling_error_severity = information
+spelling_exclusion_path = .github/linters/vs-spell-exclusion.txt
+spelling_languages = en-us
+spelling_use_default_exclusion_dictionary = true
 
 [*.{cs,razor}]
 charset = utf-8-bom
@@ -174,7 +179,32 @@ indent_size = unset
 [*.slnx]
 indent_size = 2
 
-[*.{csproj,props,pubxml,targets,wixproj}]
+# Maintained by Visual Studio
+[*.csproj]
+charset = utf-8-bom
+indent_size = 2
+
+# Maintained by Visual Studio
+[*.{pubxml,wixproj}]
+charset = utf-8-bom
+indent_size = 2
+insert_final_newline = false
+
+# Maintained by Visual Studio and Dependabot
+[{global.json,dotnet-tools.json,Directory.Packages.props}]
+charset = utf-8
+insert_final_newline = false
+
+# Maintained by git, LF required for hash consistency
+[.gitmodules]
+indent_style = tab
+end_of_line = lf
+
+# LF required for hash consistency
+[runtime-*.yml]
+end_of_line=lf
+
+[*.{manifest,props,targets}]
 charset = utf-8-bom
 indent_size = 2
 
@@ -184,7 +214,15 @@ indent_size = 2
 [*.sh]
 end_of_line = lf
 
-# Maintained by Visual Studio and Dependabot
-[{global.json,dotnet-tools.json,Directory.Packages.props}]
-charset = utf-8
+[*.css]
+indent_size = 2
+
+[*.ids]
+charset =
+trim_trailing_whitespace = false
+indent_style =
 insert_final_newline = false
+
+[*.{wxs,xslt}]
+charset = utf-8-bom
+indent_size = 4
