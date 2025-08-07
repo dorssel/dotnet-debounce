@@ -18,7 +18,7 @@ public interface IDebouncer<TData> : IDebouncerBase<DebouncedEventArgs<TData>>
     /// </summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The value is less than 1.</exception>
-    public int DataLimit { get; set; }
+    int DataLimit { get; set; }
 
     /// <summary>Accumulates one more trigger.</summary>
     /// <param name="data">Data that accompanies the trigger.</param>
@@ -26,9 +26,9 @@ public interface IDebouncer<TData> : IDebouncerBase<DebouncedEventArgs<TData>>
     /// More than <see cref="DataLimit"/> calls to <see cref="Trigger(TData)"/> while an event handler is currently being invoked.
     /// </exception>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-    public void Trigger(TData data);
+    void Trigger(TData data);
 
     /// <inheritdoc cref="IDebouncerBase{TEventArgs}.Reset"/>
     /// <param name="data">Accumulated data from each call to <see cref="IDebouncer{TData}.Trigger(TData)"/> since the last event handler was called.</param>
-    public long Reset(out IReadOnlyList<TData> data);
+    long Reset(out IReadOnlyList<TData> data);
 }
