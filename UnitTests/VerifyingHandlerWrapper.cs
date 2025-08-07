@@ -22,7 +22,7 @@ sealed class VerifyingHandlerWrapper : IDisposable
         // sender *must* be the original debouncer object
         Assert.AreSame(Debouncer, sender);
         // *must* have a positive trigger count since last handler called
-        Assert.IsTrue(debouncedEventArgs.Count > 0);
+        Assert.IsGreaterThan(0, debouncedEventArgs.Count);
         // *never* should be called reentrant (i.e. always serialize handlers)
         Assert.AreEqual(1, Interlocked.Increment(ref ReentrancyCount));
 

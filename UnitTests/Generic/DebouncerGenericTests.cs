@@ -53,7 +53,7 @@ sealed class DebouncerGenericTests
         {
             DataLimit = 1
         };
-        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
         {
             debouncer.DataLimit = dataLimit;
         });
@@ -77,7 +77,7 @@ sealed class DebouncerGenericTests
     {
         var debouncer = new Debouncer<int>();
         debouncer.Dispose();
-        _ = Assert.ThrowsException<ObjectDisposedException>(() =>
+        _ = Assert.ThrowsExactly<ObjectDisposedException>(() =>
         {
             debouncer.DataLimit = 1;
         });
@@ -108,7 +108,7 @@ sealed class DebouncerGenericTests
     {
         using var debouncer = new Debouncer<int>();
         debouncer.Dispose();
-        _ = Assert.ThrowsException<ObjectDisposedException>(() =>
+        _ = Assert.ThrowsExactly<ObjectDisposedException>(() =>
         {
             debouncer.Trigger(1);
         });
@@ -127,32 +127,32 @@ sealed class DebouncerGenericTests
         wrapper.Debounced += (s, e) =>
         {
             _ = handlerStarted.Release();
-            handlerMayFinish.Wait();
+            handlerMayFinish.Wait(CancellationToken.None);
         };
 
         // T == 0, the first trigger immediately causes a handler invocation
         debouncer.Trigger(1);
-        await handlerStarted.WaitAsync();
+        await handlerStarted.WaitAsync(CancellationToken.None);
         // the trigger gets buffered
         debouncer.Trigger(2);
 
         // the trigger throws
-        _ = Assert.ThrowsException<InvalidOperationException>(() =>
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() =>
         {
             debouncer.Trigger(3);
         });
 
         // the first handler is released, the second handler is immediately invoked
         _ = handlerMayFinish.Release();
-        await handlerStarted.WaitAsync();
+        await handlerStarted.WaitAsync(CancellationToken.None);
         _ = handlerMayFinish.Release();
         await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
 
         // Verify
         Assert.AreEqual(2L, wrapper.TriggerCount);
         Assert.AreEqual(2L, wrapper.HandlerCount);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([2], wrapper.LastTriggerData);
+        CollectionAssert.Instance.AreEqual([1, 2], wrapper.TriggerData);
+        CollectionAssert.Instance.AreEqual([2], wrapper.LastTriggerData);
     }
     #endregion
 
@@ -162,7 +162,7 @@ sealed class DebouncerGenericTests
     {
         using var debouncer = new Debouncer<int>();
         Assert.AreEqual(0L, debouncer.Reset(out var data));
-        CollectionAssert.That.AreEqual([], data);
+        CollectionAssert.Instance.AreEqual([], data);
     }
 
     [TestMethod]
@@ -171,7 +171,7 @@ sealed class DebouncerGenericTests
         using var debouncer = new Debouncer<int>();
         debouncer.Dispose();
         Assert.AreEqual(0L, debouncer.Reset(out var data));
-        CollectionAssert.That.AreEqual([], data);
+        CollectionAssert.Instance.AreEqual([], data);
     }
     #endregion
 }

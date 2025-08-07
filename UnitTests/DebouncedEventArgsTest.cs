@@ -42,7 +42,7 @@ sealed class DebouncedEventArgsTests
     [DynamicData(nameof(InvalidCounts))]
     public void ConstructorCountInvalid(long count)
     {
-        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
+        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _ = new DebouncedEventArgs(count));
     }
 
     sealed class DerivedDebouncedEventArgs(long count, bool boundsCheck) : DebouncedEventArgs(count, boundsCheck)
@@ -61,7 +61,7 @@ sealed class DebouncedEventArgsTests
     [DynamicData(nameof(InvalidCounts))]
     public void ProtectedConstructorBoundsCheckedInvalid(long count)
     {
-        _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
+        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _ = new DerivedDebouncedEventArgs(count, true));
     }
 
     [TestMethod]

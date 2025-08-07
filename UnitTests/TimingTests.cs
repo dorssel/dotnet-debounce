@@ -39,7 +39,7 @@ sealed class TimingTests
 
         // Verify that the handler was indeed *not* called, even though there was a trigger and the debounce window ran out.
         Assert.AreEqual(0L, wrapper.HandlerCount);
-        _ = Assert.ThrowsException<ObjectDisposedException>(debouncer.Trigger);
+        _ = Assert.ThrowsExactly<ObjectDisposedException>(debouncer.Trigger);
     }
     #endregion
 
@@ -247,7 +247,7 @@ sealed class TimingTests
         wrapper.Debounced += (s, e) =>
         {
             _ = started.Release();
-            finish.Wait();
+            finish.Wait(CancellationToken.None);
         };
 
         // T == 0, the trigger starts the DebounceWindow
@@ -267,7 +267,7 @@ sealed class TimingTests
 
         timeProvider.Advance(TimingUnit);
         // T == 5, DebounceWindow runs out, first handler starts
-        await started.WaitAsync();
+        await started.WaitAsync(CancellationToken.None);
 
         // the trigger starts the DebounceWindow
         debouncer.Trigger();
@@ -292,7 +292,7 @@ sealed class TimingTests
 
         timeProvider.Advance(TimingUnit);
         // T == 11, DebounceWindow runs out, second handler starts
-        await started.WaitAsync();
+        await started.WaitAsync(CancellationToken.None);
         _ = finish.Release();
         await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
 

@@ -26,7 +26,7 @@ sealed class TestableClassTests
     [TestMethod]
     public void ConstructorThrowsOnNull()
     {
-        _ = Assert.ThrowsException<ArgumentNullException>(() =>
+        _ = Assert.ThrowsExactly<ArgumentNullException>(() =>
         {
             _ = new TestableClass(null!);
         });
