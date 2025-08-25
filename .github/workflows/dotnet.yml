@@ -71,7 +71,7 @@ jobs:
           dotnet build --configuration Release --no-restore Documentation
 
       - name: Upload GitHub Pages as artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: Documentation/_site/
 
