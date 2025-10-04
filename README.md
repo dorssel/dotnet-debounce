@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 [![CodeQL](https://github.com/dorssel/dotnet-debounce/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/dorssel/dotnet-debounce/actions?query=workflow%3ACodeQL+branch%3Amaster)
 [![Lint](https://github.com/dorssel/dotnet-debounce/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/dorssel/dotnet-debounce/actions?query=workflow%3ALint+branch%3Amaster)
 [![REUSE status](https://api.reuse.software/badge/github.com/dorssel/dotnet-debounce)](https://api.reuse.software/info/github.com/dorssel/dotnet-debounce)
-[![codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
+[![Codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
 [![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
 This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
@@ -29,7 +29,7 @@ Common uses are:
 You want auto-save for your changing documents. Every key press alters the document, but not every key press should immediately lead
 to saving. Instead, the debouncer only fires when no new events are coming in within a configurable time window
 (such as when the user stops typing for 10 seconds). But simultaneously,   the event should not be held off forever
-(such as when the user types continously). Therefore, the debouncer has a configurable maximum
+(such as when the user types continuously). Therefore, the debouncer has a configurable maximum
 timeout after which the save event is no longer held back (for example, you want to auto-save no later than 5 minutes after the first
 change).
 
@@ -55,7 +55,7 @@ of rest every time.
 You listen on a stream that fires a lot of events with data attached. You would like to space out the processing of these events in time,
 processing them in batches. By using the generic version of the Debouncer, it is possible to trigger events with data attached.
 Retrieve the list of original triggered data by accessing the `TriggerData` property of the `DebouncedEventArgs`.
-Multiple data types are supported as long as they have a common base class, such as EventArgs for compatibility with .NET events.
+Multiple data types are supported as long as they have a common base class, such as `EventArgs` for compatibility with .NET events.
 
 ## Performance
 
@@ -70,7 +70,7 @@ When triggering the debouncer with data attached, it comes with a significant pe
 
 The library targets `netstandard2.0` and is compiled for `AnyCPU`.
 
-The public API uses the interface design patern, which allows 100% code coverage testing with mocking (even for edge cases that will
+The public API uses the interface design pattern, which allows 100% code coverage testing with mocking (even for edge cases that will
 never occur in real life).
 
 ## NuGet package

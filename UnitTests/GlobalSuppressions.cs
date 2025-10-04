@@ -10,3 +10,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Not important for tests.")]
+[assembly: SuppressMessage("Style", "IDE0053:Use expression body for lambda expression", Justification = "Better readability for what is actually tested.")]

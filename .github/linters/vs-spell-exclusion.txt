@@ -1,0 +1,16 @@
+backoff
+Blazor
+Codecov
+debounce
+debounced
+debouncer
+debouncers
+debounces
+debouncing
+docfx
+Dorssel
+dotnet
+Intelli
+netstandard
+nondisposable
+param

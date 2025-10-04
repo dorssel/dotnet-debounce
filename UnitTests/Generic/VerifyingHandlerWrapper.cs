@@ -28,16 +28,16 @@ sealed class VerifyingHandlerWrapper<TData> : IDisposable
     /// <summary>
     /// Concatenation of all TriggerData from all Debounced calls.
     /// </summary>
-    public IReadOnlyList<TData> TriggerData { get => _TriggerData; }
+    public IReadOnlyList<TData> TriggerData => _TriggerData;
 
     void OnDebounced(object? sender, DebouncedEventArgs<TData> debouncedEventArgs)
     {
         // sender *must* be the original debouncer object
         Assert.AreSame(Debouncer, sender);
         // *must* have a positive trigger count since last handler called
-        Assert.IsTrue(debouncedEventArgs.Count > 0);
+        Assert.IsGreaterThan(0, debouncedEventArgs.Count);
         // *never* should be called reentrant (i.e. always serialize handlers)
-        Assert.AreEqual(Interlocked.Increment(ref ReentrancyCount), 1);
+        Assert.AreEqual(1, Interlocked.Increment(ref ReentrancyCount));
 
         ++HandlerCount;
         TriggerCount += debouncedEventArgs.Count;
@@ -47,7 +47,7 @@ sealed class VerifyingHandlerWrapper<TData> : IDisposable
         Debounced?.Invoke(this, debouncedEventArgs);
 
         // *never* should be called reentrant (i.e. always serialize handlers)
-        Assert.AreEqual(Interlocked.Decrement(ref ReentrancyCount), 0);
+        Assert.AreEqual(0, Interlocked.Decrement(ref ReentrancyCount));
     }
 
     readonly IDebouncer<TData> Debouncer;
