@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2023 Frans van Dorsselaer
 SPDX-License-Identifier: MIT
 -->
 
-# dotnet-aes-extra
+# dotnet-debounce
 
 There are two builds of the library included in th package, one for .NET Standard 2.0 and one for .NET 8 (or higher).
 The public @"Dorssel.Utilities.Debouncer?text=API" is the same for both, but internally the builds slightly differ:
