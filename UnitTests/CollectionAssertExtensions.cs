@@ -4,7 +4,7 @@
 
 namespace UnitTests;
 
-static class CollectionAssertExtentions
+static class CollectionAssertExtensions
 {
     public static void AreEqual<TData>(this CollectionAssert customAssert, IEnumerable<TData> expected, IEnumerable<TData> actual)
     {

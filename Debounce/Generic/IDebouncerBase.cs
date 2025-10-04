@@ -44,6 +44,6 @@ public interface IDebouncerBase<TEventArgs> where TEventArgs : DebouncedEventArg
     /// <returns>The number of triggers that had been accumulated since the last event handler was called.</returns>
     long Reset();
 
-    /// <summary>Gets a waitable <see cref="Task"/> running any current event handlers.</summary>
+    /// <summary>Gets an awaitable <see cref="Task"/> running any current event handlers.</summary>
     Task CurrentEventHandlersTask { get; }
 }

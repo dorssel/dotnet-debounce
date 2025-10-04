@@ -4,4 +4,3 @@
 
 global using Dorssel.Utilities;
 global using Dorssel.Utilities.Generic;
-global using Microsoft.VisualStudio.TestTools.UnitTesting;
