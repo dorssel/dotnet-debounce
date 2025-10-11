@@ -3,6 +3,5 @@
 // SPDX-License-Identifier: MIT
 
 global using Dorssel.Utilities;
-global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Moq;
 global using Testable;
