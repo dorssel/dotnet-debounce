@@ -11,11 +11,6 @@ SPDX-License-Identifier: MIT
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!-- Updates to transitive MSTest.Sdk dependencies -->
-    <MicrosoftNETTestSdkVersion>18.0.0</MicrosoftNETTestSdkVersion>
-  </PropertyGroup>
-
   <ItemGroup>
     <!-- We use internal test classes. -->
     <AssemblyAttribute Include="Microsoft.VisualStudio.TestTools.UnitTesting.DiscoverInternalsAttribute" />
