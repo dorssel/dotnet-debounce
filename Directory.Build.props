@@ -11,10 +11,10 @@ SPDX-License-Identifier: MIT
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != 'true'">false</ContinuousIntegrationBuild>
 
     <!-- Use the latest .NET SDK -->
-    <MainTargetFramework>net9.0</MainTargetFramework>
+    <MainTargetFramework>net10.0</MainTargetFramework>
 
     <!-- Use the latest C# Language standard -->
-    <LangVersion>13.0</LangVersion>
+    <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
