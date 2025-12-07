@@ -57,7 +57,7 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dorssel.GitVersion.MsBuild" PrivateAssets="all" />
+    <PackageReference Include="GitVersion.MsBuild" PrivateAssets="all" />
   </ItemGroup>
 
   <Target Name="SetCopyright" AfterTargets="GetVersion">
