@@ -24,6 +24,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -32,12 +35,12 @@ jobs:
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
-
-      - name: Cache
-        uses: actions/cache@v4
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+          cache: true
+          cache-dependency-path: |
+            global.json
+            '**/Directory.Packages.props'
+            .config/dotnet-tools.json
 
       - name: Install dependencies
         run: |
@@ -82,9 +85,10 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
+          report_type: test_results
           files: TestResults/JUnit/*.xml
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}

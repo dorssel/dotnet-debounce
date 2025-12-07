@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+.nuget/
+.vs/
+.vscode/
 bin/
 obj/
-.vs/
 TestResults/
+
 *.user
-Examples/BlazorServerPush/wwwroot/libman/
 *.lutconfig
