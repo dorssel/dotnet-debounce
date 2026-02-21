@@ -55,7 +55,8 @@ jobs:
       - name: Test
         run: |
           dotnet test --configuration Release --no-build \
-            --report-trx --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+            --report-spekt-junit \
+            --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
 
       - name: Package
         run: dotnet pack --configuration Release --no-build Debounce
@@ -78,18 +79,13 @@ jobs:
         with:
           path: Documentation/_site/
 
-      - name: Convert test results
-        if: ${{ !cancelled() }}
-        run: |
-          find . -name "*.trx" -exec dotnet tool run trx2junit --output TestResults/JUnit {} +
-
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           report_type: test_results
-          files: TestResults/JUnit/*.xml
+          files: '**/TestResults/TestResults.xml'
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
