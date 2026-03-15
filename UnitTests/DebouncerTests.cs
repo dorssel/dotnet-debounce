@@ -114,7 +114,7 @@ sealed class DebouncerTests
         TimeSpan.MinValue
     ];
 
-    static IEnumerable<TimeSpan> InfiniteTimeSpans => [
+    static readonly IEnumerable<TimeSpan> InfiniteTimeSpans = [
         Timeout.InfiniteTimeSpan,
     ];
 
