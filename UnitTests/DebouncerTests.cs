@@ -86,6 +86,38 @@ sealed class DebouncerTests
     }
     #endregion
 
+    /// <summary>
+    /// Some non-default TimeSpan that is also not equal to any of the valid/invalid TimeSpan test values.
+    /// </summary>
+    static readonly TimeSpan ArbitraryNonDefaultTimeSpan = TimeSpan.FromSeconds(Math.PI);
+
+    static readonly IEnumerable<TimeSpan> NonNegativeTimeSpans = [
+        TimeSpan.MaxValue,
+        TimeSpan.FromDays(1),
+        TimeSpan.FromHours(1),
+        TimeSpan.FromMinutes(1),
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromMilliseconds(1),
+        TimeSpan.FromTicks(1),
+        TimeSpan.Zero
+    ];
+
+    static readonly IEnumerable<TimeSpan> NegativeTimeSpans =
+    [
+        TimeSpan.FromTicks(-1),
+        // NOTE: FromMilliseconds(-1) == Timeout.InfiniteTimeSpan, a magic value
+        TimeSpan.FromMilliseconds(-2),
+        TimeSpan.FromSeconds(-1),
+        TimeSpan.FromMinutes(-1),
+        TimeSpan.FromHours(-1),
+        TimeSpan.FromDays(-1),
+        TimeSpan.MinValue
+    ];
+
+    static IEnumerable<TimeSpan> InfiniteTimeSpans => [
+        Timeout.InfiniteTimeSpan,
+    ];
+
     #region DebounceWindow
     [TestMethod]
     public void DebounceWindowDefault()
@@ -95,20 +127,20 @@ sealed class DebouncerTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
+    [DynamicData(nameof(NonNegativeTimeSpans))]
     public void DebounceWindowValid(TimeSpan DebounceWindow)
     {
         using var debouncer = new Debouncer
         {
-            DebounceWindow = TimeSpanData.ArbitraryNonDefault
+            DebounceWindow = ArbitraryNonDefaultTimeSpan
         };
         debouncer.DebounceWindow = DebounceWindow;
         Assert.AreEqual(DebounceWindow, debouncer.DebounceWindow);
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
-    [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
+    [DynamicData(nameof(NegativeTimeSpans))]
+    [DynamicData(nameof(InfiniteTimeSpans))]
     public void DebounceWindowInvalid(TimeSpan DebounceWindow)
     {
         using var debouncer = new Debouncer()
@@ -149,20 +181,20 @@ sealed class DebouncerTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
-    [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
+    [DynamicData(nameof(NonNegativeTimeSpans))]
+    [DynamicData(nameof(InfiniteTimeSpans))]
     public void DebounceTimeoutValid(TimeSpan debounceTimeout)
     {
         using var debouncer = new Debouncer
         {
-            DebounceTimeout = TimeSpanData.ArbitraryNonDefault
+            DebounceTimeout = ArbitraryNonDefaultTimeSpan
         };
         debouncer.DebounceTimeout = debounceTimeout;
         Assert.AreEqual(debounceTimeout, debouncer.DebounceTimeout);
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
+    [DynamicData(nameof(NegativeTimeSpans))]
     public void DebounceTimeoutInvalid(TimeSpan debounceTimeout)
     {
         using var debouncer = new Debouncer()
@@ -203,20 +235,20 @@ sealed class DebouncerTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
+    [DynamicData(nameof(NonNegativeTimeSpans))]
     public void EventSpacingValid(TimeSpan eventSpacing)
     {
         using var debouncer = new Debouncer
         {
-            EventSpacing = TimeSpanData.ArbitraryNonDefault
+            EventSpacing = ArbitraryNonDefaultTimeSpan
         };
         debouncer.EventSpacing = eventSpacing;
         Assert.AreEqual(eventSpacing, debouncer.EventSpacing);
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
-    [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
+    [DynamicData(nameof(NegativeTimeSpans))]
+    [DynamicData(nameof(InfiniteTimeSpans))]
     public void EventSpacingInvalid(TimeSpan eventSpacing)
     {
         using var debouncer = new Debouncer()
@@ -257,20 +289,20 @@ sealed class DebouncerTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
+    [DynamicData(nameof(NonNegativeTimeSpans))]
     public void HandlerSpacingValid(TimeSpan HandlerSpacing)
     {
         using var debouncer = new Debouncer
         {
-            HandlerSpacing = TimeSpanData.ArbitraryNonDefault
+            HandlerSpacing = ArbitraryNonDefaultTimeSpan
         };
         debouncer.HandlerSpacing = HandlerSpacing;
         Assert.AreEqual(HandlerSpacing, debouncer.HandlerSpacing);
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
-    [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
+    [DynamicData(nameof(NegativeTimeSpans))]
+    [DynamicData(nameof(InfiniteTimeSpans))]
     public void HandlerSpacingInvalid(TimeSpan HandlerSpacing)
     {
         using var debouncer = new Debouncer()
@@ -311,21 +343,21 @@ sealed class DebouncerTests
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.NonNegative), typeof(TimeSpanData))]
+    [DynamicData(nameof(NonNegativeTimeSpans))]
     public void TimingGranularityValid(TimeSpan timingGranularity)
     {
         using var debouncer = new Debouncer
         {
             DebounceWindow = TimeSpan.MaxValue,
-            TimingGranularity = TimeSpanData.ArbitraryNonDefault
+            TimingGranularity = ArbitraryNonDefaultTimeSpan
         };
         debouncer.TimingGranularity = timingGranularity;
         Assert.AreEqual(timingGranularity, debouncer.TimingGranularity);
     }
 
     [TestMethod]
-    [DynamicData(nameof(TimeSpanData.Negative), typeof(TimeSpanData))]
-    [DynamicData(nameof(TimeSpanData.Infinite), typeof(TimeSpanData))]
+    [DynamicData(nameof(NegativeTimeSpans))]
+    [DynamicData(nameof(InfiniteTimeSpans))]
     public void TimingGranularityInvalid(TimeSpan timingGranularity)
     {
         using var debouncer = new Debouncer()

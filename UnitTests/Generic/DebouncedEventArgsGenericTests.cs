@@ -5,6 +5,7 @@
 // SPDX-FileContributor: Alain van den Berg
 
 using System.Collections;
+using System.Runtime.Serialization;
 
 namespace UnitTests.Generic;
 
@@ -38,6 +39,7 @@ sealed class DebouncedEventArgsGenericTests
         }
     }
 
+    [DataContract]
     sealed class MockReadOnlyList(int _Count) : IReadOnlyList<int>
     {
         public int this[int index] => index < 0 || index >= Count ? throw new ArgumentOutOfRangeException(nameof(index)) : index;
@@ -53,39 +55,44 @@ sealed class DebouncedEventArgsGenericTests
         {
             return new MockEnumerator(this);
         }
-    }
 
-    public static IEnumerable<object[]> ValidCounts
-    {
-        get
+        public override string ToString()
         {
-            yield return new object[] { 1L, new MockReadOnlyList(0) };
-            yield return new object[] { 1L, new MockReadOnlyList(1) };
-            yield return new object[] { 2L, new MockReadOnlyList(0) };
-            yield return new object[] { 2L, new MockReadOnlyList(1) };
-            yield return new object[] { 2L, new MockReadOnlyList(2) };
-            yield return new object[] { int.MaxValue - 1, new MockReadOnlyList(0) };
-            yield return new object[] { int.MaxValue - 1, new MockReadOnlyList(1) };
-            yield return new object[] { int.MaxValue - 1, new MockReadOnlyList(int.MaxValue - 2) };
-            yield return new object[] { int.MaxValue - 1, new MockReadOnlyList(int.MaxValue - 1) };
-            yield return new object[] { int.MaxValue, new MockReadOnlyList(0) };
-            yield return new object[] { int.MaxValue, new MockReadOnlyList(1) };
-            yield return new object[] { int.MaxValue, new MockReadOnlyList(int.MaxValue - 1) };
-            yield return new object[] { int.MaxValue, new MockReadOnlyList(int.MaxValue) };
+            return $"{Count}";
         }
     }
 
-    public static IEnumerable<object[]> InvalidCounts
-    {
-        get
-        {
-            yield return new object[] { 0L, new MockReadOnlyList(0) };
-            yield return new object[] { 0L, new MockReadOnlyList(1) };
-            yield return new object[] { 1L, new MockReadOnlyList(2) };
-            yield return new object[] { 2L, new MockReadOnlyList(3) };
-            yield return new object[] { (long)(int.MaxValue - 1), new MockReadOnlyList(int.MaxValue) };
-        }
-    }
+    static readonly IEnumerable<(long, MockReadOnlyList)> ValidCounts = [
+        (1, new(0)),
+        (1, new(1)),
+        (2, new(0)),
+        (2, new(1)),
+        (2, new(2)),
+        (int.MaxValue - 1, new(0)),
+        (int.MaxValue - 1, new(1)),
+        (int.MaxValue - 1, new(int.MaxValue - 2)),
+        (int.MaxValue - 1, new(int.MaxValue - 1)),
+        (int.MaxValue, new(0)),
+        (int.MaxValue, new(1)),
+        (int.MaxValue, new(int.MaxValue - 1)),
+        (int.MaxValue, new(int.MaxValue)),
+        (long.MaxValue - 1, new(0)),
+        (long.MaxValue - 1, new(1)),
+        (long.MaxValue - 1, new(int.MaxValue - 2)),
+        (long.MaxValue - 1, new(int.MaxValue - 1)),
+        (long.MaxValue, new(0)),
+        (long.MaxValue, new(1)),
+        (long.MaxValue, new(int.MaxValue - 1)),
+        (long.MaxValue, new(int.MaxValue)),
+    ];
+
+    static readonly IEnumerable<(long, MockReadOnlyList)> InvalidCounts = [
+        (0, new(0)),
+        (0, new(1)),
+        (1, new(2)),
+        (2, new(3)),
+        (int.MaxValue - 1, new(int.MaxValue)),
+    ];
 
     [TestMethod]
     [DynamicData(nameof(ValidCounts))]
