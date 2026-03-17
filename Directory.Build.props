@@ -37,6 +37,9 @@ SPDX-License-Identifier: MIT
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\strongname.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
+    <!-- Fix GitVersion during Dependabot runs -->
+    <GitVersion_AllowShallowEnabled>true</GitVersion_AllowShallowEnabled>
+
     <!-- Assembly metadata -->
     <Product>dotnet-debounce</Product>
     <Company>Frans van Dorsselaer</Company>
