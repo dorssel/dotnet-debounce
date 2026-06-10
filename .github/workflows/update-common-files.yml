@@ -15,8 +15,31 @@ on:
 permissions: {}
 
 jobs:
-  update:
-    uses: dorssel/workflows/.github/workflows/update-common-files.yml@main
+  check:
+    name: Check (common files)
+    runs-on: ubuntu-latest
+
     permissions:
       contents: write
       pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check for new .editorconfig
+        run: |
+          curl --fail --remote-name https://raw.githubusercontent.com/dorssel/workflows/refs/heads/main/.editorconfig
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          commit-message: 'Update common files'
+          title: 'Update common files'
+          branch: update-common-files
+          body: |
+            This is an automated pull request, updating common files after a detected change
+            in https://github.com/dorssel/workflows.
+          sign-commits: true

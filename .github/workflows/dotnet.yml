@@ -13,30 +13,34 @@ on:
   pull_request:
     branches: [master]
 
-permissions:
-  contents: read
-  issues: read
-  checks: write
-  pull-requests: write
-  actions: write
-  id-token: write
-  attestations: write
+permissions: {}
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      issues: read
+      checks: write
+      pull-requests: write
+      actions: write
+      id-token: write
+      attestations: write
 
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           cache: true
           cache-dependency-path: |
@@ -44,7 +48,7 @@ jobs:
             '**/Directory.Packages.props'
             .config/dotnet-tools.json
 
-      - name: Install dependencies
+      - name: Restore dependencies
         run: |
           dotnet tool restore
           dotnet restore
@@ -52,7 +56,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build --configuration Release --no-restore
+          dotnet build --configuration Release --no-restore --binaryLogger:build.binlog
 
       - name: Test
         run: |
@@ -65,7 +69,7 @@ jobs:
 
       - name: Upload Package Artifact
         id: upload
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: artifacts
           path: |
@@ -74,23 +78,23 @@ jobs:
             retention-days: 14
 
       - name: Build Attestation
-        uses: actions/attest@v4
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         with:
           subject-name: artifacts.zip
           subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
 
       - name: Build Documentation
         run: |
-          dotnet build --configuration Release --no-restore Documentation
+          dotnet build --configuration Release --no-restore Documentation --binaryLogger:documentation.binlog
 
       - name: Upload GitHub Pages as artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: Documentation/_site/
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           fail_ci_if_error: true
           report_type: test_results
@@ -99,14 +103,28 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           fail_ci_if_error: true
           files: '**/TestResults/coverage.cobertura.xml'
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Submit Dependencies to GitHub
+        uses: advanced-security/component-detection-dependency-submission-action@9c110eb34dee187cd9eca76a652b9f6a0ed22927 # v0.1.1
+        with:
+          detectorArgs: MSBuildBinaryLog=EnableIfDefaultOff
+          # This should really read 'MSBuildBinaryLog', but since it is experimental we need this 'Linux' workaround.
+          detectorsFilter: Linux
+
+      - name: Dependency Review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          comment-summary-in-pr: always
+
   deploy:
+    name: Deploy
     needs: build
     if: ${{ always() && github.event_name == 'push' && needs.build.result == 'success' }}
 
@@ -125,4 +143,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <TargetFramework>$(MainTargetFramework)</TargetFramework>
+    <IsDevelopment>true</IsDevelopment>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
