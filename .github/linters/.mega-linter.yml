@@ -35,6 +35,8 @@ XML_XMLLINT_FILE_EXTENSIONS:
   - .wxs
 # Exclude verbatim copies of external sources that are not under our control.
 # Also exclude auto-generated files.
-FILTER_REGEX_EXCLUDE: COPYING\.md|LICENSE\.txt|LICENSES/|global.json|dotnet-tools.json
+FILTER_REGEX_EXCLUDE: COPYING\.md|LICENSE\.txt|LICENSES/|global.json|dotnet-tools.json|packages.lock.json
 # Exclude additional binary files not already excluded by default.
 EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (\.snk$)
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN

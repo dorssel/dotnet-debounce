@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "GitVersion.MsBuild": {
+        "type": "Direct",
+        "requested": "[6.7.0, )",
+        "resolved": "6.7.0",
+        "contentHash": "0W5NHnfnogX0pfidRcJfqzfb8Yc/avBfq1qVuaHiHIjbtsjKHt9IFtt18p/ttCCeJlJe9fQliQ3pSkZQcibXlw=="
+      },
+      "Microsoft.AspNetCore.App.Internal.Assets": {
+        "type": "Direct",
+        "requested": "[10.0.9, )",
+        "resolved": "10.0.9",
+        "contentHash": "E9Wp/LPKAYkGOVBv4lt5U5TnUA/7pov7QZAwF3eI64kK8AAXqkPDwuadEOwpL1WXEfgecYm0fccluvABp32D8g=="
+      },
+      "Microsoft.FluentUI.AspNetCore.Components": {
+        "type": "Direct",
+        "requested": "[4.14.2, )",
+        "resolved": "4.14.2",
+        "contentHash": "44BD8rBXH4sTeGPcE7YrA8GC1x5AtAOfGz764itUILs53TAX3n+hQqCJkHCWDYZxvEq/3PPM5YClhb6BrAxhSg=="
+      },
+      "Microsoft.FluentUI.AspNetCore.Components.Icons": {
+        "type": "Direct",
+        "requested": "[4.14.2, )",
+        "resolved": "4.14.2",
+        "contentHash": "Ke1WC+g1eY6sZ/g/G9b7ZzKY8WjjvTXtPfdXKeAyIr2xvFjLqYRzK67MB7dDIl9h+unSTUcGjq9KD5NW9R0xyw==",
+        "dependencies": {
+          "Microsoft.FluentUI.AspNetCore.Components": "4.14.0"
+        }
+      },
+      "Dorssel.Utilities.Debounce": {
+        "type": "Project"
+      }
+    }
+  }
+}

@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup>
     <TargetFramework>$(MainTargetFramework)</TargetFramework>
+    <IsDevelopment>true</IsDevelopment>
     <!-- publish -->
     <IsTrimmable>false</IsTrimmable>
     <IsPublishable>true</IsPublishable>
