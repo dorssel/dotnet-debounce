@@ -37,6 +37,9 @@ SPDX-License-Identifier: MIT
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\strongname.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
+    <!-- GitVersion will handle this -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
     <!-- Bump MSTest.Sdk "transitive" dependencies (they are actually direct dependencies) -->
     <MicrosoftTestingExtensionsCodeCoverageVersion>18.8.0</MicrosoftTestingExtensionsCodeCoverageVersion>
 
@@ -64,6 +67,12 @@ SPDX-License-Identifier: MIT
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- Required for Dependabot -->
+  <PropertyGroup Label="Dependabot" Condition="'$(DEPENDABOT)' == 'true'">
+    <RestoreLockedMode>false</RestoreLockedMode>
+    <GitVersion_AllowShallowEnabled>true</GitVersion_AllowShallowEnabled>
   </PropertyGroup>
 
   <ItemGroup>

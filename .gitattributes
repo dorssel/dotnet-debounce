@@ -9,8 +9,9 @@
 .gitignore       text
 .editorconfig    text
 .config          text
-.license         text
 .nojekyll        text
+
+*.license   text
 
 *.md    text
 *.txt   text
@@ -36,3 +37,5 @@
 # These are part of the nuget package
 LICENSE.txt   text eol=crlf
 README.md     text eol=crlf
+
+packages.lock.json  text linguist-generated
