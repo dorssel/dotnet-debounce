@@ -39,3 +39,5 @@ LICENSE.txt   text eol=crlf
 README.md     text eol=crlf
 
 packages.lock.json  text linguist-generated
+
+CODEOWNERS  text
