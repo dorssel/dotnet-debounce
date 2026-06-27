@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: 2026 Frans van Dorsselaer
+#
+# SPDX-License-Identifier: MIT
+
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      # checkov:skip=CKV_GHA_7: Required input for publishing an existing release to NuGet.
+      tag_name:
+        description: 'The existing release tag to publish (e.g., v1.2.0)'
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          cache: false
+
+      - name: Download Existing Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE: ${{ inputs.tag_name }}
+        run: |
+          gh release download "${RELEASE}" --dir release-artifacts
+
+      - name: NuGet Login (Trusted Publishing)
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: login
+        with:
+          user: dorssel
+
+      - name: Push to NuGet
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          PACKAGES=(./release-artifacts/*.nupkg)
+          dotnet nuget push "${PACKAGES[@]}" --api-key "${NUGET_API_KEY}" --source https://api.nuget.org/v3/index.json
