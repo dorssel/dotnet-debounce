@@ -8,6 +8,8 @@
 name: NuGet
 
 on:
+  release:
+    types: [released]
   workflow_dispatch:
     inputs:
       # checkov:skip=CKV_GHA_7: Required input for publishing an existing release to NuGet.
@@ -38,12 +40,17 @@ jobs:
         with:
           cache: false
 
-      - name: Download Existing Release Assets
+      - name: Download Release Assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE: ${{ inputs.tag_name }}
+          RELEASE_TAG: |-
+            ${{ case(
+              github.event_name == 'release', github.event.release.tag_name,
+              github.event_name == 'workflow_dispatch', github.event.inputs.tag_name,
+              'unknown'
+            ) }}
         run: |
-          gh release download "${RELEASE}" --dir release-artifacts
+          gh release download "${RELEASE_TAG}" --dir release-artifacts
 
       - name: NuGet Login (Trusted Publishing)
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
