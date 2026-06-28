@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
 [![REUSE status](https://api.reuse.software/badge/github.com/dorssel/dotnet-debounce)](https://api.reuse.software/info/github.com/dorssel/dotnet-debounce)
 [![Codecov](https://codecov.io/gh/dorssel/dotnet-debounce/branch/master/graph/badge.svg?token=L0QI0AZRJI)](https://codecov.io/gh/dorssel/dotnet-debounce)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/dorssel/dotnet-debounce/badge)](https://scorecard.dev/viewer/?uri=github.com/dorssel/dotnet-debounce)
 [![NuGet](https://img.shields.io/nuget/v/Dorssel.Utilities.Debounce?logo=nuget)](https://www.nuget.org/packages/Dorssel.Utilities.Debounce)
 
 This library exposes a single object: an event debouncer. It can be used to "filter" or "buffer" multiple incoming events into one.
