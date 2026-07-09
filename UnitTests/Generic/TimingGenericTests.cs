@@ -52,8 +52,8 @@ sealed class TimingGenericTests
 
         Assert.AreEqual(5L, wrapper.TriggerCount);
         Assert.AreEqual(2L, wrapper.HandlerCount);
-        CollectionAssert.That.AreEqual([1, 2, 3, 4, 5], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([5], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([1, 2, 3, 4, 5], wrapper.TriggerData);
+        Assert.AreSequenceEqual([5], wrapper.LastTriggerData);
     }
 
     [TestMethod]
@@ -100,8 +100,8 @@ sealed class TimingGenericTests
         // Verify
         Assert.AreEqual(2L, wrapper.HandlerCount);
         Assert.AreEqual(4L, wrapper.TriggerCount);
-        CollectionAssert.That.AreEqual([1, 2, 3, 4], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([4], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([1, 2, 3, 4], wrapper.TriggerData);
+        Assert.AreSequenceEqual([4], wrapper.LastTriggerData);
     }
 
     [TestMethod]
@@ -139,8 +139,8 @@ sealed class TimingGenericTests
         // Verify
         Assert.AreEqual(1L, wrapper.HandlerCount);
         Assert.AreEqual(2L, wrapper.TriggerCount);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([1, 2], wrapper.TriggerData);
+        Assert.AreSequenceEqual([1, 2], wrapper.LastTriggerData);
     }
 
     [TestMethod]
@@ -164,8 +164,8 @@ sealed class TimingGenericTests
 
         Assert.AreEqual(0L, wrapper.HandlerCount);
         Assert.AreEqual(0L, wrapper.TriggerCount);
-        CollectionAssert.That.AreEqual([], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([], wrapper.TriggerData);
+        Assert.AreSequenceEqual([], wrapper.LastTriggerData);
 
         debouncer.DataLimit = 1;
         await debouncer.CurrentEventHandlersTask.WaitAsync(CancellationToken.None);
@@ -173,8 +173,8 @@ sealed class TimingGenericTests
         // Verify
         Assert.AreEqual(1L, wrapper.HandlerCount);
         Assert.AreEqual(2L, wrapper.TriggerCount);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([1, 2], wrapper.TriggerData);
+        Assert.AreSequenceEqual([1, 2], wrapper.LastTriggerData);
     }
     #endregion
 }

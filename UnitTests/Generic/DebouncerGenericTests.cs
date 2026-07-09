@@ -151,8 +151,8 @@ sealed class DebouncerGenericTests
         // Verify
         Assert.AreEqual(2L, wrapper.TriggerCount);
         Assert.AreEqual(2L, wrapper.HandlerCount);
-        CollectionAssert.That.AreEqual([1, 2], wrapper.TriggerData);
-        CollectionAssert.That.AreEqual([2], wrapper.LastTriggerData);
+        Assert.AreSequenceEqual([1, 2], wrapper.TriggerData);
+        Assert.AreSequenceEqual([2], wrapper.LastTriggerData);
     }
     #endregion
 
@@ -162,7 +162,7 @@ sealed class DebouncerGenericTests
     {
         using var debouncer = new Debouncer<int>();
         Assert.AreEqual(0L, debouncer.Reset(out var data));
-        CollectionAssert.That.AreEqual([], data);
+        Assert.AreSequenceEqual([], data);
     }
 
     [TestMethod]
@@ -171,7 +171,7 @@ sealed class DebouncerGenericTests
         using var debouncer = new Debouncer<int>();
         debouncer.Dispose();
         Assert.AreEqual(0L, debouncer.Reset(out var data));
-        CollectionAssert.That.AreEqual([], data);
+        Assert.AreSequenceEqual([], data);
     }
     #endregion
 }
