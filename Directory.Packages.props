@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
     <!-- unit tests -->
     <PackageVersion Include="JunitXml.TestLogger" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.10.0" />
-    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Moq" Version="4.21.0" />
     <!-- fuzzing tests -->
     <PackageVersion Include="FsCheck" Version="3.4.0" />
     <!-- blazor -->
