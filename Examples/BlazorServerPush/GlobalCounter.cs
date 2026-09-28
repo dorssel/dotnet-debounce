@@ -17,13 +17,12 @@ sealed class GlobalCounter : NotifyPropertyChanged
         OnNotifyPropertyChanged(nameof(Count));
     }
 
-    bool _Enabled;
     public bool Enabled
     {
-        get => _Enabled;
+        get;
         set
         {
-            if (SetProperty(ref _Enabled, value))
+            if (SetProperty(ref field, value))
             {
                 var myGeneration = ++Generation;
                 if (value)
