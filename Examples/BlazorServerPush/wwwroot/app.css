@@ -26,9 +26,9 @@ body {
     align-items: stretch !important;
 }
 
-.body-content {
+nav {
     align-self: stretch;
-    height: calc(100dvh - 86px) !important;
+    height: calc(100dvh - 80px) !important;
     display: flex;
 }
 
@@ -38,26 +38,31 @@ body {
     width: 100%;
 }
 
-footer {
+.manage {
+    width: 100dvw;
+}
+
+.fluent-layout-item[area="footer"] {
     background: var(--neutral-layer-4);
     color: var(--neutral-foreground-rest);
     align-items: center;
     padding: 10px;
 }
 
-footer a {
+.fluent-layout-item[area="footer"] fluent-link {
     color: var(--neutral-foreground-rest);
     text-decoration: none;
 }
 
-footer a:focus {
+.fluent-layout-item[area="footer"] fluent-link:focus {
     outline: 1px dashed;
     outline-offset: 3px;
 }
 
-footer a:hover {
+.fluent-layout-item[area="footer"] fluent-link:hover {
     text-decoration: underline;
 }
+
 
 .alert {
     border: 1px dashed var(--accent-fill-rest);

@@ -16,17 +16,17 @@
       },
       "Microsoft.FluentUI.AspNetCore.Components": {
         "type": "Direct",
-        "requested": "[4.14.4, )",
-        "resolved": "4.14.4",
-        "contentHash": "isJiT1YGAr6xUaVsfB/sfAFs69HDj3JMTn7pwi26/PUF2iOn8J+fjwSOHOVZ2+AhmA9f/OYLdRadjQBav9nJww=="
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "CIfl4z7wZ0u3Sks9e2PJfKSei7tIbx5Y+wvYwMpA0ETxP8ibnGt2XY3YTiWaBG2jafJpY6UpYYdWrJKKPzTuZg=="
       },
       "Microsoft.FluentUI.AspNetCore.Components.Icons": {
         "type": "Direct",
-        "requested": "[4.14.4, )",
-        "resolved": "4.14.4",
-        "contentHash": "QQ6Vq8i2oItidPBiVk3uKzAouuZV6I9UWhuvxzF1XHz2nOgs7psrDryMf84vLupIWpJ/zswr3+ysxbdBLFlPGQ==",
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "Rq7cGnPqdgI70YV4jHpNW3GOp6GNfg6Y6K6jKdqltL4S5x3T3YtD3IpJNPRe28aZoDekbnl6/Fpd7ryM+BHxKg==",
         "dependencies": {
-          "Microsoft.FluentUI.AspNetCore.Components": "4.14.2"
+          "Microsoft.FluentUI.AspNetCore.Components": "4.14.4"
         }
       },
       "Dorssel.Utilities.Debounce": {
