@@ -46,7 +46,7 @@ nav {
     background: var(--neutral-layer-4);
     color: var(--neutral-foreground-rest);
     align-items: center;
-    padding: 10px 10px;
+    padding: 10px;
 }
 
 .fluent-layout-item[area="footer"] fluent-link {
@@ -76,7 +76,7 @@ nav {
     box-shadow: 0 -1px 2px rgb(0 0 0 / 20%);
     display: none;
     left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    padding: 0.6rem 1.25rem 0.7rem;
     position: fixed;
     width: 100%;
     z-index: 1000;
@@ -105,7 +105,7 @@ nav {
     display: block;
     width: 8rem;
     height: 8rem;
-    margin: 20vh auto 1rem auto;
+    margin: 20vh auto 1rem;
 }
 
 .loading-progress circle {
