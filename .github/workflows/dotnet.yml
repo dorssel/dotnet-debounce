@@ -54,6 +54,14 @@ jobs:
           dotnet restore
           dotnet restore Documentation --no-dependencies
 
+      - name: Warm up GitVersion serially
+        # Workaround for https://github.com/GitTools/GitVersion/issues/5367
+        run: |
+          dotnet msbuild Debounce/Debounce.csproj \
+            -target:GetVersion \
+            -property:TargetFramework=net8.0 \
+            -property:Configuration=Release
+
       - name: Build
         run: |
           dotnet build --configuration Release --no-restore --binaryLogger:build.binlog
