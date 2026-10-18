@@ -42,11 +42,21 @@ jobs:
         run: |
           gh release download "${RELEASE}" --dir release-artifacts
 
+      - name: Fail if provenance already exists
+        run: |
+          shopt -s nullglob
+          PROVENANCE=(release-artifacts/*.intoto.jsonl)
+          if [ ${#PROVENANCE[@]} -gt 0 ]; then
+            echo "Provenance file(s) already exist."
+            exit 1
+          fi
+
       - name: Compute Hashes
         id: compute-hashes
         shell: bash
         run: |
           cd release-artifacts
+          shopt -s dotglob
           ASSETS=(*)
           echo "hashes=$(sha256sum -- "${ASSETS[@]}" | base64 -w0)" >> "$GITHUB_OUTPUT"
 
