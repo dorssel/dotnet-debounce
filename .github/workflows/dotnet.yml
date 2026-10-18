@@ -51,8 +51,8 @@ jobs:
       - name: Restore dependencies
         run: |
           dotnet tool restore
-          dotnet restore
-          dotnet restore Documentation --no-dependencies
+          dotnet restore --binaryLogger:binlogs/restore.binlog
+          dotnet restore Documentation --no-dependencies --binaryLogger:binlogs/restore-documentation.binlog
 
       - name: Warm up GitVersion serially
         # Workaround for https://github.com/GitTools/GitVersion/issues/5367
@@ -64,7 +64,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build --configuration Release --no-restore --binaryLogger:build.binlog
+          dotnet build --configuration Release --no-restore --binaryLogger:binlogs/build.binlog
 
       - name: Test
         run: |
@@ -107,7 +107,7 @@ jobs:
 
       - name: Build Documentation
         run: |
-          dotnet build --configuration Release --no-restore Documentation --binaryLogger:documentation.binlog
+          dotnet build --configuration Release --no-restore Documentation --binaryLogger:binlogs/build-documentation.binlog
 
       - name: Upload GitHub Pages as artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
@@ -132,11 +132,14 @@ jobs:
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Remove .slnx file to avoid benign wwarnings in dependency detection (next step)
+        run: |
+          rm *.slnx
+
       - name: Submit Dependencies to GitHub
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: advanced-security/component-detection-dependency-submission-action@a02aeda7a175ad4dd38a13c4d3ff2df9da8f2cf0 # v0.2.0
         with:
-          detectorArgs: MSBuildBinaryLog=Enable
           detectorsFilter: MSBuildBinaryLog
 
       - name: Dependency Review

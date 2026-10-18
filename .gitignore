@@ -6,6 +6,7 @@
 .vs/
 .vscode/
 bin/
+binlogs/
 obj/
 TestResults/
 
