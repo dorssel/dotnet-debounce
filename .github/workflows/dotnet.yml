@@ -76,21 +76,34 @@ jobs:
         run: dotnet pack --configuration Release --no-build Debounce
 
       - name: Upload Package Artifact
-        id: upload
+        id: upload-nupkg
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: artifacts
-          path: |
-            **/*.nupkg
-            **/*.snupkg
-            retention-days: 14
+          archive: false
+          path: Debounce/bin/Release/Dorssel.Utilities.Debounce.${{ env.GitVersion_MajorMinorPatch }}.nupkg
+          retention-days: 14
 
-      - name: Build Attestation
+      - name: Upload Symbol Package Artifact
+        id: upload-snupkg
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: false
+          path: Debounce/bin/Release/Dorssel.Utilities.Debounce.${{ env.GitVersion_MajorMinorPatch }}.snupkg
+          retention-days: 14
+
+      - name: Build Package Attestation
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
-          subject-name: artifacts.zip
-          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
+          subject-name: Dorssel.Utilities.Debounce.${{ env.GitVersion_MajorMinorPatch }}.nupkg
+          subject-digest: sha256:${{ steps.upload-nupkg.outputs.artifact-digest }}
+
+      - name: Build Symbol Package Attestation
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: Dorssel.Utilities.Debounce.${{ env.GitVersion_MajorMinorPatch }}.snupkg
+          subject-digest: sha256:${{ steps.upload-snupkg.outputs.artifact-digest }}
 
       - name: Build Documentation
         run: |
