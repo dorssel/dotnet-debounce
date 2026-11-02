@@ -11,12 +11,6 @@
           "FSharp.Core": "5.0.2"
         }
       },
-      "GitVersion.MsBuild": {
-        "type": "Direct",
-        "requested": "[6.8.2, )",
-        "resolved": "6.8.2",
-        "contentHash": "eTd8jUiogUXpVssFyDWWdMrPr5Cdc57tWaQ3Cv/eMIhnumOHZhDkc/wcy8hYU8aH7NS4VT2w/pHjVITDSTXMGw=="
-      },
       "JunitXml.TestLogger": {
         "type": "Direct",
         "requested": "[8.1.0, )",
@@ -72,6 +66,12 @@
         "dependencies": {
           "MSTest.Analyzers": "4.5.2"
         }
+      },
+      "Nerdbank.GitVersioning": {
+        "type": "Direct",
+        "requested": "[3.10.94, )",
+        "resolved": "3.10.94",
+        "contentHash": "sn6gFIx6bwFj3Me0XGmek3gLZi/MZC8C4tRLwslXGeBcXcVxvFpZyDrQA93G8TiYgxTS7J7triKB7hj5wXzSxA=="
       },
       "FSharp.Core": {
         "type": "Transitive",
