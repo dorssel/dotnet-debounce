@@ -54,10 +54,16 @@ jobs:
           dotnet restore
           dotnet restore Documentation --no-dependencies
 
+      - name: GitVersioning
+        run: |
+          dotnet build --configuration Release --no-restore \
+            --property:TargetFramework=net8.0 \
+            --property:NBGV_SetCloudBuildVersionVars=true \
+            --target:Debounce:GetBuildVersion,Debounce:SetCloudBuildVersionVars
+
       - name: Build
         run: |
-          dotnet build --configuration Release --no-restore --binaryLogger:build.binlog \
-            --property:NBGV_SetCloudBuildVersionVars=true
+          dotnet build --configuration Release --no-restore --binaryLogger:build.binlog
 
       - name: Test
         run: |
