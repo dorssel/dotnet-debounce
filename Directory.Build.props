@@ -78,6 +78,12 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PrereleaseIdentifier Condition="!$(ContinuousIntegrationBuild)" Include="private" />
+    <PrereleaseIdentifier Condition="'$(GITHUB_REF_NAME)' != 'master'" Include="dev" />
+    <PrereleaseIdentifier Condition="'$(Configuration)' != 'Release'" Include="debug" />
+  </ItemGroup>
+
   <Target Name="VersioningFixups" AfterTargets="GetBuildVersion">
     <PropertyGroup>
       <!-- For deterministic builds, use the commit year as the copyright year. -->
