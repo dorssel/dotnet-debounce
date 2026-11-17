@@ -10,15 +10,15 @@
       },
       "Microsoft.FluentUI.AspNetCore.Components": {
         "type": "Direct",
-        "requested": "[5.0.1, )",
-        "resolved": "5.0.1",
-        "contentHash": "0s8w3xy2fQMbOFJjlmtTatBYldo1ipJGexyhSM19fakd+FEeABrcF2dLwnXvLcIaTUR4yPBjuuzKxnNc4r28aA=="
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "9d68Jk4PI4hf9+uhF/3IdeKNkLm9fJ+n4BsG4IuZ1p6cC5ZrSV69e19GbXtpBAOfxT36DV8/U/HWxDUj7rgcaQ=="
       },
       "Microsoft.FluentUI.AspNetCore.Components.Icons": {
         "type": "Direct",
-        "requested": "[5.0.1, )",
-        "resolved": "5.0.1",
-        "contentHash": "uWXVs4NAYeRBNz/MY9BUkS69wOBzU51j16M9O+3vHDFC8TTEwJ7HpLLpDAbwrNG5Wqwd/08pGaNSyHAb6zxX6Q==",
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "qisq1Qj9oiuG2ubj/f4aBtLd+XuCHGYunhLnwLIRRXDf0NRjAiQsq7EL1UrvYSkdgWVfR3jBhbR9NvK/u9QgvQ==",
         "dependencies": {
           "Microsoft.FluentUI.AspNetCore.Components": "4.14.5"
         }
